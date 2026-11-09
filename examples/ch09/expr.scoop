@@ -1,0 +1,21 @@
+enum Expr {
+    Num(Int),
+    Add(Node, Node),
+    Mul(Node, Node)
+}
+
+// class 实例在堆上，Node 字段只保存一个引用
+class Node(val expr: Expr)
+
+fun eval(e: Expr): Int =
+    when (e) {
+        case Expr.Num(val n) -> n
+        case Expr.Add(val a, val b) -> eval(a.expr) + eval(b.expr)
+        case Expr.Mul(val a, val b) -> eval(a.expr) * eval(b.expr)
+    }
+
+fun main() {
+    // 2 + 3 * 4
+    val e = Expr.Add(Node(Expr.Num(2)), Node(Expr.Mul(Node(Expr.Num(3)), Node(Expr.Num(4)))))
+    println(eval(e))
+}

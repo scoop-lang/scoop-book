@@ -1,0 +1,36 @@
+import scoop.*
+
+struct User(val name: String, val email: String?)
+
+fun findUser(id: Int): User? =
+    when (id) {
+        1 -> Some(User("Ada", Some("ada@example.com")))
+        2 -> Some(User("Bob", None))
+        else -> None
+    }
+
+fun main() {
+    // map：有值时变换，结果仍是 Option
+    val length: Long? = findUser(1).map { u -> u.name.charLength }
+    println(length ?: 0L)
+
+    // flatMap：变换函数本身返回 Option 时使用，结果只有一层
+    val email: String? = findUser(2).flatMap { u -> u.email }
+    println(email ?: "no email")
+
+    // filter：不满足条件时变成 None
+    val ada: User? = findUser(1).filter { u -> u.name == "Ada" }
+    println(ada?.name ?: "not Ada")
+
+    // getOrElse：缺失时调用函数计算默认值
+    val user: User = findUser(9).getOrElse { User("guest", None) }
+    println(user.name)
+
+    // orElse：缺失时换成另一个 Option
+    val fallback: User? = findUser(9).orElse { findUser(2) }
+    println(fallback?.name ?: "nobody")
+
+    // fold：两种情况各给一个函数，得到普通值
+    val label: String = findUser(9).fold({ u -> u.name }, { "missing" })
+    println(label)
+}

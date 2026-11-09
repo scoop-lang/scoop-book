@@ -1,0 +1,21 @@
+package book.tally
+
+// 与 native/tally.h 一一对应的底层声明，只在本 Cone 内部使用
+
+@CLayout
+internal struct TallySummary(val count: Long, val min: Double, val max: Double, val sum: Double)
+
+@Extern(name = "tally_new")
+internal fun tallyNew(): Ptr<Unit>?
+
+@Extern(name = "tally_add")
+internal fun tallyAdd(tally: Ptr<Unit>, value: Double)
+
+@Extern(name = "tally_summary")
+internal fun tallySummary(tally: Ptr<Unit>): TallySummary
+
+@Extern(name = "tally_stddev")
+internal fun tallyStddev(tally: Ptr<Unit>, out: Ptr<Double>): Int
+
+@Extern(name = "tally_free")
+internal fun tallyFree(tally: Ptr<Unit>)

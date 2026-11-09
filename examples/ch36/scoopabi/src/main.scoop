@@ -1,0 +1,15 @@
+package book.scoopabi
+
+// Scoop ABI：String 直接以 Scoop 引用（ScoopString *）传给 C
+// 与 C ABI 不同，调用处不需要 @Unsafe：安全性由 C 实现者负责
+@Extern(name = "text_count_upper", abi = "scoop")
+internal fun countUpper(text: String): Long
+
+@Extern(name = "text_total_length", abi = "scoop")
+internal fun totalLength(a: String, b: String): Long
+
+fun main() {
+    println(countUpper("Hello, Scoop ABI"))
+    val word = "def"
+    println(totalLength(f"abc${word}", "!"))
+}

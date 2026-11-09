@@ -1,0 +1,4 @@
+@Global
+var lastName: String = ""
+
+fun main() {}

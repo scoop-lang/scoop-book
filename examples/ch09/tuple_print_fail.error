@@ -1,0 +1,1 @@
+f-string expression of type `(Int, Int)` does not implement core `ToString`

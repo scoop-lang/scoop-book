@@ -1,0 +1,24 @@
+struct Point(val x: Int, val y: Int)
+
+fun describe(point: Point): String =
+    when (val(x, y) = point) {
+        Point(0, 0) -> "origin"
+        case _ if x == y -> f"diagonal ${x}"
+        else -> f"(${x}, ${y})"
+    }
+
+fun guess(target: Int, n: Int): String =
+    when (n) {
+        target -> "correct"
+        else if n > target -> "too big"
+        else -> "too small"
+    }
+
+fun main() {
+    println(describe(Point(0, 0)))
+    println(describe(Point(2, 2)))
+    println(describe(Point(1, 2)))
+    println(guess(7, 7))
+    println(guess(7, 9))
+    println(guess(7, 1))
+}

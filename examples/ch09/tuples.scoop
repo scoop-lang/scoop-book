@@ -1,0 +1,32 @@
+fun minMax(values: Array<Int>): (Int, Int) {
+    var lo = values[0L]
+    var hi = values[0L]
+    for (v in values) {
+        if (v < lo)
+            lo = v
+        if (v > hi)
+            hi = v
+    }
+    return (lo, hi)
+}
+
+fun main() {
+    val pair = (1, "one")
+    val triple: (Int, Double, String) = (2, 2.5, "two")
+    println(pair._2)
+    println(triple._1 + 1)
+
+    val range = minMax([3, 9, 1, 7])
+    println(f"min=${range._1}, max=${range._2}")
+
+    // 解构：第 10 章详细介绍
+    val(lo, hi) = minMax([5, 2, 8])
+    println(f"min=${lo}, max=${hi}")
+
+    val single = (42,)
+    val notATuple = (42)
+    println(single._1 == notATuple)
+
+    println((1, "a") == (1, "a"))
+    println(() == Unit)
+}

@@ -1,0 +1,6 @@
+class Connection(val id: Int)
+
+fun main() {
+    val conn: Connection? = Some(Connection(1))
+    println(conn == None)
+}

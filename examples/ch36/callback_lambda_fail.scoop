@@ -1,0 +1,14 @@
+@Extern(name = "qsort")
+fun cQsort(
+    base: Ptr<Unit>,
+    count: ULong,
+    size: ULong,
+    compare: FunPtr<(Ptr<Unit>, Ptr<Unit>) -> Int>
+)
+
+@Unsafe
+fun sortInts(base: Ptr<Unit>, count: ULong) {
+    cQsort(base, count, sizeOf<Int>(), { a: Ptr<Unit>, b: Ptr<Unit> -> 0 })
+}
+
+fun main() {}

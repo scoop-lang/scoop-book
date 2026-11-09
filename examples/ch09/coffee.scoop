@@ -1,0 +1,43 @@
+interface Priced {
+    fun price(): Int
+}
+
+enum Coffee: Priced, ToString {
+    Espresso,
+    Latte(val shots: Int = 1),
+    Custom {name: String, cost: Int}
+
+    val hasMilk: Boolean get() =
+        when (this) {
+            case Latte(_) -> true
+            else -> false
+        }
+
+    override fun price(): Int =
+        when (this) {
+            case Espresso -> 3
+            case Latte(val shots) -> 4 + shots
+            case Custom {val cost, ..} -> cost
+        }
+
+    public override fun toString(): String =
+        when (this) {
+            case Espresso -> "espresso"
+            case Latte(val shots) -> f"latte with ${shots} shot(s)"
+            case Custom {val name, ..} -> name
+        }
+
+    companion object {
+        val houseSpecial: Coffee = Coffee.Custom(name = "maple mocha", cost = 7)
+    }
+}
+
+fun main() {
+    val order: Array<Coffee> = [Coffee.Espresso, Coffee.Latte(2), Coffee.houseSpecial]
+    var total = 0
+    for (coffee in order) {
+        println(f"${coffee}: ${coffee.price()}, milk: ${coffee.hasMilk}")
+        total = total + coffee.price()
+    }
+    println(f"total: ${total}")
+}

@@ -1,0 +1,28 @@
+// 普通顶层变量：可以存放任何类型，大多数时候用它就够了
+var greeting: String = "hello"
+
+// raw 全局存储：有固定地址，可以取址交给 C；类型必须不含引用
+@Global
+var totalCalls: Long = 0L
+
+// 每个线程各有一份
+@ThreadLocal
+var callsOnThisThread: Long = 0L
+
+fun work() {
+    totalCalls = totalCalls + 1L
+    callsOnThisThread = callsOnThisThread + 1L
+}
+
+fun main() {
+    work()
+    work()
+    println(f"${greeting}: ${totalCalls} / ${callsOnThisThread}")
+
+    @Unsafe
+    {
+        val p = addressOf(totalCalls)
+        p.store(100L)
+    }
+    println(totalCalls)
+}

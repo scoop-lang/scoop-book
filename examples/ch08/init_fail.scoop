@@ -1,0 +1,7 @@
+struct Percent(val value: Int) {
+    init {
+        require(value in 0..100)
+    }
+}
+
+fun main() {}

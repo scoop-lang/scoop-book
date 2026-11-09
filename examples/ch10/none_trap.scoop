@@ -1,0 +1,9 @@
+fun main() {
+    val result: Int? = Some(5)
+
+    // 这不是"匹配 None"，而是声明了一个名叫 None 的新变量
+    val None = result
+
+    // 这里的 None 是上面的变量，值是 Some(5)
+    println(None ?: 0)
+}

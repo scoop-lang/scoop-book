@@ -1,0 +1,11 @@
+// int close(int fd)：失败时返回 -1，并把错误码写进 errno
+@Extern(name = "close", captureErrno = true)
+fun cClose(fd: Int): (Int, Int)
+
+fun main() {
+    @Unsafe
+    {
+        val(result, errno) = cClose(-1)
+        println(f"result = ${result}, errno = ${errno}")
+    }
+}

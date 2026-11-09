@@ -1,0 +1,23 @@
+struct Rgba(val red: Int, val green: Int, val blue: Int, val alpha: Int)
+
+fun main() {
+    val color = Rgba(255, 128, 0, 200)
+
+    // 位置模式中，.. 可以出现在开头、中间或结尾
+    val(red, ..) = color
+    val(.., alpha) = color
+    val(r, .., a) = color
+    println(f"${red} ${alpha} ${r} ${a}")
+
+    // 字段模式中，.. 只能放在最后，表示忽略没有列出的字段
+    val {green, blue, ..} = color
+    println(f"green = ${green}, blue = ${blue}")
+
+    // 带类型名的字段模式
+    val Rgba {alpha: opacity, ..} = color
+    println(f"opacity = ${opacity}")
+
+    // tuple 同样可以用 ..
+    val(first, .., last) = (1, 2, 3, 4, 5)
+    println(f"${first}..${last}")
+}

@@ -1,0 +1,23 @@
+struct Vec2(val x: Double, val y: Double)
+
+// 只做数值运算，不碰任何引用类型：可以标 @NoGC
+@NoGC
+fun dot(a: Vec2, b: Vec2): Double = a.x * b.x + a.y * b.y
+
+@NoGC
+fun clamp(value: Int, low: Int, high: Int): Int =
+    when {
+        value < low -> low
+        value > high -> high
+        else -> value
+    }
+
+// 用在类型上：保证这个 struct 永远不含引用，否则编译报错
+@NoGC
+struct Rgb(val r: UByte, val g: UByte, val b: UByte)
+
+fun main() {
+    println(dot(Vec2(1.0, 2.0), Vec2(3.0, 4.0)))
+    println(clamp(300, 0, 255))
+    println(Rgb(255u, 128u, 0u).g)
+}

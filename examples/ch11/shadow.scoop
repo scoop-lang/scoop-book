@@ -1,0 +1,16 @@
+enum Light {
+    Red,
+    Yellow,
+    Green
+}
+
+fun action(light: Light): String =
+    when (light) {
+        case Red -> "stop"
+        // 本意是匹配 Green，却多写了 val
+        case val Green -> "go"
+    }
+
+fun main() {
+    println(action(Light.Yellow))
+}

@@ -1,0 +1,21 @@
+struct Reading(val sensor: Int, val value: Double)
+
+fun main() {
+    // 先分配 4 个“尚未初始化”的槽位，不需要为 Reading 编一个假的默认值
+    val slots = MutableArray<MaybeUninit<Reading>>(4L) { MaybeUninit<Reading>.uninit() }
+    val filled = MutableArray<Boolean>(4L) { false }
+
+    slots[2] = MaybeUninit<Reading>.initialized(Reading(3, 19.0))
+    filled[2] = true
+
+    for (i in 0L until 4L) {
+        if (!filled[i])
+            continue
+        @Unsafe
+        {
+            // 由程序自己保证这个槽位已经初始化
+            val r = slots[i].assumeInit()
+            println(f"slot ${i}: sensor ${r.sensor} = ${r.value}")
+        }
+    }
+}

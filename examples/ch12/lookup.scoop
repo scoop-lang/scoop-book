@@ -1,0 +1,22 @@
+struct User(val id: Int, val name: String)
+
+fun findUser(id: Int): User? =
+    if (id == 1)
+        Some(User(1, "Ada"))
+    else
+        None
+
+fun greeting(id: Int): String =
+    when (findUser(id)) {
+        case Some(val user) -> f"Hello, ${user.name}!"
+        case None -> "Hello, guest!"
+    }
+
+fun main() {
+    println(greeting(1))
+    println(greeting(2))
+
+    val explicit: Option<User> = findUser(1)
+    val sugar: User? = explicit
+    println(sugar == Some(User(1, "Ada")))
+}

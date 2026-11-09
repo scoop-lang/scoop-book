@@ -1,0 +1,42 @@
+struct Point(val x: Int, val y: Int)
+
+enum Event {
+    Click(Point),
+    Key(Char, Boolean),
+    Scroll(Int),
+    Resize {width: Int, height: Int}
+}
+
+fun handle(e: Event): String =
+    when (e) {
+        case Click(Point(0, 0)) -> "click at corner"
+        case Click(Point {val x, ..}) if x < 0 -> "click outside"
+        case Click(val p) -> f"click at ${p.x},${p.y}"
+        case Key('q', true) -> "quit"
+        case Key(val c, true) -> f"ctrl+${c}"
+        case Key(val c, false) -> f"key ${c}"
+        case Scroll(0) -> "no scroll"
+        case Scroll(- 1) -> "scroll up one"
+        case Scroll(val n) -> f"scroll ${n}"
+        case Resize {width: 0, ..} -> "minimized"
+        case Resize {val width, val height} -> f"resize ${width}x${height}"
+    }
+
+fun main() {
+    val events =
+        [
+            Event.Click(Point(0, 0)),
+            Event.Click(Point(-5, 3)),
+            Event.Click(Point(10, 20)),
+            Event.Key('q', true),
+            Event.Key('s', true),
+            Event.Key('a', false),
+            Event.Scroll(0),
+            Event.Scroll(-1),
+            Event.Scroll(3),
+            Event.Resize(width = 0, height = 0),
+            Event.Resize(width = 800, height = 600)
+        ]
+    for (e in events)
+        println(handle(e))
+}

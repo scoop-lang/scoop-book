@@ -1,0 +1,4 @@
+@Extern(name = "puts")
+fun cPuts(s: String): Int
+
+fun main() {}

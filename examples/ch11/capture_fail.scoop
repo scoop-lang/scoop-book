@@ -1,0 +1,11 @@
+fun check(n: Int): String {
+    val target = 3
+    return when (n) {
+        case target -> "matched"
+        else -> "no match"
+    }
+}
+
+fun main() {
+    println(check(5))
+}

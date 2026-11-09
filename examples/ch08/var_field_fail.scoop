@@ -1,0 +1,3 @@
+struct Counter(var count: Int)
+
+fun main() {}

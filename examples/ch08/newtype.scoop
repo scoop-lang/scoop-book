@@ -1,0 +1,11 @@
+struct Meters(val value: Double)
+
+struct Seconds(val value: Double)
+
+fun speed(distance: Meters, time: Seconds): Double = distance.value / time.value
+
+fun main() {
+    val d = Meters(100.0)
+    val t = Seconds(9.58)
+    println(speed(d, t))
+}

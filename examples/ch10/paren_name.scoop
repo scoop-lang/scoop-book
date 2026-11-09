@@ -1,0 +1,13 @@
+struct Square(val side: Int)
+
+fun main() {
+    val square = Square(3)
+
+    // 不是解构：side 是整个 Square
+    val(side) = square
+    println(side.side)
+
+    // 字段模式才会取出字段
+    val {side: length} = square
+    println(length)
+}

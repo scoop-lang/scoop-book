@@ -1,0 +1,9 @@
+struct Point(val x: Int, val y: Int)
+
+fun firstCoordinate(value: Any): Int =
+    when (value) {
+        case Point(x, _) -> x
+        else -> 0
+    }
+
+fun main() {}

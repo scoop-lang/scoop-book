@@ -1,0 +1,10 @@
+schema = 1
+
+[cone]
+group = "book.scoopabi"
+name = "scoopabi"
+version = "0.1.0"
+kind = "executable"
+
+[[native.sources]]
+path = "native/text.c"

@@ -1,0 +1,24 @@
+struct Point(val x: Int, val y: Int)
+
+class Cursor(var x: Int, var y: Int)
+
+fun moveRight(p: Point): Point = p.{x: p.x + 1}
+
+fun moveRight(c: Cursor) {
+    c.x = c.x + 1
+}
+
+fun main() {
+    // struct：赋值和传参都复制整个值
+    var a = Point(0, 0)
+    val saved = a
+    a = moveRight(a)
+    println(f"a = (${a.x}, ${a.y}), saved = (${saved.x}, ${saved.y})")
+
+    // class：赋值和传参复制的是引用，两边看到同一个对象
+    val c = Cursor(0, 0)
+    val alias = c
+    moveRight(c)
+    println(f"c.x = ${c.x}, alias.x = ${alias.x}")
+    println(c === alias)
+}

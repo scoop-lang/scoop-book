@@ -1,0 +1,32 @@
+enum Shape {
+    // 单元 variant：不带数据
+    Dot,
+    // 位置 payload：按位置携带数据
+    Circle(Double),
+    Rect(Double, Double),
+    // 命名字段（block 式）
+    Text {content: String, size: Int},
+    // 命名字段（构造器式），可以有默认值
+    Line(val length: Double, val width: Int = 1)
+}
+
+fun describe(shape: Shape): String =
+    when (shape) {
+        case Shape.Dot -> "a dot"
+        case Shape.Circle(val radius) -> f"a circle, radius ${radius}"
+        case Shape.Rect(val w, val h) -> f"a ${w} x ${h} rectangle"
+        case Shape.Text {val content, val size} -> f"text \"${content}\" at size ${size}"
+        case Shape.Line(val length, val width) -> f"a line, length ${length}, width ${width}"
+    }
+
+fun main() {
+    println(describe(Shape.Dot))
+    println(describe(Shape.Circle(1.5)))
+    println(describe(Shape.Rect(2.0, 3.0)))
+    println(describe(Shape.Text(content = "hi", size = 12)))
+    println(describe(Shape.Line(4.0)))
+    println(describe(Shape.Line(length = 4.0, width = 3)))
+
+    println(Shape.Circle(1.0) == Shape.Circle(1.0))
+    println(Shape.Circle(1.0) == Shape.Rect(1.0, 1.0))
+}

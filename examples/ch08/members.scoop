@@ -1,0 +1,35 @@
+private fun toCelsius(degrees: Double, unit: String): Double =
+    when (unit) {
+        "C" -> degrees
+        "F" -> (degrees - 32.0) / 1.8
+        else -> throw IllegalArgumentException(Some(f"unknown unit: ${unit}"))
+    }
+
+struct Temperature(val celsius: Double) {
+    // 次构造器：必须委托给主构造器
+    constructor(degrees: Double, unit: String): this(toCelsius(degrees, unit)) {}
+
+    // 计算属性：每次读取时计算，不占存储
+    val fahrenheit: Double get() = celsius * 1.8 + 32.0
+
+    // 方法返回新值，而不是修改自己
+    fun warmer(delta: Double): Temperature = this.{celsius: celsius + delta}
+
+    companion object {
+        val freezing: Temperature = Temperature(0.0)
+    }
+}
+
+fun main() {
+    val boiling = Temperature(212.0, "F")
+    println(boiling.celsius)
+    println(boiling.warmer(-50.0).fahrenheit)
+    println(Temperature.freezing.fahrenheit)
+
+    try {
+        val strange = Temperature(1.0, "K")
+        println(strange.celsius)
+    } catch (e: IllegalArgumentException) {
+        println(e.message ?: "invalid temperature")
+    }
+}

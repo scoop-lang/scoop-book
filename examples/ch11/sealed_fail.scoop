@@ -1,0 +1,12 @@
+sealed interface Shape {}
+
+struct Circle(val radius: Double): Shape
+
+struct Square(val side: Double): Shape
+
+fun area(s: Shape): Double =
+    when (s) {
+        is Circle -> 3.0 * s.radius * s.radius
+    }
+
+fun main() {}

@@ -1,0 +1,1 @@
+argument for `compare` has type (Ptr<Unit>, Ptr<Unit>) -> Int, which is not a subtype of FunPtr<(Ptr<Unit>, Ptr<Unit>) -> Int>

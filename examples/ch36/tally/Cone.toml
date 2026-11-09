@@ -1,0 +1,13 @@
+schema = 1
+
+[cone]
+group = "book.tally"
+name = "tally"
+version = "0.1.0"
+kind = "executable"
+
+[[native.sources]]
+path = "native/tally.c"
+
+[[native.libraries]]
+name = "m"

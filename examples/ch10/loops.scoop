@@ -1,0 +1,27 @@
+import scoop.collections.*
+
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    val points = [Point(1, 2), Point(3, 4), Point(5, 6)]
+
+    // for 循环变量可以直接解构
+    for ((x, y) in points)
+        println(f"${x} + ${y} = ${x + y}")
+
+    // 遍历 Map 时，每个条目是一个 (key, value) tuple
+    val stock = LinkedHashMap<String, Int>()
+    stock["apple"] = 3
+    stock["pear"] = 0
+    for ((fruit, count) in stock)
+        println(f"${fruit}: ${count}")
+
+    // lambda 参数也可以解构
+    val list = listOf<Point>(Point(1, 1), Point(2, 3))
+    val areas = list.map { (w, h) -> w * h }
+    for (area in areas)
+        println(area)
+
+    val scores = listOf<(String, Int)>(("Ada", 90), ("Alan", 85))
+    scores.forEach { (name, score) -> println(f"${name} scored ${score}") }
+}

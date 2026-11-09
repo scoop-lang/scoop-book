@@ -1,0 +1,10 @@
+@Extern(name = "strlen")
+fun cStrlen(s: Ptr<Int8>): ULong
+
+fun main() {
+    @Unsafe
+    {
+        val length = "hello".withCString { p -> cStrlen(p) }
+        println(length)
+    }
+}

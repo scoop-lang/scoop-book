@@ -1,0 +1,8 @@
+struct Point(val x: Int, val y: Int)
+
+fun <T: Equals<T>> same(a: T, b: T): Boolean = a == b
+
+fun main() {
+    println(Point(1, 2) == Point(1, 2))
+    println(same(Point(1, 2), Point(1, 2)))
+}

@@ -1,0 +1,1 @@
+pattern does not list all fields of struct `Point`; add `..` to ignore the rest

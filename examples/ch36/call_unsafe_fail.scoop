@@ -1,0 +1,6 @@
+@Extern(name = "abs")
+fun cAbs(n: Int): Int
+
+fun main() {
+    println(cAbs(-42))
+}

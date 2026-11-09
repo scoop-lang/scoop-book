@@ -1,0 +1,14 @@
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    val start = Point(1, 2)
+
+    // var 解构得到的每个变量都可以重新赋值
+    var(x, y) = start
+    x = x + 10
+    y = y * 3
+    println(f"x = ${x}, y = ${y}")
+
+    // 解构得到的是副本，原来的值不受影响
+    println(f"start = (${start.x}, ${start.y})")
+}

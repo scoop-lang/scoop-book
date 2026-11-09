@@ -1,0 +1,7 @@
+fun main() {
+    val n = 1
+    when {
+        case 1 -> println("one")
+        else -> println("other")
+    }
+}

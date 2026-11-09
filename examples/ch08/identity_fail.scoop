@@ -1,0 +1,7 @@
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    val a = Point(1, 2)
+    val b = a
+    println(a === b)
+}

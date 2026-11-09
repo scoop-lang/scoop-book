@@ -1,0 +1,20 @@
+struct Point(val x: Int, val y: Int)
+
+struct Line(val start: Point, val end: Point)
+
+fun main() {
+    val line = Line(Point(0, 0), Point(3, 4))
+
+    // 位置模式和字段模式可以任意嵌套
+    val((x0, y0), {x: x1, y: y1}) = line
+    println(f"(${x0}, ${y0}) -> (${x1}, ${y1})")
+
+    // 只取需要的部分
+    val {end: {y: height, ..}, ..} = line
+    println(f"height = ${height}")
+
+    // tuple 里装 struct 也一样
+    val labeled = ("corner", Point(5, 6))
+    val(label, (cx, cy)) = labeled
+    println(f"${label}: ${cx}, ${cy}")
+}

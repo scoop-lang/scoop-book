@@ -1,0 +1,15 @@
+enum Direction {
+    North,
+    South
+}
+
+fun opposite(d: Direction): Direction =
+    when (d) {
+        case Direction.North -> South
+        case Direction.South -> North
+    }
+
+fun main() {
+    val d: Direction = North
+    println(opposite(d) == Direction.South)
+}

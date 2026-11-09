@@ -1,0 +1,26 @@
+package book.events
+
+// 与 native/events.h 对应。回调的 C 签名是 void (*)(void *context, int32_t value)
+internal typealias ValueCallback = ForeignCallback<(Ptr<Unit>, Int) -> Unit>
+
+@Extern(name = "events_each_prime")
+internal fun eventsEachPrime(limit: Int, fn: FunPtr<(Ptr<Unit>, Int) -> Unit>, context: Ptr<Unit>)
+
+@Extern(name = "events_ticker_start")
+internal fun eventsTickerStart(
+    count: Int,
+    fn: FunPtr<(Ptr<Unit>, Int) -> Unit>,
+    context: Ptr<Unit>
+): Ptr<Unit>?
+
+@Extern(name = "events_ticker_join")
+internal fun eventsTickerJoin(ticker: Ptr<Unit>)
+
+// C 返回之后，把回调中抛出的第一个异常重新抛出
+@Unsafe
+internal fun rethrowFailure(callback: ValueCallback) {
+    when (foreignCallbackFailure(callback)) {
+        case Some(val e) -> throw e
+        case None -> {}
+    }
+}

@@ -1,0 +1,23 @@
+class Connection(val id: Int)
+
+class Client {
+    // Option 类型的 var 属性可以省略初值，默认为 None
+    var connection: Connection?
+
+    fun connect() {
+        connection = Some(Connection(7))
+    }
+
+    fun status(): String =
+        when (connection) {
+            case Some(val c) -> f"connected (#${c.id})"
+            case None -> "not connected"
+        }
+}
+
+fun main() {
+    val client = Client()
+    println(client.status())
+    client.connect()
+    println(client.status())
+}

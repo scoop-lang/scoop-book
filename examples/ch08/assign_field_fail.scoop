@@ -1,0 +1,6 @@
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    var p = Point(1, 2)
+    p.x = 10
+}

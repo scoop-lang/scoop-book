@@ -1,0 +1,6 @@
+class Account(val owner: String, val balance: Long)
+
+fun main() {
+    val (owner, balance) = Account("Ada", 100L)
+    println(owner)
+}

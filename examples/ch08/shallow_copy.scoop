@@ -1,0 +1,14 @@
+import scoop.collections.*
+
+struct Playlist(val name: String, val songs: ArrayList<String>)
+
+fun main() {
+    val mine = Playlist("road trip", ArrayList<String>())
+    val yours = mine.{name: "copy of road trip"}
+
+    yours.songs.add("Blue Sky")
+
+    println(mine.name)
+    println(yours.name)
+    println(f"mine has ${mine.songs.size} song(s)")
+}

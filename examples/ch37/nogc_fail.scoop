@@ -1,0 +1,4 @@
+@NoGC
+fun label(n: Int): String = f"#${n}"
+
+fun main() {}

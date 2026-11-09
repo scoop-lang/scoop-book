@@ -1,0 +1,78 @@
+package book.tally
+
+// 面向使用者的安全封装：调用方看不到指针，也不需要写 @Unsafe
+public class Tally: Closeable {
+    // C 对象的句柄；close 之后变为 None
+    private var handle: Ptr<Unit>?
+
+    public constructor() {
+        @Unsafe
+        {
+            handle = Some(tallyNew() ?: throw IllegalStateException(Some("out of memory")))
+        }
+    }
+
+    private fun live(): Ptr<Unit> = handle ?: throw IllegalStateException(Some("tally is closed"))
+
+    private fun summary(): TallySummary {
+        val h = live()
+        @Unsafe
+        {
+            return tallySummary(h)
+        }
+    }
+
+    public fun add(value: Double) {
+        val h = live()
+        @Unsafe
+        {
+            tallyAdd(h, value)
+        }
+    }
+
+    public val count: Long get() = summary().count
+
+    public val mean: Double? get() {
+        val s = summary()
+        return if (s.count == 0L)
+            None
+        else
+            Some(s.sum / s.count.toDouble())
+    }
+
+    public val stddev: Double? get() {
+        val h = live()
+        var result = 0.0
+        var ok = 0
+        @Unsafe
+        {
+            // C 函数通过指针把结果写进 result
+            ok = tallyStddev(h, addressOf(result))
+        }
+        return if (ok == 1)
+            Some(result)
+        else
+            None
+    }
+
+    public override fun close() {
+        // 先把字段置为 None，再释放，避免重复释放
+        val h = handle ?: return
+        handle = None
+        @Unsafe
+        {
+            tallyFree(h)
+        }
+    }
+
+    // 兜底：使用者忘了 close 时，GC 回收这个对象之前会尽力执行一次
+    release {
+        @Unsafe
+        {
+            when (handle) {
+                case Some(val h) -> tallyFree(h)
+                case None -> {}
+            }
+        }
+    }
+}

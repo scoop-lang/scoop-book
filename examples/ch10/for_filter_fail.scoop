@@ -1,0 +1,5 @@
+fun main() {
+    val values: Array<Int?> = [Some(1), None, Some(3)]
+    for (Some(v) in values)
+        println(v)
+}

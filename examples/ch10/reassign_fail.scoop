@@ -1,0 +1,8 @@
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    for ((x, y) in [Point(1, 2), Point(3, 4)]) {
+        x = x + 1
+        println(y)
+    }
+}

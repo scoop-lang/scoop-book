@@ -1,0 +1,13 @@
+schema = 1
+
+[cone]
+group = "book.events"
+name = "events"
+version = "0.1.0"
+kind = "executable"
+
+[[native.sources]]
+path = "native/events.c"
+
+[dependencies]
+"scoop:scoop.std" = "0.1.0"

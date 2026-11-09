@@ -1,0 +1,29 @@
+struct User(val name: String, val email: String?)
+
+fun findUser(id: Int): User? =
+    when (id) {
+        1 -> Some(User("Ada", Some("ada@example.com")))
+        2 -> Some(User("Bob", None))
+        else -> None
+    }
+
+fun report(id: Int): String {
+    // email 本身是 String?，所以 ?. 的结果是 String??
+    val email: String?? = findUser(id)?.email
+    return when (email) {
+        case Some(Some(val address)) -> f"${id}: ${address}"
+        case Some(None) -> f"${id}: user has no email"
+        case None -> f"${id}: no such user"
+    }
+}
+
+// 不关心是哪一层缺失时，用 ?: None 去掉一层
+fun emailOf(id: Int): String? = findUser(id)?.email ?: None
+
+fun main() {
+    println(report(1))
+    println(report(2))
+    println(report(3))
+    println(emailOf(1) ?: "-")
+    println(emailOf(2) ?: "-")
+}

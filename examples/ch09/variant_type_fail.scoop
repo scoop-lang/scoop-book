@@ -1,0 +1,8 @@
+enum Shape {
+    Dot,
+    Circle(Double)
+}
+
+fun area(circle: Shape.Circle): Double = 0.0
+
+fun main() {}

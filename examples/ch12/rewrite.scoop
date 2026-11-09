@@ -1,0 +1,33 @@
+class Session(val user: String) {
+    fun touch() {
+        println(f"session of ${user} refreshed")
+    }
+}
+
+// 写法一：when 取出值
+fun describe(session: Session?): String =
+    when (session) {
+        case Some(val s) -> f"logged in as ${s.user}"
+        case None -> "anonymous"
+    }
+
+// 写法二：用 ?: return 提前退出，之后得到的就是普通值
+fun printUser(session: Session?) {
+    val s = session ?: return
+    println(f"user: ${s.user}")
+}
+
+fun main() {
+    val active: Session? = Some(Session("ada"))
+    val none: Session? = None
+
+    println(describe(active))
+    println(describe(none))
+
+    printUser(active)
+    printUser(none)
+
+    // 写法三：只需要调用一个方法时，直接用 ?.
+    active?.touch()
+    none?.touch()
+}

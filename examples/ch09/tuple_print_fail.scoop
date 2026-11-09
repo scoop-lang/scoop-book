@@ -1,0 +1,4 @@
+fun main() {
+    val point = (3, 4)
+    println(f"point = ${point}")
+}

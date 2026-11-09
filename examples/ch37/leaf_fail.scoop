@@ -1,0 +1,14 @@
+@Extern(name = "abs")
+fun cAbs(n: Int): Int
+
+// @NoGC 函数里只能调用 @GCLeaf 的 C 函数
+@NoGC
+@Unsafe
+fun distance(a: Int, b: Int): Int = cAbs(a - b)
+
+fun main() {
+    @Unsafe
+    {
+        println(distance(3, 10))
+    }
+}

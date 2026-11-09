@@ -1,0 +1,5 @@
+import scoop.collections.*
+
+fun main() {
+    val grid = HashMap<(Int, Int), String>()
+}

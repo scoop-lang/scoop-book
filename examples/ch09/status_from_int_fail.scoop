@@ -1,0 +1,8 @@
+enum Status: Int {
+    Ok = 200,
+    NotFound = 404
+}
+
+fun main() {
+    val status: Status = 404
+}

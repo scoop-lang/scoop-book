@@ -1,0 +1,4 @@
+empty mean: -1.0
+count: 8
+mean: 5.0
+stddev: 2.0

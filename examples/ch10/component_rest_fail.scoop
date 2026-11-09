@@ -1,0 +1,10 @@
+class Range2(val low: Int, val high: Int) {
+    operator fun component1(): Int = low
+
+    operator fun component2(): Int = high
+}
+
+fun main() {
+    val (low, ..) = Range2(10, 20)
+    println(low)
+}

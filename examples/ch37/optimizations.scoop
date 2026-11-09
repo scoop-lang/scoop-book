@@ -1,0 +1,17 @@
+struct Vec2(val x: Double, val y: Double) {
+    operator fun plus(other: Vec2): Vec2 = Vec2(x + other.x, y + other.y)
+
+    fun length2(): Double = x * x + y * y
+}
+
+fun total(points: Array<Vec2>): Double {
+    var sum = Vec2(0.0, 0.0)
+    for (p in points)
+        sum = sum + p
+    return sum.length2()
+}
+
+fun main() {
+    val points = Array<Vec2>(1000L) { i -> Vec2(i.toDouble(), 1.0) }
+    println(total(points))
+}

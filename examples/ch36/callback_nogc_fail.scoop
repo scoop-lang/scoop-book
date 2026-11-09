@@ -1,0 +1,20 @@
+@Extern(name = "qsort")
+fun cQsort(
+    base: Ptr<Unit>,
+    count: ULong,
+    size: ULong,
+    compare: FunPtr<(Ptr<Unit>, Ptr<Unit>) -> Int>
+)
+
+@Unsafe
+fun compareInts(a: Ptr<Unit>, b: Ptr<Unit>): Int {
+    println("comparing")
+    return a.cast<Int>().load() - b.cast<Int>().load()
+}
+
+@Unsafe
+fun sortInts(base: Ptr<Unit>, count: ULong) {
+    cQsort(base, count, sizeOf<Int>(), ::compareInts)
+}
+
+fun main() {}

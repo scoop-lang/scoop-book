@@ -1,0 +1,38 @@
+struct User(val name: String, val nickname: String?)
+
+fun findUser(id: Int): User? =
+    when (id) {
+        1 -> Some(User("Ada", Some("ada")))
+        2 -> Some(User("Bob", None))
+        else -> None
+    }
+
+fun nameLength(id: Int): Long = findUser(id)?.name?.charLength ?: 0L
+
+fun displayName(id: Int): String = findUser(id)?.name ?: "guest"
+
+fun requireUser(id: Int): User =
+    findUser(id) ?: throw IllegalArgumentException(Some(f"no user ${id}"))
+
+fun main() {
+    // ?. 的结果仍然是 Option
+    val maybeLength: Long? = findUser(1)?.name?.charLength
+    println(maybeLength ?: -1L)
+
+    println(nameLength(1))
+    println(nameLength(9))
+    println(displayName(2))
+    println(displayName(9))
+
+    // ?: 可以连写，从左到右找第一个有值的
+    val primary: String? = None
+    val secondary: String? = None
+    println(primary ?: secondary ?: "default")
+
+    println(requireUser(1).name)
+    try {
+        println(requireUser(9).name)
+    } catch (e: IllegalArgumentException) {
+        println(e.message ?: "unknown error")
+    }
+}

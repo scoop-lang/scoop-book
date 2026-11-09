@@ -1,0 +1,1 @@
+`@NoGC` extern function `countUpper` has non-GC-free parameter 1 of type String

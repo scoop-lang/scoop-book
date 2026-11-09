@@ -1,0 +1,29 @@
+import Light.*
+
+enum Light {
+    Red,
+    Yellow,
+    Green
+}
+
+fun next(light: Light): Light =
+    when (light) {
+        case Red -> Green
+        case Green -> Yellow
+        case Yellow -> Red
+    }
+
+fun name(light: Light): String =
+    when (light) {
+        case Red -> "red"
+        case Yellow -> "yellow"
+        case Green -> "green"
+    }
+
+fun main() {
+    var light = Red
+    for (_ in 1 .. 4) {
+        println(name(light))
+        light = next(light)
+    }
+}

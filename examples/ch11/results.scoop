@@ -1,0 +1,27 @@
+fun parseAnswer(text: String): Boolean? =
+    when (text) {
+        case "yes" -> Some(true)
+        case "no" -> Some(false)
+        case _ -> None
+    }
+
+fun switchLabel(on: Boolean): String =
+    when (on) {
+        true -> "ON"
+        false -> "OFF"
+    }
+
+fun main() {
+    val reply = parseAnswer("yes")
+    val(label, known) =
+        when (reply) {
+            case Some(val value) -> (switchLabel(value), true)
+            case None -> ("?", false)
+        }
+    println(f"${label} ${known}")
+
+    when (parseAnswer("maybe")) {
+        case Some(val value) -> println(switchLabel(value))
+        case None -> println("not understood")
+    }
+}

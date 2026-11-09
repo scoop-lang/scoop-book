@@ -1,0 +1,31 @@
+import scoop.collections.*
+import scoop.text.*
+
+fun main() {
+    // Map 查询返回 Option
+    val ages = HashMap<String, Int>()
+    ages["Ada"] = 36
+    println(ages["Ada"] ?: 0)
+    println(ages["Bob"] ?: 0)
+
+    // OrNone 系列：解析失败返回 None，而不是抛异常
+    println("42".toIntOrNone() ?: -1)
+    println("forty-two".toIntOrNone() ?: -1)
+
+    val numbers = listOf<String>("1", "x", "3").mapNotNone { s -> s.toIntOrNone() }
+    println(numbers.size)
+    println(numbers.firstOrNone() ?: 0)
+
+    // 迭代器的 next() 返回 Option，配合 ?: break 使用
+    val iter = numbers.iterator()
+    var sum = 0
+    while (true) {
+        val n = iter.next() ?: break
+        sum = sum + n
+    }
+    println(sum)
+
+    // as? 转换失败得到 None
+    val value: Any = "text"
+    println((value as? String)?.charLength ?: -1L)
+}

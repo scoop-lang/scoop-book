@@ -1,0 +1,41 @@
+// void *malloc(size_t size)、void free(void *p)
+@Extern(name = "malloc")
+fun cMalloc(size: ULong): Ptr<Unit>?
+
+@Extern(name = "free")
+fun cFree(p: Ptr<Unit>)
+
+fun main() {
+    println(f"Int: size ${sizeOf<Int>()}, align ${alignOf<Int>()}")
+    println(f"Double: size ${sizeOf<Double>()}, align ${alignOf<Double>()}")
+
+    @Unsafe
+    {
+        val count = 4L
+        val raw =
+            cMalloc(sizeOf<Int>() * count.toULong()) ?:
+                throw IllegalStateException(Some("out of memory"))
+        val ints = raw.cast<Int>()
+
+        // 偏移量按元素计：ints + 2 指向第 3 个 Int，而不是第 3 个字节
+        for (i in 0L until count)
+            ints.store(i, (i * 10L).toInt())
+        println((ints + 2).load())
+
+        var sum = 0
+        for (i in 0L until count)
+            sum = sum + ints.load(i)
+        println(f"sum = ${sum}")
+
+        cFree(raw)
+    }
+
+    // addressOf 取一个局部变量的地址，常用于 C 的“输出参数”
+    var answer = 0
+    @Unsafe
+    {
+        val p = addressOf(answer)
+        p.store(42)
+    }
+    println(answer)
+}

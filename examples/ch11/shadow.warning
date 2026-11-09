@@ -1,0 +1,1 @@
+binding `Green` shadows an enum variant available here; rename the binding or qualify the variant

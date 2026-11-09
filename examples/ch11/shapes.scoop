@@ -1,0 +1,27 @@
+enum Shape {
+    Circle(Double),
+    Rect(Double, Double),
+    Polygon {name: String, sides: Int},
+    Empty
+}
+
+fun describe(s: Shape): String =
+    when (s) {
+        case Shape.Circle(val r) if r > 10.0 -> "big circle"
+        case Circle(val r) -> f"circle, radius ${r}"
+        case Rect(val w, val h) if w == h -> f"square, side ${w}"
+        case Rect(val w, _) -> f"rectangle, width ${w}"
+        case Polygon {val name, sides: 3} -> f"triangle ${name}"
+        case Polygon {val name, ..} -> f"polygon ${name}"
+        case Empty -> "nothing"
+    }
+
+fun main() {
+    println(describe(Shape.Circle(20.0)))
+    println(describe(Shape.Circle(1.5)))
+    println(describe(Shape.Rect(2.0, 2.0)))
+    println(describe(Shape.Rect(2.0, 3.0)))
+    println(describe(Shape.Polygon(name = "abc", sides = 3)))
+    println(describe(Shape.Polygon(name = "hex", sides = 6)))
+    println(describe(Shape.Empty))
+}

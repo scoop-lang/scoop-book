@@ -1,0 +1,4 @@
+@CLayout
+struct Person(val age: Int, val name: String)
+
+fun main() {}

@@ -1,0 +1,12 @@
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    val points = MutableArray<Point>(3L) { i -> Point(i.toInt(), 0) }
+
+    // 取出的是副本；要改变数组，就把新值写回去
+    val first = points[0L]
+    points[0L] = first.{y: 9}
+
+    for (p in points)
+        println(f"(${p.x}, ${p.y})")
+}

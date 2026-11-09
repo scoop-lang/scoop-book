@@ -1,0 +1,8 @@
+a dot
+a circle, radius 1.5
+a 2.0 x 3.0 rectangle
+text "hi" at size 12
+a line, length 4.0, width 1
+a line, length 4.0, width 3
+true
+false

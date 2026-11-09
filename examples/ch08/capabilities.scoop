@@ -1,0 +1,24 @@
+import scoop.collections.*
+
+struct Point(val x: Int, val y: Int): ToString, Equals<Point>, Hash {
+    public override fun toString(): String = f"(${x}, ${y})"
+
+    public override operator fun equals(other: Point): Boolean = x == other.x && y == other.y
+
+    public override fun hash(): Long = x.hash() * 31L + y.hash()
+}
+
+fun <T: Equals<T>> same(a: T, b: T): Boolean = a == b
+
+fun main() {
+    val p = Point(1, 2)
+    println(p)
+    println(f"p = ${p}")
+    println(same(p, Point(1, 2)))
+
+    val labels = HashMap<Point, String>()
+    labels[Point(0, 0)] = "origin"
+    labels[p] = "home"
+    println(labels[Point(1, 2)] ?: "unknown")
+    println(labels[Point(9, 9)] ?: "unknown")
+}

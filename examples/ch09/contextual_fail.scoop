@@ -1,0 +1,8 @@
+enum Direction {
+    North,
+    South
+}
+
+fun main() {
+    val d = North
+}

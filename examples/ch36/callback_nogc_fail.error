@@ -1,0 +1,1 @@
+fun compareInts(a: Ptr<Unit>, b: Ptr<Unit>): Int — native callbacks must be declared `@NoGC`

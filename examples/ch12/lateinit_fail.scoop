@@ -1,0 +1,7 @@
+class Connection(val id: Int)
+
+class Client {
+    lateinit var connection: Connection
+}
+
+fun main() {}

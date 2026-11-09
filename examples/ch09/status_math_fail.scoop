@@ -1,0 +1,9 @@
+enum Status: Int {
+    Ok = 200,
+    NotFound = 404
+}
+
+fun main() {
+    var status = Status.Ok
+    status += 1
+}

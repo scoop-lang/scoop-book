@@ -1,0 +1,11 @@
+@Extern(name = "malloc")
+fun cMalloc(size: ULong): Ptr<Unit>
+
+fun main() {
+    @Unsafe
+    {
+        val p = cMalloc(16uL)
+        if (p == Ptr<Unit>(0uL))
+            println("out of memory")
+    }
+}

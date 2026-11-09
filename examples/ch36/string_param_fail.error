@@ -1,0 +1,1 @@
+extern parameter is not ABI-safe: cPuts.parameter1: ref type `String` is managed

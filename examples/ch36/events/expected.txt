@@ -1,0 +1,6 @@
+2, 3, 5, 7, 11, 13, 17, 19, 23, 29
+failed: prime 11 is larger than 10
+[ticker] tick 1
+[ticker] tick 2
+[ticker] tick 3
+failed: missing context onTick.logger: Logger

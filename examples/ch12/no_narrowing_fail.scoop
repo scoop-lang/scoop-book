@@ -1,0 +1,6 @@
+fun main() {
+    val name: String? = Some("Ada")
+    if (name != None) {
+        println(name.charLength)
+    }
+}

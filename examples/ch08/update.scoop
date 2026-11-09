@@ -1,0 +1,25 @@
+struct Point(val x: Int, val y: Int)
+
+struct Line(val start: Point, val end: Point)
+
+class Player(var name: String, var position: Point)
+
+fun main() {
+    val origin = Point(0, 0)
+    val right = origin.{x: 5}
+    println(f"origin = (${origin.x}, ${origin.y}), right = (${right.x}, ${right.y})")
+
+    // 嵌套的 struct 需要逐层更新
+    val line = Line(Point(0, 0), Point(3, 4))
+    val longer = line.{end: line.end.{x: 10}}
+    println(f"end = (${longer.end.x}, ${longer.end.y})")
+
+    // 可变状态放在 var 绑定或 class 的 var 属性里
+    var cursor = Point(1, 1)
+    cursor = cursor.{y: cursor.y + 1}
+    println(f"cursor = (${cursor.x}, ${cursor.y})")
+
+    val player = Player("Ada", Point(0, 0))
+    player.position = player.position.{x: player.position.x + 1}
+    println(f"${player.name} at (${player.position.x}, ${player.position.y})")
+}

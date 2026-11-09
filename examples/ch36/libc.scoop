@@ -1,0 +1,30 @@
+// C 标准库里的函数：int abs(int)、size_t strlen(const char *)
+@Extern(name = "abs")
+fun cAbs(n: Int): Int
+
+@Extern(name = "strlen")
+fun cStrlen(s: Ptr<Int8>): ULong
+
+// 把 strlen 包装成安全函数：调用方不需要写 @Unsafe
+fun utf8Length(text: String): ULong {
+    @Unsafe
+    {
+        // withCString 把字符串临时复制成以 0 结尾的 C 字符串，指针只在回调内有效
+        return text.withCString(
+            fun(p: Ptr<Int8>): ULong {
+                @Unsafe
+                {
+                    return cStrlen(p)
+                }
+            }
+        )
+    }
+}
+
+fun main() {
+    @Unsafe
+    {
+        println(cAbs(-42))
+    }
+    println(utf8Length("héllo"))
+}

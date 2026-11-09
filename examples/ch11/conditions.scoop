@@ -1,0 +1,33 @@
+fun classify(n: Int): String =
+    when (n) {
+        0 -> "zero"
+        1, 2, 3 -> "small"
+        in 4 .. 9 -> "medium"
+        case val x if x < 0 -> f"negative (${x})"
+        else -> "large"
+    }
+
+fun sign(n: Int): String =
+    when {
+        n > 0 -> "positive"
+        n < 0 -> "negative"
+        else -> "zero"
+    }
+
+fun kind(value: Any): String =
+    when (value) {
+        is String if value.charLength > 3L -> f"long string ${value}"
+        is String -> f"short string ${value}"
+        is Int -> f"int, next is ${value + 1}"
+        else -> "something else"
+    }
+
+fun main() {
+    for (n in [0, 2, 5, -3, 100])
+        println(classify(n))
+    println(sign(-7))
+    println(kind("hello"))
+    println(kind("hi"))
+    println(kind(41))
+    println(kind(1.5))
+}

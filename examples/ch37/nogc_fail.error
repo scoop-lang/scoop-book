@@ -1,0 +1,1 @@
+`@NoGC` function `label` has non-GC-free return type String

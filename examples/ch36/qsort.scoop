@@ -1,0 +1,45 @@
+// void qsort(void *base, size_t count, size_t size,
+//            int (*compare)(const void *, const void *))
+@Extern(name = "qsort")
+fun cQsort(
+    base: Ptr<Unit>,
+    count: ULong,
+    size: ULong,
+    compare: FunPtr<(Ptr<Unit>, Ptr<Unit>) -> Int>
+)
+
+// 交给 C 回调的函数：顶层、@NoGC，签名与 FunPtr 中的函数类型完全一致
+@NoGC
+@Unsafe
+fun compareInts(a: Ptr<Unit>, b: Ptr<Unit>): Int {
+    val x = a.cast<Int>().load()
+    val y = b.cast<Int>().load()
+    return when {
+        x < y -> -1
+        x > y -> 1
+        else -> 0
+    }
+}
+
+fun sortInPlace(numbers: MutableArray<Int>) {
+    @Unsafe
+    {
+        // 借出数组元素区的地址；回调返回后指针失效
+        numbers.withDataPointer(
+            fun(data: Ptr<Int>, count: Long) {
+                @Unsafe
+                {
+                    cQsort(data.cast<Unit>(), count.toULong(), sizeOf<Int>(), ::compareInts)
+                }
+            }
+        )
+    }
+}
+
+fun main() {
+    val numbers: MutableArray<Int> = [5, 3, 9, 1, 7]
+    sortInPlace(numbers)
+    for (n in numbers)
+        print(f"${n} ")
+    println("")
+}

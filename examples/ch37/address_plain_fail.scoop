@@ -1,0 +1,9 @@
+var counter: Long = 0L
+
+fun main() {
+    @Unsafe
+    {
+        val p = addressOf(counter)
+        p.store(1L)
+    }
+}

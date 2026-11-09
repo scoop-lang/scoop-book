@@ -1,0 +1,1 @@
+`var` struct fields are not supported (value types are immutable)

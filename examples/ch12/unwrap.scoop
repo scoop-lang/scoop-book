@@ -1,0 +1,11 @@
+fun main() {
+    val present: String? = Some("Ada")
+    println(present!!)
+
+    val absent: String? = None
+    try {
+        println(absent!!)
+    } catch (e: UnwrapException) {
+        println(f"caught: ${e.message ?: ""}")
+    }
+}

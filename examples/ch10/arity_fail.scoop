@@ -1,0 +1,5 @@
+fun main() {
+    val triple = (1, 2, 3)
+    val (a, b) = triple
+    println(a + b)
+}

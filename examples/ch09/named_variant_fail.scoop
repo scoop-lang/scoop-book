@@ -1,0 +1,11 @@
+enum Shape {
+    Dot,
+    Text {
+        content: String,
+        size: Int
+    }
+}
+
+fun main() {
+    val label = Shape.Text("hi", 12)
+}

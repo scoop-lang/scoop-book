@@ -1,0 +1,5 @@
+fun main() {
+    val nickname: String? = Some("Ada")
+    val Some(name) = nickname
+    println(name)
+}

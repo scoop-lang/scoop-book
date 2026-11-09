@@ -1,0 +1,14 @@
+struct Point(val x: Int, val y: Int)
+
+struct Size(val width: Int, val height: Int = width)
+
+fun main() {
+    val p = Point(3, 4)
+    val q = Point(y = 4, x = 3)
+    println(f"p = (${p.x}, ${p.y})")
+    println(p == q)
+    println(p != Point(0, 0))
+
+    val square = Size(5)
+    println(f"${square.width} x ${square.height}")
+}

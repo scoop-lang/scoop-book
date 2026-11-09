@@ -1,0 +1,64 @@
+package book.events
+
+interface Logger {
+    fun log(message: String)
+}
+
+class PrefixLogger(val prefix: String): Logger {
+    override fun log(message: String) {
+        println(f"${prefix}${message}")
+    }
+}
+
+context(logger: Logger)
+fun onTick(tick: Int) {
+    logger.log(f"tick ${tick}")
+}
+
+// 异步回调：C 在自己创建的线程上调用它。
+// 回调看到的 Context 是注册那一刻的快照，而不是调用时线程上的绑定
+@Unsafe
+fun startTicker(count: Int, callback: ValueCallback) {
+    try {
+        val ticker =
+            eventsTickerStart(count, callback.function, callback.context) ?:
+                throw IllegalStateException(Some("cannot start ticker"))
+        eventsTickerJoin(ticker)
+        rethrowFailure(callback)
+    } finally {
+        // join 之后 C 不会再调用它，这时才能释放
+        releaseForeignCallback(callback)
+    }
+}
+
+fun runTicker(count: Int, logger: Logger) {
+    @Unsafe
+    {
+        val callback =
+            context(logger) {
+                foreignCallback<(Ptr<Unit>, Int) -> Unit>(
+                    { t: Int -> onTick(t) },
+                    0,
+                    ForeignCallbackMode.Reusable
+                )
+            }
+        startTicker(count, callback)
+    }
+}
+
+// 错误示范：注册时没有绑定 Logger
+fun runTickerWithoutContext(count: Int, logger: Logger) {
+    @Unsafe
+    {
+        val callback =
+            foreignCallback<(Ptr<Unit>, Int) -> Unit>(
+                { t: Int -> onTick(t) },
+                0,
+                ForeignCallbackMode.Reusable
+            )
+        // 调用时再绑定也没有用
+        context(logger) {
+            startTicker(count, callback)
+        }
+    }
+}

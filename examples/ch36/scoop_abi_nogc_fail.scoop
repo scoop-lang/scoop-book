@@ -1,0 +1,5 @@
+@NoGC
+@Extern(name = "text_count_upper", abi = "scoop")
+fun countUpper(text: String): Long
+
+fun main() {}

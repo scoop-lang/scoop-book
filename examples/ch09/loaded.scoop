@@ -1,0 +1,18 @@
+enum Loaded<T> {
+    Loading,
+    Ready(T),
+    Failed(String)
+}
+
+fun render(state: Loaded<Int>): String =
+    when (state) {
+        case Loaded.Loading -> "loading..."
+        case Loaded.Ready(val count) -> f"${count} new messages"
+        case Loaded.Failed(val reason) -> f"error: ${reason}"
+    }
+
+fun main() {
+    val states: Array<Loaded<Int>> = [Loaded.Loading, Loaded.Ready(3), Loaded.Failed("offline")]
+    for (state in states)
+        println(render(state))
+}

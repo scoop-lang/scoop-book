@@ -1,0 +1,1 @@
+type argument `Point` for `T` must satisfy upper bound `ToString`

@@ -1,0 +1,47 @@
+package book.layout
+
+import scoop.platform.time.*
+
+// 同样的两个字段，一个是值类型，一个是引用类型
+struct PointValue(val x: Double, val y: Double)
+
+class PointObject(val x: Double, val y: Double)
+
+fun sumValues(points: Array<PointValue>): Double {
+    var sum = 0.0
+    for (p in points)
+        sum = sum + p.x + p.y
+    return sum
+}
+
+fun sumObjects(points: Array<PointObject>): Double {
+    var sum = 0.0
+    for (p in points)
+        sum = sum + p.x + p.y
+    return sum
+}
+
+// 一个固定的“打乱”顺序：i * 7919 对 n 取模（n 与 7919 互质）
+fun scrambled(i: Long, n: Long): Long = i * 7919L % n
+
+fun main() {
+    val n = 2000000L
+
+    val v = measureTimedValue { Array<PointValue>(n) { i -> PointValue(i.toDouble(), 1.0) } }
+    val o = measureTimedValue { Array<PointObject>(n) { i -> PointObject(i.toDouble(), 1.0) } }
+    println(f"create struct array: ${v.duration.inWholeMilliseconds} ms")
+    println(f"create class array:  ${o.duration.inWholeMilliseconds} ms")
+
+    val values = v.value
+    val objects = o.value
+    // 让对象在数组中的顺序与分配顺序无关，模拟“在不同时间创建”的对象
+    val shuffled = Array<PointObject>(n) { i -> objects[scrambled(i, n)] }
+
+    println(sumValues(values) == sumObjects(shuffled))
+    val a = measureTimedValue { sumValues(values) }
+    val b = measureTimedValue { sumObjects(objects) }
+    val c = measureTimedValue { sumObjects(shuffled) }
+    println(f"sum struct array:          ${a.duration.inWholeMicroseconds} µs")
+    println(f"sum class array:           ${b.duration.inWholeMicroseconds} µs")
+    println(f"sum class array, shuffled: ${c.duration.inWholeMicroseconds} µs")
+}

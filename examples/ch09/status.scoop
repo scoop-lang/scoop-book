@@ -1,0 +1,27 @@
+enum Status: Int {
+    Ok = 200,
+    NotFound = 404,
+    ServerError = 500
+}
+
+fun isError(code: Int): Boolean = code >= 400
+
+fun reason(status: Status): String =
+    when (status) {
+        case Status.Ok -> "OK"
+        case Status.NotFound -> "Not Found"
+        case Status.ServerError -> "Internal Server Error"
+    }
+
+fun main() {
+    val status = Status.NotFound
+
+    // Status 可以直接当作 Int 使用
+    val code: Int = status
+    println(f"${code} ${reason(status)}")
+    println(isError(Status.Ok))
+
+    // 算术运算的结果是 Int，而不是 Status
+    val next: Int = status + 1
+    println(next)
+}

@@ -1,0 +1,6 @@
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    val {x} = Point(1, 2)
+    println(x)
+}

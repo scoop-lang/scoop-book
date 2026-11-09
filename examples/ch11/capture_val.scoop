@@ -1,0 +1,11 @@
+fun check(n: Int): String {
+    val target = 3
+    return when (n) {
+        // val target 声明了一个新变量，遮蔽了外面的 target
+        case val target -> f"matched ${target}"
+    }
+}
+
+fun main() {
+    println(check(5))
+}

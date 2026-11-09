@@ -1,0 +1,13 @@
+[book]
+title = "Scoop 程序设计"
+authors = ["chenxu"]
+language = "zh-CN"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[output.html]
+# GitHub Pages 自定义域名；构建时写入 book/CNAME
+cname = "book.scoop-lang.org"
+additional-js = ["theme/scoop-highlight.js"]

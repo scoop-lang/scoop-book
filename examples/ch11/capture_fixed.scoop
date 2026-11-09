@@ -1,0 +1,20 @@
+fun check(n: Int): String {
+    val target = 3
+    return when (n) {
+        target -> "matched"
+        else -> "no match"
+    }
+}
+
+fun checkWithGuard(n: Int): String {
+    val target = 3
+    return when (n) {
+        case val x if x == target -> "matched"
+        else -> "no match"
+    }
+}
+
+fun main() {
+    println(check(5))
+    println(checkWithGuard(3))
+}

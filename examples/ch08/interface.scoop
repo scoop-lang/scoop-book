@@ -1,0 +1,25 @@
+interface Shape {
+    fun area(): Double
+}
+
+struct Circle(val radius: Double): Shape {
+    override fun area(): Double = 3.14159 * radius * radius
+}
+
+struct Rect(val width: Double, val height: Double): Shape {
+    override fun area(): Double = width * height
+}
+
+fun total(shapes: Array<Shape>): Double {
+    var sum = 0.0
+    for (shape in shapes)
+        sum = sum + shape.area()
+    return sum
+}
+
+fun main() {
+    val c: Shape = Circle(1.0)
+    val r: Shape = Rect(2.0, 3.0)
+    println(total([c, r]))
+    println(c is Circle)
+}

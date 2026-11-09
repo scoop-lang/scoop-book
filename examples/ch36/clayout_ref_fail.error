@@ -1,0 +1,1 @@
+`@CLayout` field is not C-FFI-safe: Person.name: ref type `String` is managed

@@ -1,0 +1,11 @@
+struct Point(val x: Int, val y: Int)
+
+fun load(): Point {
+    println("loading...")
+    return Point(1, 2)
+}
+
+fun main() {
+    val(x, y) = load()
+    println(x + y)
+}

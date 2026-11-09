@@ -1,0 +1,13 @@
+enum Light {
+    Red,
+    Yellow,
+    Green
+}
+
+fun action(light: Light): String =
+    when (light) {
+        case Red -> "stop"
+        case Green -> "go"
+    }
+
+fun main() {}

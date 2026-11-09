@@ -1,0 +1,28 @@
+struct Point(val x: Int, val y: Int)
+
+fun locate(p: Point): String =
+    when (p) {
+        case Point(0, 0) -> "origin"
+        case(0, val y) -> f"on the y axis at ${y}"
+        case {x: val px, y: 0} -> f"on the x axis at ${px}"
+        case Point {val x, val y} if x == y -> f"on the diagonal at ${x}"
+        case _ -> "somewhere else"
+    }
+
+fun both(flags: (Boolean, Boolean)): String =
+    when (flags) {
+        case(true, true) -> "both"
+        case(true, false) -> "first only"
+        case(false, true) -> "second only"
+        case(false, false) -> "neither"
+    }
+
+fun main() {
+    println(locate(Point(0, 0)))
+    println(locate(Point(0, 5)))
+    println(locate(Point(4, 0)))
+    println(locate(Point(3, 3)))
+    println(locate(Point(1, 2)))
+    println(both((true, false)))
+    println(both((false, false)))
+}

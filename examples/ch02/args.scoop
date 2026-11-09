@@ -1,0 +1,8 @@
+fun main(args: Array<String>): Int {
+    if (args.size < 2L) {
+        println("用法：args <名字>")
+        return 1
+    }
+    println(f"你好，${args[1L]}！")
+    return 0
+}

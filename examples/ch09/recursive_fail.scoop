@@ -1,0 +1,6 @@
+enum Expr {
+    Num(Int),
+    Add(Expr, Expr)
+}
+
+fun main() {}

@@ -1,0 +1,23 @@
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    val p = Point(3, 4)
+
+    // 按字段声明顺序解构
+    val(x, y) = p
+    println(f"x = ${x}, y = ${y}")
+
+    // 按字段名解构，可以改名
+    val {x: left, y: top} = p
+    println(f"left = ${left}, top = ${top}")
+
+    // tuple 按位置解构，_ 表示不需要这个位置
+    val record = ("Ada", 36, "London")
+    val(name, _, city) = record
+    println(f"${name} lives in ${city}")
+
+    // 单元素 tuple 的模式也要写尾随逗号
+    val single = (42,)
+    val(answer,) = single
+    println(answer)
+}

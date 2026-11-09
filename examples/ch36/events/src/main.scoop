@@ -1,0 +1,20 @@
+package book.events
+
+import scoop.collections.*
+
+fun main() {
+    println(primesUpTo(30).joinToString(", "))
+    try {
+        primesUpTo(30, max = 10)
+    } catch (e: IllegalArgumentException) {
+        println(f"failed: ${e.message ?: "?"}")
+    }
+
+    val logger: Logger = PrefixLogger("[ticker] ")
+    runTicker(3, logger)
+    try {
+        runTickerWithoutContext(3, logger)
+    } catch (e: MissingContextException) {
+        println(f"failed: ${e.message ?: "?"}")
+    }
+}

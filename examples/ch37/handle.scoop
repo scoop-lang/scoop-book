@@ -1,0 +1,24 @@
+class Session(val user: String)
+
+// 假装这是 C 那边保存的一个整数，例如 C 库的 void *userdata
+@Global
+var savedToken: ULong = 0uL
+
+fun register(s: Session) {
+    @Unsafe
+    {
+        savedToken = getGcHandle(s).raw
+    }
+}
+
+fun takeBack(): Session {
+    @Unsafe
+    {
+        return releaseGcHandle(GcHandle<Session>(savedToken))
+    }
+}
+
+fun main() {
+    register(Session("ada"))
+    println(takeBack().user)
+}
