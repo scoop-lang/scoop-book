@@ -1,0 +1,7 @@
+class Account(private val balance: Int)
+
+fun Account.peek(): Int = this.balance
+
+fun main() {
+    println(Account(100).peek())
+}

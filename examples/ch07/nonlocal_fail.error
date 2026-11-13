@@ -1,0 +1,2 @@
+no applicable candidate for `forEachValue`
+return label `firstNegative` does not name the current callable; non-local returns are not allowed

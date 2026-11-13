@@ -1,0 +1,15 @@
+inline fun repeatTimes(times: Int, crossinline action: (Int) -> Unit) {
+    for (i in 0 until times)
+        action(i)
+}
+
+tailrec fun sumTo(n: Long, acc: Long): Long =
+    if (n == 0L)
+        acc
+    else
+        sumTo(n - 1L, acc + n)
+
+fun main() {
+    repeatTimes(3) { println(f"tick ${it}") }
+    println(sumTo(100L, 0L))
+}

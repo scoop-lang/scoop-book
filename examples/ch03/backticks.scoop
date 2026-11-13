@@ -1,0 +1,9 @@
+fun `is valid`(score: Int): Boolean = score >= 0
+
+fun main() {
+    val `when` = "keyword as a name"
+    val `in` = 3
+    println(`when`)
+    println(`in` + 1)
+    println(`is valid`(-1))
+}

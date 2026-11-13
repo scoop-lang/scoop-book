@@ -1,0 +1,9 @@
+fun main() {
+    val n = 3
+    val label =
+        when {
+            n > 0 -> "positive"
+            n < 0 -> "negative"
+        }
+    println(label)
+}

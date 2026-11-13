@@ -1,0 +1,19 @@
+fun main() {
+    var slow = ""
+    for (i in 1 .. 5) {
+        slow = slow + i.toString() + " "
+    }
+    println(slow)
+
+    val builder = StringBuilder()
+    for (i in 1 .. 5) {
+        builder.append(i).append(' ')
+    }
+    builder.append("done=").append(true)
+    val result = builder.toString()
+    println(result)
+
+    builder.clear().append("reused")
+    println(builder.toString())
+    println(result)
+}

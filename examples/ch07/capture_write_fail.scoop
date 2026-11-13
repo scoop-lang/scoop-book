@@ -1,0 +1,10 @@
+fun forEachValue(values: Array<Int>, action: (Int) -> Unit) {
+    for (value in values)
+        action(value)
+}
+
+fun main() {
+    var count = 0
+    forEachValue([1, 2, 3]) { count = count + it }
+    println(count)
+}

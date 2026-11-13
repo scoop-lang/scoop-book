@@ -1,0 +1,20 @@
+fun square(x: Int): Int = x * x
+
+fun average(a: Int, b: Int) = (a + b) / 2
+
+fun larger(a: Int, b: Int): Int {
+    if (a > b) {
+        return a
+    }
+    return b
+}
+
+fun report(label: String, value: Int) {
+    println(f"${label}: ${value}")
+}
+
+fun main() {
+    report("square", square(7))
+    report("average", average(3, 8))
+    report("larger", larger(3, 9))
+}

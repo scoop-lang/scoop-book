@@ -1,0 +1,5 @@
+fun main() {
+    val scores = [90, 75, 60]
+    val count: Int = scores.size
+    println(count)
+}

@@ -1,0 +1,23 @@
+fun main() {
+    val text = "Scoop 雪花"
+    println(text.getCharAt(0L))
+    println(text.getCharAt(6L))
+    println(text.slice(0L, 5L))
+    println(text.slice(6L, text.charLength))
+
+    val builder = StringBuilder()
+    for (c in text) {
+        builder.append('[').append(c).append(']')
+    }
+    println(builder.toString())
+
+    val chars = text.toMutableCharArray()
+    chars[0L] = 's'
+    println(String.fromChars(chars))
+    println(text)
+
+    val a = 'a'
+    println(a.code)
+    println((a.code + 1).toChar())
+    println('雪'.code)
+}

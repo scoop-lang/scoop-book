@@ -1,0 +1,5 @@
+fun applyTo(value: Int, operation: (Int) -> Int): Int = operation(value)
+
+fun main() {
+    println(applyTo(1) { it.toString() })
+}

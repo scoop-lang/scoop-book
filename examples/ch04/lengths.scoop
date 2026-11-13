@@ -1,0 +1,27 @@
+//! dep: scoop:scoop.charset:0.1.0
+
+import scoop.charset.*
+
+fun columns(text: String): Long {
+    var total = 0L
+    for (c in text) {
+        total += unicodeScalarWidth(c).toLong()
+    }
+    return total
+}
+
+fun describe(text: String) {
+    val bytes = text.byteLength
+    val chars = text.charLength
+    val clusters = graphemes(text).size
+    println(
+        f"[${text}] bytes=${bytes} chars=${chars} graphemes=${clusters} columns=${columns(text)}"
+    )
+}
+
+fun main() {
+    describe("cat")
+    describe("Ada 雪")
+    describe("e\u0301")
+    describe("👍🏽")
+}

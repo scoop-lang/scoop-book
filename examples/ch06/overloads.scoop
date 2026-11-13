@@ -1,0 +1,34 @@
+open class Animal
+
+class Dog: Animal()
+
+fun describe(x: Int): String = "Int"
+
+fun describe(x: Long): String = "Long"
+
+fun describe(x: String): String = "String"
+
+fun describe(x: Any): String = "Any"
+
+fun greet(animal: Animal): String = "hello, animal"
+
+fun greet(dog: Dog): String = "hello, dog"
+
+fun area(side: Int): Int = side * side
+
+fun area(width: Int, height: Int = 1): Int = width * height
+
+fun main() {
+    println(describe(1))
+    println(describe(1L))
+    println(describe(10000000000))
+    println(describe("text"))
+    println(describe(true))
+
+    println(greet(Dog()))
+    val pet: Animal = Dog()
+    println(greet(pet))
+
+    println(area(3))
+    println(area(3, 2))
+}

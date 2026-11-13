@@ -1,0 +1,25 @@
+class Greeter {
+    public fun hello(): String = "member hello"
+}
+
+fun Greeter.hello(): String = "extension hello"
+
+fun Greeter.wave(): String = "extension wave"
+
+open class Shape
+
+class Circle: Shape()
+
+fun Shape.kind(): String = "shape"
+
+fun Circle.kind(): String = "circle"
+
+fun main() {
+    val greeter = Greeter()
+    println(greeter.hello())
+    println(greeter.wave())
+
+    val shape: Shape = Circle()
+    println(shape.kind())
+    println(Circle().kind())
+}

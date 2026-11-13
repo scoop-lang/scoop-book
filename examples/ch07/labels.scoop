@@ -1,0 +1,21 @@
+fun forEachValue(values: Array<Int>, action: (Int) -> Unit) {
+    for (value in values)
+        action(value)
+}
+
+fun main() {
+    val clamp: (Int) -> Int =
+        clamp@{
+            if (it > 100)
+                return@clamp 100
+            it
+        }
+    println(clamp(250))
+    println(clamp(42))
+
+    forEachValue([3, -1, 4]) {
+        if (it < 0)
+            return@forEachValue
+        println(it)
+    }
+}

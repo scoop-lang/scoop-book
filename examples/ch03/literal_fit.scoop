@@ -1,0 +1,13 @@
+fun main() {
+    val b: Byte = 100
+    val s: Short = -30000
+    val total: Long = 5
+    val id: UInt = 5u
+    val code: UByte = 255u
+
+    println(b)
+    println(s)
+    println(total)
+    println(id)
+    println(code)
+}

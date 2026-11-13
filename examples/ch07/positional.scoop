@@ -1,0 +1,12 @@
+fun greet(name: String, greeting: String = "Hello"): String = f"${greeting}, ${name}!"
+
+fun main() {
+    println(greet("Ada"))
+    println(greet(greeting = "Hi", name = "Lin"))
+
+    val g: (String, String) -> String = ::greet
+    println(g("Sam", "Howdy"))
+
+    val friendly: (String) -> String = { greet(it) }
+    println(friendly("Kim"))
+}

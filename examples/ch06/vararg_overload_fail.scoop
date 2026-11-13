@@ -1,0 +1,7 @@
+fun sum(vararg numbers: Int): Int = 0
+
+fun sum(numbers: Array<Int>): Int = 0
+
+fun main() {
+    println(sum(1, 2))
+}

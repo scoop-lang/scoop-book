@@ -1,0 +1,37 @@
+struct Point(val x: Int, val y: Int)
+
+enum Shape {
+    Circle(Point, Double),
+    Rect(Point, Point),
+}
+
+fun area(shape: Shape): Double =
+    when (shape) {
+        case Shape.Circle(_, val r) -> 3.14159 * r * r
+        case Shape.Rect(val a, val b) -> ((b.x - a.x) * (b.y - a.y)).toDouble()
+    }
+
+fun firstLarge(shapes: Array<Shape>, limit: Double): Shape? {
+    for (shape in shapes) {
+        if (area(shape) > limit) {
+            return Some(shape)
+        }
+    }
+    return None
+}
+
+fun main() {
+    val origin = Point(0, 0)
+    val corner = origin.{x: 4, y: 3}
+    val shapes = [Shape.Rect(origin, corner), Shape.Circle(corner, 2.0)]
+
+    for (shape in shapes) {
+        println(f"area = ${area(shape)}")
+    }
+
+    val large = firstLarge(shapes, 12.5)
+    when (large) {
+        case Some(val shape) -> println(f"first large area: ${area(shape)}")
+        case None -> println("nothing large")
+    }
+}

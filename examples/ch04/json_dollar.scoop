@@ -1,0 +1,9 @@
+fun main() {
+    val schema = """{"$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "user"}"""
+    println(schema)
+
+    val age = 30
+    val name = "Ada"
+    println(f"""{"name": "${name}", "age": ${age}, "next": ${age + 1}}""")
+    println(f"age+42 = ${age + 42}")
+}

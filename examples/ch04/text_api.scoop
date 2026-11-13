@@ -1,0 +1,33 @@
+import scoop.collections.joinToString
+import scoop.text.*
+
+fun main() {
+    val line = "  name = Ada Lovelace  "
+    val trimmed = line.trim()
+    println(f"[${trimmed}]")
+
+    val key = trimmed.substringBefore(" = ")
+    val value = trimmed.substringAfter(" = ")
+    println(f"key=${key}, value=${value}")
+
+    println(value.contains("Love"))
+    println(value.startsWith("Ada"))
+    println(value.endsWith('e'))
+    println(value.indexOf("Love"))
+    println(value.indexOf("Babbage"))
+
+    val parts = "red,green,,blue".split(',')
+    println(parts.size)
+    println(parts.joinToString(" | "))
+
+    println("a-b-c".replace("-", "::"))
+    println("report.txt".removeSuffix(".txt"))
+    println("7".padStart(3L, '0'))
+    println("ab".repeat(3L))
+    println("Hello, World".uppercaseAscii())
+
+    for (row in "first\nsecond\r\nthird".lines()) {
+        println(f"> ${row}")
+    }
+    println("   ".isBlank())
+}

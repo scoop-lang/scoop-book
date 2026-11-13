@@ -1,0 +1,4 @@
+fun main() {
+    val b: Byte = 200
+    println(b)
+}

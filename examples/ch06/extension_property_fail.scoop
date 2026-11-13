@@ -1,0 +1,5 @@
+val String.visits: Int = 0
+
+fun main() {
+    println("home".visits)
+}

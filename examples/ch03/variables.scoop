@@ -1,0 +1,21 @@
+const val MAX_PLAYERS: Int = 4
+
+val title = "Scoop Quiz"
+
+var rounds = 0
+
+fun main() {
+    val name = "Ada"
+    var score = 0
+    score = score + 10
+    score += 5
+
+    val ratio: Double = 0.75
+    var lives: Long = 3L
+    lives -= 1L
+    rounds += 1
+
+    println(f"${title}: ${name} has ${score} points")
+    println(f"ratio ${ratio}, lives ${lives}")
+    println(f"round ${rounds} of at most ${MAX_PLAYERS} players")
+}

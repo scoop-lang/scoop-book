@@ -1,0 +1,5 @@
+fun rect(width: Int = height, height: Int = 1): Int = width * height
+
+fun main() {
+    println(rect())
+}

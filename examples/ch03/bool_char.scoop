@@ -1,0 +1,22 @@
+fun main() {
+    val ready = true
+    val done = false
+    println(ready && !done)
+    println(ready || done)
+
+    val letter = 'A'
+    val snow = '雪'
+    val smile = '\u{1F600}'
+    println(letter)
+    println(letter.code)
+    println(snow.code)
+    println(smile)
+    println((letter.code + 1).toChar())
+    println('a' < 'b')
+
+    try {
+        println(0x110000.toChar())
+    } catch (e: IllegalArgumentException) {
+        println("not a Unicode scalar")
+    }
+}

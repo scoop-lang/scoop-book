@@ -1,0 +1,19 @@
+fun makeGreeter(greeting: String): (String) -> String = { name -> f"${greeting}, ${name}!" }
+
+fun main() {
+    val factor = 3
+    val scale: (Int) -> Int = { it * factor }
+    println(scale(5))
+
+    val hello = makeGreeter("Hello")
+    val howdy = makeGreeter("Howdy")
+    println(hello("Ada"))
+    println(howdy("Lin"))
+
+    var total = 10
+    val snapshot = total
+    val report = { f"total was ${snapshot}" }
+    total = 99
+    println(report())
+    println(f"total is ${total}")
+}

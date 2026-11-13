@@ -1,0 +1,10 @@
+fun main() {
+    val clamp: (Int) -> Int =
+        {
+            n ->
+            if (n > 100)
+                return 100
+            n
+        }
+    println(clamp(250))
+}

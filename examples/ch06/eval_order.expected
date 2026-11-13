@@ -1,0 +1,10 @@
+box(depth = ..., width = ...):
+  eval depth
+  eval width
+  eval default height
+  box(5, 1, 4)
+box(2, 3, 4):
+  eval width
+  eval height
+  eval depth
+  box(2, 3, 4)

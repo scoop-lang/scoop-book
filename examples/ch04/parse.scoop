@@ -1,0 +1,25 @@
+import scoop.text.*
+
+fun main() {
+    val port = "8080".toIntOrNone() ?: 80
+    val bad = "80x".toIntOrNone() ?: 80
+    println(port)
+    println(bad)
+
+    val big = "9000000000".toLongOrNone() ?: 0L
+    println(big)
+    println("ff".toIntOrNone(16) ?: 0)
+    println("2.5".toDoubleOrNone() ?: 0.0)
+    println("true".toBooleanStrictOrNone() ?: false)
+    println(" 42".toIntOrNone() ?: -1)
+    println(" 42".trim().toIntOrNone() ?: -1)
+
+    println(255.toString(16))
+    println(255.toString(2))
+
+    try {
+        println("forty-two".toInt())
+    } catch (e: NumberFormatException) {
+        println(f"failed: ${e.message ?: "unknown"}")
+    }
+}

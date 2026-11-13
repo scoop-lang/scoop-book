@@ -1,0 +1,2 @@
+no applicable candidate for `show`
+fun show(x: Int): String — argument for `x` has type Int8, which is not a subtype of Int

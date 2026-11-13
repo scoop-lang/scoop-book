@@ -1,0 +1,3 @@
+call to `pair` is ambiguous
+fun pair(a: Int, b: Any): String — tied after pairwise declaration forwarding
+fun pair(a: Any, b: Int): String — tied after pairwise declaration forwarding

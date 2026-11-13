@@ -1,0 +1,5 @@
+fun main() {
+    val width = 1.5f
+    val height = 2.5
+    println(width * height)
+}

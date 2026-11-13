@@ -1,0 +1,4 @@
+fun main() {
+    val n: Int = "x"
+    println(n)
+}

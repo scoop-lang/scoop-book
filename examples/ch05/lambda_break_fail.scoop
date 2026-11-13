@@ -1,0 +1,14 @@
+fun forEachNumber(values: Array<Int>, action: (Int) -> Unit) {
+    for (v in values) {
+        action(v)
+    }
+}
+
+fun main() {
+    for (round in 1..2) {
+        forEachNumber([1, 2, 3]) { v ->
+            if (v == 2) break
+            println(v)
+        }
+    }
+}

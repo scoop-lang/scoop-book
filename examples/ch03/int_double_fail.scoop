@@ -1,0 +1,4 @@
+fun main() {
+    val total = 10
+    println(total / 4.0)
+}

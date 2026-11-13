@@ -1,0 +1,11 @@
+open class Animal
+
+class Dog : Animal()
+
+fun count(vararg animals: Animal): Long = animals.size
+
+fun main() {
+    println(count(Dog(), Dog()))
+    val dogs: Array<Dog> = [Dog(), Dog()]
+    println(count(*dogs))
+}

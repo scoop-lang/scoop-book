@@ -1,0 +1,31 @@
+class Greeter(val greeting: String) {
+    fun greet(name: String): String = f"${greeting}, ${name}!"
+}
+
+class Tag(val label: String)
+
+fun double(x: Int): Int = x * 2
+
+fun String.shout(): String = this + "!"
+
+fun applyTo(value: Int, operation: (Int) -> Int): Int = operation(value)
+
+fun main() {
+    println(applyTo(21, ::double))
+
+    val hi = Greeter("Hi")
+    val bound: (String) -> String = hi::greet
+    println(bound("Ada"))
+
+    val unbound: (Greeter, String) -> String = Greeter::greet
+    println(unbound(Greeter("Hey"), "Lin"))
+
+    val shout: (String) -> String = String::shout
+    println(shout("hello"))
+
+    val makeTag: (String) -> Tag = ::Tag
+    println(makeTag("new").label)
+
+    fun triple(x: Int): Int = x * 3
+    println(applyTo(5, ::triple))
+}

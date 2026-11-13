@@ -1,0 +1,4 @@
+fun main(): Int {
+    println("everything is fine")
+    return 0
+}

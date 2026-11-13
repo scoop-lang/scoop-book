@@ -1,0 +1,37 @@
+fun main() {
+    val temperature = 31
+
+    // 作为表达式：结果赋给变量
+    val feeling =
+        if (temperature > 28)
+            "hot"
+        else
+            "fine"
+    println(feeling)
+
+    // else if 链也是一个表达式
+    val level =
+        if (temperature >= 35) {
+            "extreme"
+        } else
+            if (temperature >= 30) {
+                "high"
+            } else {
+                "normal"
+            }
+    println(level)
+
+    // 块的最后一个表达式是分支的结果
+    val fan =
+        if (temperature > 28) {
+            println("turning the fan on")
+            3
+        } else {
+            0
+        }
+    println(f"fan speed: ${fan}")
+
+    // 作为语句：结果被丢弃，可以没有 else
+    if (fan > 2)
+        println("it is noisy")
+}

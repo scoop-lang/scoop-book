@@ -1,0 +1,68 @@
+fun firstNegative(values: Array<Int>): Int {
+    for (v in values) {
+        if (v < 0)
+            return v
+    }
+    return 0
+}
+
+fun half(n: Int): String {
+    // return 也是表达式，可以放在 else 分支里
+    val h =
+        if (n % 2 == 0)
+            n / 2
+        else
+            return "odd"
+    return f"half of ${n} is ${h}"
+}
+
+fun main() {
+    // continue 跳过本轮，break 结束循环
+    for (n in 1 .. 10) {
+        if (n % 3 == 0)
+            continue
+        if (n > 7)
+            break
+        print(f"${n} ")
+    }
+    println("")
+
+    // when 的分支里也可以 break / continue
+    val readings = [12, -1, 15, 999, 18]
+    for (r in readings) {
+        when {
+            r < 0 -> continue
+            r == 999 -> break
+        }
+        print(f"${r} ")
+    }
+    println("")
+
+    // 标签：跳出外层循环
+    val grid = [[1, 2, 3], [4, 0, 6], [7, 8, 9]]
+    var found = "none"
+    search@for (row in 0L until grid.size) {
+        for (col in 0L until grid[row].size) {
+            if (grid[row][col] == 0) {
+                found = f"(${row}, ${col})"
+                break@search
+            }
+        }
+    }
+    println(f"zero at ${found}")
+
+    // continue@label：直接进入外层循环的下一轮
+    rows@for (row in grid) {
+        for (cell in row) {
+            if (cell == 0)
+                continue@rows
+        }
+        print(f"${row[0L]}.. ")
+    }
+    println("")
+
+    println(firstNegative([3, -1, -5]))
+    println(firstNegative([3, 4]))
+    println(half(8))
+    println(half(7))
+}

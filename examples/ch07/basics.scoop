@@ -1,0 +1,18 @@
+fun applyTwice(value: Int, operation: (Int) -> Int): Int = operation(operation(value))
+
+fun main() {
+    val square: (Int) -> Int = { x -> x * x }
+    println(square(4))
+    println(square.invoke(5))
+
+    val add: (Int, Int) -> Int = { a, b -> a + b }
+    println(add(2, 3))
+
+    val hello: () -> String = { "hello" }
+    println(hello())
+
+    println(applyTwice(3, square))
+    println(applyTwice(3, { x -> x + 10 }))
+    println(applyTwice(3) { x -> x - 1 })
+    println(applyTwice(3) { it * 2 })
+}

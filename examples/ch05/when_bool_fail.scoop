@@ -1,0 +1,6 @@
+fun main() {
+    val verbose = true
+    when (verbose) {
+        true -> println("verbose mode")
+    }
+}

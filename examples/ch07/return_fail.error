@@ -1,0 +1,1 @@
+a lambda cannot use bare `return`; use `return@label` for a local return

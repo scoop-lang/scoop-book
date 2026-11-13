@@ -1,0 +1,10 @@
+fun clamp(value: Int, low: Int, high: Int): Int {
+    if (value < low) {
+        value = low
+    }
+    return value
+}
+
+fun main() {
+    println(clamp(-1, 0, 10))
+}

@@ -1,0 +1,18 @@
+import scoop.collections.*
+
+fun main() {
+    val scores = [72, 95, 58, 88]
+
+    val passed = scores.filter { it >= 60 }
+    println(f"passed: ${passed.size}")
+
+    val curved = scores.map { it + 5 }
+    for (score in curved)
+        println(score)
+
+    val total = scores.fold(0) { sum, score -> sum + score }
+    println(f"total: ${total}")
+
+    println(scores.any { it > 90 })
+    println(scores.all { it > 50 })
+}

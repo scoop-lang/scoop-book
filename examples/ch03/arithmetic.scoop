@@ -1,0 +1,20 @@
+fun main() {
+    println(Int.MAX_VALUE + 1)
+    println(Long.MAX_VALUE + 1L)
+    println(Int.MAX_VALUE.toLong() + 1L)
+
+    println(7 / 2)
+    println(-7 / 2)
+    println(-7 % 2)
+
+    println(0xF0 and 0x3C)
+    println(0xF0 or 0x0F)
+    println(1 shl 4L)
+
+    val divisor = 0
+    try {
+        println(10 / divisor)
+    } catch (e: ArithmeticException) {
+        println("division by zero")
+    }
+}

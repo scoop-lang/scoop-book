@@ -1,0 +1,15 @@
+fun main() {
+    val text = "A雪"
+    val bytes = text.toByteArray()
+    val dump = StringBuilder()
+    for (b in bytes) {
+        dump.append(b.toUByte()).append(' ')
+    }
+    println(f"${bytes.size} bytes: ${dump.toString()}")
+
+    println(String.fromUtf8(bytes))
+
+    val broken: Array<Byte> = [0x41.toByte(), 0xFF.toByte(), 0x42.toByte()]
+    println(String.fromUtf8OrNone(broken) ?: "<invalid UTF-8>")
+    println(String.fromUtf8Lossy(broken))
+}

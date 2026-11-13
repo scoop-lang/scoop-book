@@ -1,0 +1,7 @@
+fun parse(text: String): Int = 0
+
+fun parse(text: String): Long = 0L
+
+fun main() {
+    println(parse("1"))
+}

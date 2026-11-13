@@ -1,0 +1,6 @@
+fun double(x: Int): Int = x * 2
+
+fun main() {
+    val f: (Int) -> Int = double
+    println(f(1))
+}

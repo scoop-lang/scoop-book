@@ -1,0 +1,12 @@
+fun firstNegative(values: Array<Int>): Int {
+    for (value in values) {
+        if (value < 0)
+            return value
+    }
+    return 0
+}
+
+fun main() {
+    println(firstNegative([1, -2, 3]))
+    println(firstNegative([1, 2]))
+}

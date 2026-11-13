@@ -1,0 +1,38 @@
+fun fail(message: String): Nothing {
+    throw IllegalArgumentException(Some(message))
+}
+
+fun percent(value: Int): Int =
+    if (value in 0 .. 100)
+        value
+    else
+        fail(f"not a percentage: ${value}")
+
+fun grade(score: Int): String =
+    when {
+        score >= 90 -> "A"
+        score >= 60 -> "pass"
+        score >= 0 -> "fail"
+        else -> fail(f"negative score: ${score}")
+    }
+
+fun checkAge(age: Int): String {
+    if (age < 0) {
+        fail(f"negative age: ${age}")
+    }
+    return f"age ${age}"
+}
+
+fun main() {
+    println(f"${percent(42)}% ${grade(95)} ${checkAge(30)}")
+    try {
+        println(percent(120))
+    } catch (e: IllegalArgumentException) {
+        println(f"error: ${e.message ?: ""}")
+    }
+    try {
+        println(checkAge(-1))
+    } catch (e: IllegalArgumentException) {
+        println(f"error: ${e.message ?: ""}")
+    }
+}

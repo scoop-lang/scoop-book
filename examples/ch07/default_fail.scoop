@@ -1,0 +1,6 @@
+fun greet(name: String, greeting: String = "Hello"): String = f"${greeting}, ${name}!"
+
+fun main() {
+    val g = ::greet
+    println(g("Ada"))
+}

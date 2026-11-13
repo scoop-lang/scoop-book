@@ -1,0 +1,4 @@
+fun main() {
+    val word = "cat"
+    word = word + "s"
+}

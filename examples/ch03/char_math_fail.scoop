@@ -1,0 +1,4 @@
+fun main() {
+    val next = 'a' + 1
+    println(next)
+}

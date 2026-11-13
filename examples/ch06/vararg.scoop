@@ -1,0 +1,30 @@
+fun sum(vararg numbers: Int): Int {
+    var total = 0
+    for (n in numbers) {
+        total += n
+    }
+    return total
+}
+
+fun join(vararg parts: String, separator: String = ", "): String {
+    val result = StringBuilder()
+    for (i in 0L until parts.size) {
+        if (i > 0L) {
+            result.append(separator)
+        }
+        result.append(parts[i])
+    }
+    return result.toString()
+}
+
+fun main() {
+    println(sum())
+    println(sum(1, 2, 3))
+
+    val more = [4, 5]
+    println(sum(1, *more, 6))
+    println(sum(numbers = more))
+
+    println(join("a", "b", "c"))
+    println(join("a", "b", separator = " | "))
+}

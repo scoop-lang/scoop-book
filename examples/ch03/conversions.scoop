@@ -1,0 +1,14 @@
+fun main() {
+    val count: Int = 3
+    val total: Long = 10L
+    println(total + count.toLong())
+    println(total.toInt() + count)
+
+    val average = total.toDouble() / count.toDouble()
+    println(average)
+
+    val big: Long = 5_000_000_000L
+    println(big.toInt())
+    println(300.toByte())
+    println((-1).toUInt())
+}

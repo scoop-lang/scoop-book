@@ -1,0 +1,4 @@
+#!/usr/bin/env -S scoop run --release
+fun main() {
+    println("I am a script")
+}

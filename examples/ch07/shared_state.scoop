@@ -1,0 +1,37 @@
+class Counter(var value: Int)
+
+fun forEachValue(values: Array<Int>, action: (Int) -> Unit) {
+    for (value in values)
+        action(value)
+}
+
+fun makeCounter(): () -> Int {
+    val state = Counter(0)
+    return {
+        state.value = state.value + 1
+        state.value
+    }
+}
+
+fun main() {
+    val sum = Counter(0)
+    forEachValue([1, 2, 3]) { sum.value = sum.value + it }
+    println(sum.value)
+
+    val next = makeCounter()
+    next()
+    next()
+    println(next())
+
+    val other = makeCounter()
+    println(other())
+
+    val clicks = Counter(0)
+    val press = { clicks.value = clicks.value + 1 }
+    val reset = { clicks.value = 0 }
+    press()
+    press()
+    println(f"clicks=${clicks.value}")
+    reset()
+    println(f"clicks=${clicks.value}")
+}

@@ -1,0 +1,5 @@
+fun box(width: Int, height: Int = 1, depth: Int = 1): Int = width * height * depth
+
+fun main() {
+    println(box(depth = 2, 3))
+}

@@ -1,0 +1,7 @@
+fun answer() {
+    return 42
+}
+
+fun main() {
+    answer()
+}

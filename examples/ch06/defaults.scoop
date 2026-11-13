@@ -1,0 +1,16 @@
+fun greeting(name: String, prefix: String = "Hello", ending: String = "!"): String =
+    f"${prefix}, ${name}${ending}"
+
+fun box(width: Int, height: Int = width, depth: Int = 1): Int = width * height * depth
+
+fun main() {
+    println(greeting("Scoop"))
+    println(greeting("Ada", "Hi"))
+    println(greeting(name = "Lin", ending = "."))
+    println(greeting(ending = "?", name = "Kai", prefix = "Hey"))
+    println(greeting("Mo", ending = "~"))
+
+    println(box(3))
+    println(box(3, 2))
+    println(box(3, depth = 4))
+}

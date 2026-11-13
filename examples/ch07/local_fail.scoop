@@ -1,0 +1,7 @@
+fun main() {
+    var count = 0
+    fun bump() {
+        count = count + 1
+    }
+    bump()
+}

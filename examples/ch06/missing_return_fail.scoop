@@ -1,0 +1,9 @@
+fun twice(x: Int): Int = x * 2
+
+fun quadruple(x: Int): Int {
+    twice(twice(x))
+}
+
+fun main() {
+    println(quadruple(3))
+}

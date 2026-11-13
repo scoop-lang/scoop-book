@@ -1,0 +1,27 @@
+fun String.exclaim(): String = this + "!"
+
+fun Int.isEven(): Boolean = this % 2 == 0
+
+val String.initial: Char
+get() = this.getCharAt(0L)
+
+val Int.squared: Int
+get() = this * this
+
+class Counter(var count: Int)
+
+fun Counter.bump(by: Int = 1) {
+    count += by
+}
+
+fun main() {
+    println("hello".exclaim())
+    println(4.isEven())
+    println("Scoop".initial)
+    println(7.squared)
+
+    val counter = Counter(0)
+    counter.bump()
+    counter.bump(by = 5)
+    println(counter.count)
+}

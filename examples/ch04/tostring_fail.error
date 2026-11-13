@@ -1,0 +1,1 @@
+f-string expression of type `Point` does not implement core `ToString`

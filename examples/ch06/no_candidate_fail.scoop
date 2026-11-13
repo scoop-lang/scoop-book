@@ -1,0 +1,8 @@
+fun show(x: Int): String = "Int"
+
+fun show(x: Double): String = "Double"
+
+fun main() {
+    val small: Byte = 1
+    println(show(small))
+}

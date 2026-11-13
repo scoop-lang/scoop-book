@@ -1,0 +1,25 @@
+fun main() {
+    val greeting = "Hello"
+    val tabbed = "name:\tAda\nlang:\tScoop"
+    val quoted = "She said \"hi\" and left a \\ behind"
+    val snow = "\u96EA and \u{1F600}"
+    println(greeting)
+    println(tabbed)
+    println(quoted)
+    println(snow)
+
+    val raw =
+        """C:\new\table
+    no escapes here: \n \t"""
+    println(raw)
+
+    val letter: Char = 'A'
+    val han: Char = '雪'
+    val emoji: Char = '\u{1F600}'
+    println(letter)
+    println(han)
+    println(emoji)
+
+    val full = greeting + ", " + "world" + "!"
+    println(full)
+}

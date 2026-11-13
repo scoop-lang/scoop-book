@@ -1,0 +1,1 @@
+cannot capture mutable local `total`; bind its current value to a `val` snapshot or capture explicit reference state

@@ -1,0 +1,20 @@
+fun trace(label: String, value: Int): Int {
+    println(f"  eval ${label}")
+    return value
+}
+
+fun box(
+    width: Int,
+    height: Int = trace("default height", 1),
+    depth: Int = trace("default depth", 1)
+): Int {
+    println(f"  box(${width}, ${height}, ${depth})")
+    return width * height * depth
+}
+
+fun main() {
+    println("box(depth = ..., width = ...):")
+    box(depth = trace("depth", 4), width = trace("width", 5))
+    println("box(2, 3, 4):")
+    box(trace("width", 2), trace("height", 3), trace("depth", 4))
+}

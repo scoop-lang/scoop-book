@@ -1,0 +1,6 @@
+fun main() {
+    val names = ["Ada", "Grace"]
+    for (i in 0 until names.size) {
+        println(names[i])
+    }
+}

@@ -1,0 +1,4 @@
+fun main() {
+    val price: Double = 1
+    println(price)
+}

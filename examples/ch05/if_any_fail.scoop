@@ -1,0 +1,5 @@
+fun main() {
+    val n = 3
+    val shown = if (n > 0) n else "none"
+    println(shown)
+}

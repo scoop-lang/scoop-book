@@ -1,0 +1,22 @@
+fun main() {
+    val small = 42
+    val large = 3_000_000_000
+    val explicit = 7L
+    val mask = 0xFF
+    val flags = 0b1010
+    val unsigned = 42u
+    val bigUnsigned = 7UL
+
+    println(small)
+    println(large)
+    println(explicit)
+    println(mask)
+    println(flags)
+    println(unsigned)
+    println(bigUnsigned)
+
+    println(Int.MAX_VALUE)
+    println(Long.MIN_VALUE)
+    println(Byte.MIN_VALUE)
+    println(UInt.MAX_VALUE)
+}

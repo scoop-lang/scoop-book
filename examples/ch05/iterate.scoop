@@ -1,0 +1,35 @@
+fun main() {
+    // 数组
+    val primes = [2, 3, 5, 7]
+    var sum = 0
+    for (p in primes) {
+        sum += p
+    }
+    println(f"sum = ${sum}")
+
+    // 需要下标时，遍历 0L until size
+    val names = ["Ada", "Grace", "Linus"]
+    for (i in 0L until names.size) {
+        println(f"${i}: ${names[i]}")
+    }
+
+    // 倒序遍历下标
+    for (i in names.size - 1L downTo 0L) {
+        print(f"${names[i]} ")
+    }
+    println("")
+
+    // 字符串按 Char（Unicode 标量）遍历
+    for (c in "héllo") {
+        print(f"[${c}]")
+    }
+    println("")
+
+    // ArrayList 也一样
+    val todo = ArrayList<String>()
+    todo.add("write")
+    todo.add("test")
+    for (item in todo) {
+        println(f"- ${item}")
+    }
+}

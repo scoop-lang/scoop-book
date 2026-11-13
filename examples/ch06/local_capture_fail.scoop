@@ -1,0 +1,13 @@
+fun countdown(): Int {
+    var steps = 0
+    fun tick() {
+        steps += 1
+    }
+    tick()
+    tick()
+    return steps
+}
+
+fun main() {
+    println(countdown())
+}

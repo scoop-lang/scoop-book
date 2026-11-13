@@ -1,0 +1,8 @@
+fun pair(a: Int, b: Any): String = "first"
+
+fun pair(a: Any, b: Int): String = "second"
+
+fun main() {
+    val n = 1
+    println(pair(n, n))
+}

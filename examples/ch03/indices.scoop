@@ -1,0 +1,13 @@
+fun main() {
+    val scores = [90, 75, 60]
+    println(scores.size)
+    println(scores[0L])
+    println(scores[1])
+    println(scores[scores.size - 1L])
+
+    val position: Int = 2
+    println(scores[position.toLong()])
+
+    val count: Int = scores.size.toInt()
+    println(count * 10)
+}

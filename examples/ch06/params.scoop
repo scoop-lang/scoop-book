@@ -1,0 +1,33 @@
+fun clamp(value: Int, low: Int, high: Int): Int {
+    var result = value
+    if (result < low) {
+        result = low
+    }
+    if (result > high) {
+        result = high
+    }
+    return result
+}
+
+fun normalize(count: Int): Int {
+    val count =
+        if (count < 0)
+            0
+        else
+            count
+    return count
+}
+
+fun addItem(items: ArrayList<String>, item: String) {
+    items.add(item)
+}
+
+fun main() {
+    println(clamp(15, 0, 10))
+    println(normalize(-3))
+
+    val names = ArrayList<String>()
+    addItem(names, "Ada")
+    addItem(names, "Lin")
+    println(names.size)
+}

@@ -1,0 +1,2 @@
+`infix` requires a member or extension receiver
+infix function `add` must have exactly one parameter, found 2

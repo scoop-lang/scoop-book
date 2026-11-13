@@ -1,0 +1,4 @@
+fun main() {
+    val n = 3
+    println("n = " + n)
+}

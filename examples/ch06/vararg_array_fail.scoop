@@ -1,0 +1,6 @@
+fun sum(vararg numbers: Int): Int = numbers.size.toInt()
+
+fun main() {
+    val values = [1, 2, 3]
+    println(sum(values))
+}

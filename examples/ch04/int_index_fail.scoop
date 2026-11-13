@@ -1,0 +1,5 @@
+fun main() {
+    val text = "Scoop"
+    val i = 0
+    println(text.getCharAt(i))
+}

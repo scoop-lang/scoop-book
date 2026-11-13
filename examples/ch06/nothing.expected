@@ -1,0 +1,3 @@
+42% A age 30
+error: not a percentage: 120
+error: negative age: -1

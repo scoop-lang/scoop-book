@@ -1,0 +1,5 @@
+fun main() {
+    val total: Long = 10L
+    val n: Int = total
+    println(n)
+}

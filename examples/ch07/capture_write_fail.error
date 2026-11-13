@@ -1,0 +1,2 @@
+no applicable candidate for `forEachValue`
+cannot capture mutable local `count`; bind its current value to a `val` snapshot or capture explicit reference state

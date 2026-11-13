@@ -1,0 +1,6 @@
+fun main() {
+    val name = "Ada"
+    println("Hello, $name")
+    println("Hello, ${name}")
+    println(f"Hello, ${name}")
+}

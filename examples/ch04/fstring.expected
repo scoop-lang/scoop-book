@@ -1,0 +1,8 @@
+Hello, Ada!
+Ada was born in 1815, 211 years ago.
+Ada has 3 letters
+plain: ${name}
+price: $5, braces: {not interpolated}
+Name: Ada
+Born: 1815
+Path: C:\docs\Ada.txt

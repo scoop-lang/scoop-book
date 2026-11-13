@@ -1,0 +1,18 @@
+//! dep: scoop:scoop.charset:0.1.0
+
+import scoop.charset.normalizeNfc
+
+fun main() {
+    val a = "apple"
+    val b = "app" + "le"
+    println(a == b)
+    println("apple" < "banana")
+    println("Zebra" < "apple")
+    println("apple".compareTo("apple"))
+
+    val composed = "\u00E9"
+    val decomposed = "e\u0301"
+    println(f"${composed} ${decomposed} ${composed.charLength} ${decomposed.charLength}")
+    println(composed == decomposed)
+    println(normalizeNfc(decomposed) == composed)
+}

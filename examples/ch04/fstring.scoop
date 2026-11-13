@@ -1,0 +1,16 @@
+fun main() {
+    val name = "Ada"
+    val year = 1815
+    println(f"Hello, ${name}!")
+    println(f"${name} was born in ${year}, ${2026 - year} years ago.")
+    println(f"${name} has ${name.charLength} letters")
+
+    println("plain: ${name}")
+    println(f"price: \$5, braces: {not interpolated}")
+
+    val report =
+        f"""Name: ${name}
+Born: ${year}
+Path: C:\docs\${name}.txt"""
+    println(report)
+}

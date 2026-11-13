@@ -1,0 +1,4 @@
+fun main() {
+    val id: UInt = 5
+    println(id)
+}

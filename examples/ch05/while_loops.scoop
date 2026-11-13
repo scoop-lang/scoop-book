@@ -1,0 +1,40 @@
+fun collatzSteps(start: Long): Int {
+    var n = start
+    var steps = 0
+    while (n != 1L) {
+        n =
+            if (n % 2L == 0L)
+                n / 2L
+            else
+                3L * n + 1L
+        steps++
+    }
+    return steps
+}
+
+fun digitCount(value: Int): Int {
+    var n = value
+    var digits = 0
+    do {
+        digits++
+        n /= 10
+    } while (n != 0)
+    return digits
+}
+
+fun main() {
+    println(collatzSteps(6L))
+    println(collatzSteps(27L))
+
+    println(digitCount(0))
+    println(digitCount(7))
+    println(digitCount(2026))
+
+    // do-while 循环体里声明的名字，在条件里可以使用
+    var i = 0
+    do {
+        val square = i * i
+        i++
+    } while (square < 50)
+    println(f"first square >= 50 comes from ${i - 1}")
+}

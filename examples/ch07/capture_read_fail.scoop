@@ -1,0 +1,5 @@
+fun main() {
+    var total = 10
+    val report = { println(total) }
+    report()
+}

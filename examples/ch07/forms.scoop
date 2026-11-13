@@ -1,0 +1,34 @@
+fun main() {
+    val add = { a: Int, b: Int -> a + b }
+    println(add(1, 2))
+
+    val describe: (Int) -> String =
+        {
+            n ->
+            val kind =
+                if (n % 2 == 0)
+                    "even"
+                else
+                    "odd"
+            f"${n} is ${kind}"
+        }
+    println(describe(7))
+
+    val record: (String) -> Unit =
+        {
+            println(f"record: ${it}")
+            it.charLength
+        }
+    record("Ada")
+
+    val parse =
+        fun(text: String): Int {
+            if (text == "one")
+                return 1
+            if (text == "two")
+                return 2
+            return 0
+        }
+    println(parse("two"))
+    println(parse("many"))
+}
