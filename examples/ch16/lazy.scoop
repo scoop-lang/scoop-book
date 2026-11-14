@@ -1,0 +1,27 @@
+class Lazy<T>(private val compute: () -> T) {
+    private var cached: T? = None
+
+    operator fun getValue(thisRef: Any): T =
+        when (val current = cached) {
+            case Some(val value) -> value
+            case None -> {
+                val value = compute()
+                cached = Some(value)
+                value
+            }
+        }
+}
+
+class Report(val title: String) {
+    val body: String by Lazy<String> {
+        println("building body...")
+        f"Report: ${title}"
+    }
+}
+
+fun main() {
+    val report = Report("Q3")
+    println("report created")
+    println(report.body)
+    println(report.body)
+}

@@ -1,0 +1,8 @@
+class Session {
+    var user: String?
+    var count: Int
+}
+
+fun main() {
+    println("x")
+}

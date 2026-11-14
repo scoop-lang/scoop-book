@@ -1,0 +1,10 @@
+fun main() {
+    var total = 0
+    val counter = object {
+        fun add(n: Int) {
+            total += n
+        }
+    }
+    counter.add(1)
+    println(total)
+}

@@ -1,0 +1,21 @@
+open class Animal(val name: String)
+
+class Dog(name: String): Animal(name) {
+    fun fetch(): String = f"${name} fetches the ball"
+}
+
+class Owner(val pet: Animal)
+
+fun main() {
+    val owner = Owner(Dog("Rex"))
+
+    val pet = owner.pet
+    if (pet is Dog) {
+        println(pet.fetch())
+    }
+
+    when (val p = owner.pet) {
+        is Dog -> println(p.fetch())
+        else -> println(f"${p.name} is not a dog")
+    }
+}

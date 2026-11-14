@@ -1,0 +1,9 @@
+interface Counter {
+    var count: Int
+}
+
+struct Clicks(val count: Int): Counter
+
+fun main() {
+    println(Clicks(1).count)
+}

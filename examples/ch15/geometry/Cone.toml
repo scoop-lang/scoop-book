@@ -1,0 +1,7 @@
+schema = 1
+
+[cone]
+group = "book.geometry"
+name = "geometry"
+version = "0.1.0"
+kind = "library"

@@ -1,0 +1,38 @@
+import scoop.collections.*
+
+typealias UserId = Long
+
+typealias Names = Array<String>
+
+typealias Table<V> = HashMap<String, V>
+
+typealias Check<T> = (T) -> Boolean
+
+fun lookup(id: UserId): String =
+    if (id == 1L)
+        "Ada"
+    else
+        "unknown"
+
+fun <T> countMatching(values: Array<T>, check: Check<T>): Int {
+    var count = 0
+    for (value in values) {
+        if (check(value)) {
+            count += 1
+        }
+    }
+    return count
+}
+
+fun main() {
+    val id: UserId = 1L
+    val plain: Long = id
+    println(lookup(plain))
+
+    val names: Names = ["Ada", "Grace", "Alan"]
+    println(countMatching(names) { name -> name.charLength > 3L })
+
+    val ages: Table<Int> = HashMap()
+    ages["Ada"] = 36
+    println(ages["Ada"] ?: 0)
+}

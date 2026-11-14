@@ -1,0 +1,11 @@
+class Fixed(private val value: Int) {
+    operator fun getValue(thisRef: Any): Int = value
+}
+
+struct Config(val name: String) {
+    val port: Int by Fixed(8080)
+}
+
+fun main() {
+    println(Config("dev").port)
+}

@@ -1,0 +1,15 @@
+interface Named {
+    fun displayName(): String
+}
+
+class Person(val name: String) {
+    fun displayName(): String = name
+}
+
+fun show(value: Named) {
+    println(value.displayName())
+}
+
+fun main() {
+    show(Person("Ada"))
+}

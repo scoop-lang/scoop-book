@@ -1,0 +1,6 @@
+import scoop.compiler.includeStr
+
+fun main() {
+    val name = "assets/banner.txt"
+    print(includeStr(name))
+}

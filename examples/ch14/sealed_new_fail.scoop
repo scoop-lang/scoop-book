@@ -1,0 +1,8 @@
+sealed class Payment(val cents: Long)
+
+class Cash(cents: Long): Payment(cents)
+
+fun main() {
+    val p = Payment(100L)
+    println(p.cents)
+}

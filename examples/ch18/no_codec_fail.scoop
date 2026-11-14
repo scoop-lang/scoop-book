@@ -1,0 +1,9 @@
+//! dep: scoop:scoop.json:0.1.0
+
+import scoop.json.*
+
+struct User(val name: String)
+
+fun main() {
+    println(Json.encodeToString(User("Ada")))
+}

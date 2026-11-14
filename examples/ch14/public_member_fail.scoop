@@ -1,0 +1,7 @@
+public interface Named {
+    fun displayName(): String
+}
+
+fun main() {
+    println("unused")
+}

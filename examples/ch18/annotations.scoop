@@ -1,0 +1,60 @@
+annotation class Table(val name: String)
+
+annotation class Column(val name: String, val nullable: Boolean = false)
+
+@Repeatable
+annotation class Tag(val text: String)
+
+@Table("accounts")
+@Tag("billing")
+@Tag("audited")
+struct Account(
+    @Column("account_id") val id: Long,
+    @Column("display_name") val owner: String,
+    @Column("email", nullable = true) val email: String? = None
+)
+
+fun stringArgument(annotation: AnnotationInfo, index: Long): String =
+    when (annotation.arguments[index].value) {
+        case AnnotationValue.String(val text) -> text
+        else -> "?"
+    }
+
+fun booleanArgument(annotation: AnnotationInfo, index: Long): Boolean =
+    when (annotation.arguments[index].value) {
+        case AnnotationValue.Boolean(val flag) -> flag
+        else -> false
+    }
+
+fun <T> printSchema() {
+    val description = typeInfo<T>().describe()
+    for (table in findAnnotations(description.annotations, annotationKey<Table>())) {
+        println(f"table ${stringArgument(table, 0L)}")
+    }
+    for (tag in findAnnotations(description.annotations, annotationKey<Tag>())) {
+        println(f"  tag ${stringArgument(tag, 0L)}")
+    }
+    when (description.shape) {
+        case TypeShape.Struct(val shape) -> {
+            for (field in shape.fields) {
+                for (column in findAnnotations(field.annotations, annotationKey<Column>())) {
+                    val nullable =
+                        if (booleanArgument(column, 1L))
+                            " NULL"
+                        else
+                            " NOT NULL"
+                    println(
+                        f"  column ${stringArgument(column, 0L)}: ${field.type.displayName}${
+                            nullable
+                        }"
+                    )
+                }
+            }
+        }
+        else -> println("  (not a struct)")
+    }
+}
+
+fun main() {
+    printSchema<Account>()
+}

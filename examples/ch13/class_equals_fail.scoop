@@ -1,0 +1,7 @@
+class Name(val text: String)
+
+fun main() {
+    val a = Name("Ada")
+    val b = Name("Ada")
+    println(a == b)
+}

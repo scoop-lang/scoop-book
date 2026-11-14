@@ -1,0 +1,12 @@
+class Greeter(private val greeting: String) {
+    operator fun invoke(name: String): String = f"${greeting}, ${name}!"
+
+    operator fun invoke(): String = f"${greeting}!"
+}
+
+fun main() {
+    val hello = Greeter("Hello")
+    println(hello("Ada"))
+    println(hello())
+    println(hello.invoke("Grace"))
+}

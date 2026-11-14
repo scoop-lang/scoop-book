@@ -1,0 +1,34 @@
+interface Greeter {
+    fun greet(name: String): String
+}
+
+fun politeGreeter(prefix: String): Greeter =
+    object: Greeter {
+        var count: Int = 0
+
+        override fun greet(name: String): String {
+            count += 1
+            return f"${prefix} ${name} (#${count})"
+        }
+    }
+
+fun main() {
+    val greeter = politeGreeter("Dear")
+    println(greeter.greet("Ada"))
+    println(greeter.greet("Bob"))
+
+    val point =
+        object {
+            val x: Int = 3
+            val y: Int = 4
+        }
+    println(point.x + point.y)
+
+    val unit = "cm"
+
+    class Length(val value: Int) {
+        fun show(): String = f"${value} ${unit}"
+    }
+
+    println(Length(12).show())
+}

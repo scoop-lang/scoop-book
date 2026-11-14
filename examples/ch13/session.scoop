@@ -1,0 +1,17 @@
+class Session(val id: Int) {
+    var user: String?
+    var token: String? = None
+
+    fun login(name: String) {
+        user = Some(name)
+    }
+
+    fun describe(): String = f"session ${id}: ${user ?: "anonymous"}"
+}
+
+fun main() {
+    val s = Session(7)
+    println(s.describe())
+    s.login("Ada")
+    println(s.describe())
+}

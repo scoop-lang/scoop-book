@@ -1,0 +1,18 @@
+class Rect(val width: Int, val height: Int) {
+    constructor(side: Int): this(side, side) {}
+
+    val area: Int = width * height
+}
+
+class Box {
+    var items: Int = 0
+
+    constructor(items: Int) {
+        this.items = items
+    }
+}
+
+fun main() {
+    println(Rect(4).area)
+    println(Box(3).items)
+}

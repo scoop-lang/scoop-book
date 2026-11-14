@@ -1,0 +1,7 @@
+class Secret {
+    private val code: Int = 7
+}
+
+fun main() {
+    println(f"${Secret().code}")
+}

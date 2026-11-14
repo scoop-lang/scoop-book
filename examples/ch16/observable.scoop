@@ -1,0 +1,23 @@
+class Logged(private val name: String, private var current: Int) {
+    operator fun getValue(thisRef: Any): Int = current
+
+    operator fun setValue(thisRef: Any, value: Int) {
+        println(f"${name}: ${current} -> ${value}")
+        current = value
+    }
+}
+
+class Settings {
+    var volume: Int by Logged("volume", 5)
+}
+
+fun main() {
+    val settings = Settings()
+    settings.volume = 8
+    settings.volume += 2
+    println(f"final volume = ${settings.volume}")
+
+    var retries: Int by Logged("retries", 0)
+    retries = 3
+    println(f"retries = ${retries}")
+}

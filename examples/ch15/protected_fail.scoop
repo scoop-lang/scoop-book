@@ -1,0 +1,16 @@
+open class Account {
+    public var balance: Long = 0L
+    private set(value) {
+        field = value
+    }
+
+    protected fun audit(note: String) {
+        println(note)
+    }
+}
+
+fun main() {
+    val account = Account()
+    account.balance = 10L
+    account.audit("changed")
+}

@@ -1,0 +1,7 @@
+class Token(val value: String)
+
+public fun issue(): Token = Token("t")
+
+fun main() {
+    println(issue().value)
+}

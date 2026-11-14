@@ -1,0 +1,6 @@
+table accounts
+  tag billing
+  tag audited
+  column account_id: Long NOT NULL
+  column display_name: String NOT NULL
+  column email: Option<String> NULL

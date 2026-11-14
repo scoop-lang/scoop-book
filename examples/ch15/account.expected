@@ -1,0 +1,4 @@
+[audit Ada] deposit 1000
+[audit Ada] deposit 50
+[audit Ada] interest added
+balance = 1050

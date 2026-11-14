@@ -1,0 +1,39 @@
+interface Describable {
+    fun describe(): String
+}
+
+struct Point(val x: Int, val y: Int): Describable {
+    override fun describe(): String = f"(${x}, ${y})"
+}
+
+class Label(val text: String): Describable {
+    override fun describe(): String = text
+}
+
+fun show(item: Describable) {
+    println(item.describe())
+}
+
+fun main() {
+    val p = Point(1, 2)
+    println(p.describe())
+
+    show(p)
+    val d: Describable = p
+
+    val items: Array<Describable> = [p as Describable, Label("origin")]
+    for (item in items) {
+        show(item)
+    }
+
+    val a: Any = p
+    val b: Any = p
+    println(a === a)
+    println(a === b)
+
+    if (d is Point) {
+        println(d.x + d.y)
+    }
+    val back = d as Point
+    println(back == p)
+}

@@ -1,0 +1,8 @@
+object Config {
+    val name: String = "demo"
+}
+
+fun main() {
+    val c = Config()
+    println(c.name)
+}

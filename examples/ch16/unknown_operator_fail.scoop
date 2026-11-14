@@ -1,0 +1,7 @@
+class Flag(val on: Boolean) {
+    operator fun and(other: Flag): Flag = Flag(on && other.on)
+}
+
+fun main() {
+    println(Flag(true).and(Flag(false)).on)
+}

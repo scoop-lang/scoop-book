@@ -1,0 +1,9 @@
+package book.geometry
+
+const val PI: Double = 3.14159
+
+fun requireNonNegative(value: Double, what: String) {
+    if (value < 0.0) {
+        throw IllegalArgumentException(Some(f"${what} must not be negative"))
+    }
+}

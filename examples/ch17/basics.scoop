@@ -1,0 +1,39 @@
+struct Box<T>(val value: T) {
+    fun <R> map(transform: (T) -> R): Box<R> = Box(transform(value))
+}
+
+class Stack<T> {
+    private val items = ArrayList<T>()
+
+    fun push(item: T) {
+        items.add(item)
+    }
+
+    fun pop(): T? =
+        if (items.size == 0L)
+            None
+        else
+            Some(items.removeAt(items.size - 1L))
+
+    fun count(): Long = items.size
+}
+
+fun <A, B> swap(pair: (A, B)): (B, A) = (pair._2, pair._1)
+
+fun main() {
+    val number = Box<Int>(42)
+    val word = Box("Scoop")
+    println(number.value + 1)
+    println(word.value.charLength)
+    val length = word.map { text -> text.charLength }
+    println(length.value)
+
+    val stack = Stack<String>()
+    stack.push("a")
+    stack.push("b")
+    println(stack.count())
+    println(stack.pop() ?: "empty")
+
+    val swapped = swap((1, "one"))
+    println(f"${swapped._1} ${swapped._2}")
+}

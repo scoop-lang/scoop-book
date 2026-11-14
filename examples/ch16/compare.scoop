@@ -1,0 +1,25 @@
+import scoop.collections.*
+
+struct Version(val major: Int, val minor: Int, val patch: Int): Compare<Version>, ToString {
+    public override operator fun compareTo(other: Version): Long =
+        when {
+            major != other.major -> major.compareTo(other.major)
+            minor != other.minor -> minor.compareTo(other.minor)
+            else -> patch.compareTo(other.patch)
+        }
+
+    public override fun toString(): String = f"${major}.${minor}.${patch}"
+}
+
+fun main() {
+    val current = Version(1, 4, 2)
+    val latest = Version(1, 10, 0)
+    println(current < latest)
+    println(current >= Version(1, 4, 2))
+    println(current == Version(1, 4, 2))
+
+    val versions = [latest, Version(0, 9, 9), current, Version(1, 4, 0)]
+    println(versions.sorted().joinToString(", "))
+    println(versions.sortedDescending().joinToString(", "))
+    println(versions.sortedBy { v -> v.patch }.joinToString(", "))
+}

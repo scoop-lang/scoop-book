@@ -1,0 +1,7 @@
+class Person(val name: String) {
+    override fun displayName(): String = name
+}
+
+fun main() {
+    println(Person("Ada").displayName())
+}

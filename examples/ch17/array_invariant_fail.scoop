@@ -1,0 +1,20 @@
+interface Named {
+    public fun displayName(): String
+}
+
+struct User(val name: String): Named {
+    public override fun displayName(): String = name
+}
+
+struct Box<T>(val value: T)
+
+fun printAll(values: Array<Named>) {
+    for (value in values) {
+        println(value.displayName())
+    }
+}
+
+fun main() {
+    val users = [User("Ada"), User("Grace")]
+    printAll(users)
+}

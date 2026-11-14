@@ -1,0 +1,13 @@
+struct Entry<K, V>(val key: K, val value: V)
+
+fun <T> repeatValue(value: T, times: Int): Array<T> = Array(times.toLong()) { _ -> value }
+
+fun main() {
+    val a = Entry("port", 8080)
+    val b = Entry<String, Long>("timeout", 30)
+    val c = Entry<_, String?>("user", None)
+    println(f"${a.key}=${a.value} ${b.key}=${b.value} ${c.key}=${c.value ?: "none"}")
+
+    val zeros = repeatValue<Long>(0, 3)
+    println(zeros.size)
+}

@@ -1,0 +1,13 @@
+struct Secret(val code: Int)
+
+fun <T: ToString> show(value: T): String = f"${value}"
+
+fun <T> show(value: T): String = "<hidden>"
+
+fun <T> showLater(value: T): String = show(value)
+
+fun main() {
+    println(show(42))
+    println(show(Secret(7)))
+    println(showLater(42))
+}

@@ -1,0 +1,5 @@
+fun <T> twice(x: T): T = x + x
+
+fun main() {
+    println(twice(21))
+}

@@ -1,0 +1,9 @@
+interface Named {
+    val name: String
+}
+
+struct City(val name: String): Named
+
+fun main() {
+    println(City("Lyon").name)
+}

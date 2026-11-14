@@ -1,0 +1,16 @@
+import scoop.compiler.*
+
+fun main() {
+    print(includeStr("assets/banner.txt"))
+
+    val bytes = includeBytes("assets/banner.txt")
+    println(f"bytes=${bytes.size}, first=${bytes[0L]}")
+
+    val bundled = includeDir("assets", include = ["**/*.txt"], exclude = ["private/**"])
+    for (file in bundled.files) {
+        println(f"file=${file.path} (${file.bytes.size} bytes)")
+    }
+    val helpSize = bundled["docs/help.txt"]?.size ?: 0L
+    val privateSize = bundled["private/notes.txt"]?.size ?: 0L
+    println(f"help=${helpSize}, private=${privateSize}")
+}

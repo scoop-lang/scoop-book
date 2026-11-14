@@ -1,0 +1,5 @@
+struct Entry<K, V>(val key: K, val value: V)
+
+fun main() {
+    val c = Entry("user", None)
+}

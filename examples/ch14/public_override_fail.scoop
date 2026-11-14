@@ -1,0 +1,12 @@
+public interface Named {
+    public fun displayName(): String
+}
+
+class Person(val name: String): Named {
+    override fun displayName(): String = name
+}
+
+fun main() {
+    val n: Named = Person("Ada")
+    println(n.displayName())
+}

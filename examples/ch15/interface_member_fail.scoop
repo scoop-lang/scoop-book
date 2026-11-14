@@ -1,0 +1,7 @@
+public interface Named {
+    fun name(): String
+}
+
+fun main() {
+    println("unreachable")
+}

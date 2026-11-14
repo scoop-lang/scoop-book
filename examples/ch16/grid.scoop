@@ -1,0 +1,36 @@
+class Grid(val width: Long, val height: Long) {
+    private val cells = MutableArray<Char>(width * height) { _ -> '.' }
+
+    operator fun get(row: Long, col: Long): Char = cells[row * width + col]
+
+    operator fun set(row: Long, col: Long, value: Char) {
+        cells[row * width + col] = value
+    }
+
+    operator fun contains(position: (Long, Long)): Boolean {
+        val row = position._1
+        val col = position._2
+        return row >= 0L && row < height && col >= 0L && col < width
+    }
+
+    fun render() {
+        for (row in 0L ..< height) {
+            val line = StringBuilder()
+            for (col in 0L ..< width) {
+                line.append(this[row, col])
+            }
+            println(line.toString())
+        }
+    }
+}
+
+fun main() {
+    val grid = Grid(5L, 3L)
+    grid[0L, 0L] = '#'
+    grid[1L, 2L] = '@'
+    grid[2L, 4L] = '#'
+    grid.render()
+    println(grid[1L, 2L])
+    println((1L, 4L) in grid)
+    println((3L, 0L) in grid)
+}

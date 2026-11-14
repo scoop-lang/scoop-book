@@ -1,0 +1,1 @@
+property `count` without an initializer must be a mutable Option property

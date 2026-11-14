@@ -1,0 +1,9 @@
+class Playlist(val title: String) {
+    class Stats(val count: Int) {
+        fun describe(): String = f"${title}: ${count} songs"
+    }
+}
+
+fun main() {
+    println(Playlist.Stats(1).describe())
+}

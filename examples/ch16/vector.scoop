@@ -1,0 +1,24 @@
+struct Vec2(val x: Double, val y: Double): ToString {
+    operator fun plus(other: Vec2): Vec2 = Vec2(x + other.x, y + other.y)
+
+    operator fun minus(other: Vec2): Vec2 = Vec2(x - other.x, y - other.y)
+
+    operator fun times(factor: Double): Vec2 = Vec2(x * factor, y * factor)
+
+    operator fun unaryMinus(): Vec2 = Vec2(-x, -y)
+
+    public override fun toString(): String = f"(${x}, ${y})"
+}
+
+operator fun Double.times(v: Vec2): Vec2 = v * this
+
+fun main() {
+    val a = Vec2(1.0, 2.0)
+    val b = Vec2(0.5, -1.0)
+    println(a + b)
+    println(a - b)
+    println(a * 3.0)
+    println(2.0 * a)
+    println(-a)
+    println(a + b * 2.0)
+}

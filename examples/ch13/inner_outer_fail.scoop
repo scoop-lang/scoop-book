@@ -1,0 +1,10 @@
+class Playlist(val title: String) {
+    inner class Cursor {
+        fun show(): String = title
+    }
+}
+
+fun main() {
+    val c = Playlist.Cursor()
+    println(c.show())
+}

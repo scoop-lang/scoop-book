@@ -1,0 +1,44 @@
+interface Logger {
+    fun info(message: String)
+
+    fun warn(message: String)
+
+    fun alert(message: String)
+}
+
+class ConsoleLogger: Logger {
+    public override fun info(message: String) {
+        println(f"[info] ${message}")
+    }
+
+    public override fun warn(message: String) {
+        println(f"[warn] ${message}")
+    }
+
+    public override fun alert(message: String) {
+        warn(f"ALERT ${message}")
+    }
+}
+
+class CountingLogger(private val inner: Logger): Logger by inner {
+    var warnings: Int = 0
+
+    public override fun warn(message: String) {
+        warnings += 1
+        inner.warn(message)
+    }
+}
+
+fun main() {
+    val logger = CountingLogger(ConsoleLogger())
+    logger.info("starting")
+    logger.warn("disk almost full")
+    println(f"warnings: ${logger.warnings}")
+
+    val asInterface: Logger = logger
+    asInterface.warn("via interface")
+    println(f"warnings: ${logger.warnings}")
+
+    logger.alert("overheating")
+    println(f"warnings: ${logger.warnings}")
+}

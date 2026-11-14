@@ -1,0 +1,11 @@
+class Account(val owner: String, initial: Long) {
+    var balance: Long = initial
+        private set(value) {
+            field = value
+        }
+}
+
+fun main() {
+    val a = Account("Ada", 100L)
+    a.balance = 0L
+}

@@ -1,0 +1,25 @@
+struct Box<T>(val value: T)
+
+fun <T> isInstance(value: Any): Boolean = value is T
+
+fun <T> firstOfType(values: Array<Any>): T? {
+    for (value in values) {
+        if (value is T) {
+            return Some(value)
+        }
+    }
+    return None
+}
+
+fun main() {
+    val boxed: Any = Box(1)
+    println(boxed is Box<Int>)
+    println(boxed is Box<String>)
+
+    println(isInstance<String>("text"))
+    println(isInstance<Int>("text"))
+
+    val things: Array<Any> = [1 as Any, "two" as Any, 3.0 as Any]
+    println(firstOfType<String>(things) ?: "none")
+    println(firstOfType<Double>(things) ?: 0.0)
+}

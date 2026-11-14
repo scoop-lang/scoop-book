@@ -1,0 +1,2 @@
+automatic encode has no ValueEncoder<Role> field codec
+automatic decode has no ValueDecoder<Role> field codec

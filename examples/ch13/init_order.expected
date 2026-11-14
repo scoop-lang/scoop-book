@@ -1,0 +1,12 @@
+primary:
+  first property
+  init 1: name=a, size=3
+  second property
+  init 2
+secondary:
+  first property
+  init 1: name=b, size=1
+  second property
+  init 2
+  secondary constructor body
+built a and b

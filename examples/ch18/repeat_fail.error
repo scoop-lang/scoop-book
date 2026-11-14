@@ -1,0 +1,1 @@
+annotation `@Table` must not be repeated on the same target

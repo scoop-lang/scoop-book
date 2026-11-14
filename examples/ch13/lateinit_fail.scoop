@@ -1,0 +1,7 @@
+class Session {
+    lateinit var user: String
+}
+
+fun main() {
+    println("x")
+}

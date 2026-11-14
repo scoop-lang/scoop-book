@@ -1,0 +1,11 @@
+interface Named {
+    public fun displayName(): String
+}
+
+struct User(val name: String): Named {
+    public override fun displayName(): String = name
+}
+
+fun main() {
+    val people: Array<Named> = [User("Ada"), User("Grace")]
+}

@@ -1,0 +1,7 @@
+fun <T> show(value: T) {
+    println(value)
+}
+
+fun main() {
+    show(1)
+}

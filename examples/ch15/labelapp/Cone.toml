@@ -1,0 +1,10 @@
+schema = 1
+
+[cone]
+group = "book.labelapp"
+name = "labelapp"
+version = "0.1.0"
+kind = "executable"
+
+[dependencies]
+"book.labels:labels" = { version = "0.1.0", path = "../labels" }

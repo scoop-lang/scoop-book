@@ -1,0 +1,4 @@
+fun main() {
+    val where = ::currentSourceLocation
+    println(where().line)
+}

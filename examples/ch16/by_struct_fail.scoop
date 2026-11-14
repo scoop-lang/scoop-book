@@ -1,0 +1,13 @@
+interface Named {
+    fun name(): String
+}
+
+class Fixed : Named {
+    public override fun name(): String = "fixed"
+}
+
+struct Wrapper(val inner: Named) : Named by inner
+
+fun main() {
+    println(Wrapper(Fixed()).name())
+}

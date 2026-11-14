@@ -1,0 +1,17 @@
+interface Walker {
+    fun move(): String = "walk"
+}
+
+interface Swimmer {
+    fun move(): String = "swim"
+}
+
+class Duck: Walker, Swimmer {
+    override fun move(): String = super < Walker >.move() + " and " + super < Swimmer >.move()
+}
+
+fun main() {
+    println(Duck().move())
+    val w: Walker = Duck()
+    println(w.move())
+}

@@ -1,0 +1,13 @@
+import scoop.collections.*
+
+struct Score(val points: Int) {
+    operator fun compareTo(other: Score): Long = points.compareTo(other.points)
+}
+
+fun main() {
+    val a = Score(3)
+    val b = Score(7)
+    println(a < b)
+    val ranked = [b, a].sorted()
+    println(ranked.size)
+}

@@ -1,0 +1,45 @@
+class Playlist(val title: String) {
+    private val songs = ArrayList<String>()
+
+    fun add(song: String): Playlist {
+        songs.add(song)
+        return this
+    }
+
+    fun cursor(): Cursor = Cursor()
+
+    inner class Cursor {
+        var position: Long = 0L
+
+        fun current(): String = f"${title}: ${songs[position]}"
+
+        fun next(): Boolean {
+            if (position + 1L >= songs.size) {
+                return false
+            }
+            position += 1L
+            return true
+        }
+    }
+
+    class Stats(val count: Long) {
+        fun describe(): String = f"${count} songs"
+    }
+
+    fun stats(): Stats = Stats(songs.size)
+}
+
+fun main() {
+    val list = Playlist("Road trip").add("Song A").add("Song B")
+    val cursor = list.cursor()
+    println(cursor.current())
+    cursor.next()
+    println(cursor.current())
+
+    val other = list.Cursor()
+    println(other.current())
+
+    val stats = Playlist.Stats(7L)
+    println(stats.describe())
+    println(list.stats().describe())
+}

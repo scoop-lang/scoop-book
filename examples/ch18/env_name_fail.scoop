@@ -1,0 +1,5 @@
+import scoop.compiler.env
+
+fun main() {
+    println(env("HOME") ?: "unknown")
+}

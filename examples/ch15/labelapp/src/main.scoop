@@ -1,0 +1,9 @@
+package book.labelapp
+
+import book.labels.label
+
+fun main() {
+    println(label("name", "Ada"))
+    println(label("age", 36))
+    println(label("ratio", 0.5))
+}

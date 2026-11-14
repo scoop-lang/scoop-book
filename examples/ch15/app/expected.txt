@@ -1,0 +1,4 @@
+circle: 3.14159
+rect: 6.0
+rect: 2.25
+total: 11.39159

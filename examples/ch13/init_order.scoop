@@ -1,0 +1,30 @@
+fun trace(label: String): Int {
+    println(f"  ${label}")
+    return 0
+}
+
+class Widget(val name: String, size: Int) {
+    val first: Int = trace("first property")
+
+    init {
+        println(f"  init 1: name=${name}, size=${size}")
+    }
+
+    val second: Int = trace("second property")
+
+    init {
+        println("  init 2")
+    }
+
+    constructor(name: String): this(name, 1) {
+        println("  secondary constructor body")
+    }
+}
+
+fun main() {
+    println("primary:")
+    val a = Widget("a", 3)
+    println("secondary:")
+    val b = Widget("b")
+    println(f"built ${a.name} and ${b.name}")
+}

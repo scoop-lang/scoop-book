@@ -1,0 +1,31 @@
+sealed class Payment(val cents: Long) {
+    abstract fun describe(): String
+}
+
+class Card(cents: Long, val last4: String): Payment(cents) {
+    override fun describe(): String = f"card *${last4}"
+}
+
+class Cash(cents: Long): Payment(cents) {
+    override fun describe(): String = "cash"
+}
+
+open class Voucher(cents: Long, val code: String): Payment(cents) {
+    override fun describe(): String = f"voucher ${code}"
+}
+
+class GiftCard(cents: Long, code: String): Voucher(cents, code)
+
+fun fee(p: Payment): Long =
+    when (p) {
+        is Card -> p.cents / 50L
+        is Cash -> 0L
+        is Voucher -> 10L
+    }
+
+fun main() {
+    val payments: Array<Payment> = [Card(10000L, "4242"), Cash(500L), GiftCard(2000L, "XMAS")]
+    for (p in payments) {
+        println(f"${p.describe()}: fee ${fee(p)}")
+    }
+}

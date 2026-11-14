@@ -1,0 +1,8 @@
+class Order {
+    val total: Long = subtotal + 10L
+    val subtotal: Long = 90L
+}
+
+fun main() {
+    println(Order().total)
+}

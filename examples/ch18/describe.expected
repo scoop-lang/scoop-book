@@ -1,0 +1,5 @@
+Account is a struct: id: Long owner: String email: Option<String>
+Shape is an enum: Circle Rect
+Int is neither a struct nor an enum
+true
+false

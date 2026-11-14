@@ -1,0 +1,14 @@
+interface Named {
+    public fun displayName(): String
+}
+
+struct User(val name: String): Named {
+    public override fun displayName(): String = name
+}
+
+struct Box<T>(val value: T)
+
+fun main() {
+    val users: Box<User> = Box(User("Ada"))
+    val named: Box<Named> = users
+}

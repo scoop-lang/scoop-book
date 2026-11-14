@@ -1,0 +1,16 @@
+struct Box<T>(val value: T) {
+    override interface ToString where T: ToString {
+        public override fun toString(): String = f"Box(${value})"
+    }
+}
+
+struct Secret(val code: Int)
+
+fun main() {
+    println(Box(42))
+    println(Box("Scoop"))
+    println(Box(Box(1.5)))
+
+    val hidden = Box(Secret(7))
+    println(hidden.value.code)
+}

@@ -1,0 +1,8 @@
+typealias UserId = Long
+
+fun describe(id: UserId): String = f"user ${id}"
+
+fun describe(count: Long): String = f"${count} items"
+
+fun main() {
+}

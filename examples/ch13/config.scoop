@@ -1,0 +1,27 @@
+const val APP_NAME: String = "demo"
+
+object Config {
+    const val MAX_USERS: Int = 100
+    val startedBy: String = announce()
+
+    var requests: Int = 0
+
+    fun record() {
+        requests += 1
+    }
+}
+
+fun announce(): String {
+    println("Config initialized")
+    return "main"
+}
+
+fun main() {
+    println(f"${APP_NAME} max=${Config.MAX_USERS}")
+    println("before first access")
+    Config.record()
+    Config.record()
+    println(f"requests=${Config.requests} by ${Config.startedBy}")
+    val same = Config
+    println(same === Config)
+}

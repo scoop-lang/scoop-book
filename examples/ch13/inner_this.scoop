@@ -1,0 +1,10 @@
+class Outer(val name: String) {
+    inner class Inner(val name: String) {
+        fun both(): String = f"${this.name} in ${this @Outer.name}"
+    }
+}
+
+fun main() {
+    val o = Outer("box")
+    println(o.Inner("ball").both())
+}

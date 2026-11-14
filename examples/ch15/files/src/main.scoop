@@ -1,0 +1,8 @@
+package book.files
+
+fun main() {
+    println(greet("Ada"))
+    println(decorate("hi"))
+}
+
+private fun decorate(text: String): String = f"[${text}]"

@@ -1,0 +1,13 @@
+interface Walker {
+    fun move(): String = "walk"
+}
+
+interface Swimmer {
+    fun move(): String = "swim"
+}
+
+class Duck: Walker, Swimmer
+
+fun main() {
+    println(Duck().move())
+}

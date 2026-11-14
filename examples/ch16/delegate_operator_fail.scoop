@@ -1,0 +1,11 @@
+class Fixed(private val value: Int) {
+    fun getValue(thisRef: Any): Int = value
+}
+
+class Config {
+    val port: Int by Fixed(8080)
+}
+
+fun main() {
+    println(Config().port)
+}

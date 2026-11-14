@@ -1,0 +1,11 @@
+open class Animal {
+    open fun sound(): String = "..."
+}
+
+class Dog : Animal() {
+    fun sound(): String = "woof"
+}
+
+fun main() {
+    println(Dog().sound())
+}

@@ -1,0 +1,20 @@
+open class Animal(val name: String) {
+    open fun sound(): String = "..."
+
+    fun describe(): String = f"${name} says ${sound()}"
+}
+
+class Dog(name: String): Animal(name) {
+    override fun sound(): String = "woof"
+}
+
+class Puppy(name: String): Animal(name) {
+    override fun sound(): String = super.sound() + " yip"
+}
+
+fun main() {
+    val animals: Array<Animal> = [Animal("thing"), Dog("Rex"), Puppy("Bit")]
+    for (a in animals) {
+        println(a.describe())
+    }
+}

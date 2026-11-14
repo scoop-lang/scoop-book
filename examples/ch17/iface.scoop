@@ -1,0 +1,48 @@
+import scoop.text.*
+
+interface Parser<T> {
+    public fun parse(text: String): T?
+}
+
+object IntParser: Parser<Int> {
+    public override fun parse(text: String): Int? = text.toIntOrNone()
+}
+
+object YesNoParser: Parser<Boolean> {
+    public override fun parse(text: String): Boolean? =
+        when (text) {
+            "yes" -> Some(true)
+            "no" -> Some(false)
+            else -> None
+        }
+}
+
+fun <T> parseAll(parser: Parser<T>, inputs: Array<String>): ArrayList<T> {
+    val results = ArrayList<T>()
+    for (input in inputs) {
+        when (val parsed = parser.parse(input)) {
+            case Some(val value) -> results.add(value)
+            case None -> {}
+        }
+    }
+    return results
+}
+
+interface Describable {
+    public fun describe(): String
+}
+
+struct Box<T: ToString>(val value: T): Describable {
+    public override fun describe(): String = f"Box(${value})"
+}
+
+fun main() {
+    println(IntParser.parse("42") ?: -1)
+    println(YesNoParser.parse("maybe") ?: false)
+    println(parseAll(IntParser, ["1", "x", "3"]).size)
+
+    val boxes: Array<Describable> = [Box(1) as Describable, Box("two") as Describable]
+    for (box in boxes) {
+        println(box.describe())
+    }
+}

@@ -1,0 +1,15 @@
+class Rect {
+    val width: Int
+    val height: Int
+
+    constructor(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+    }
+
+    constructor(side: Int) : this(side, side) {}
+}
+
+fun main() {
+    println(Rect(2, 3).width)
+}

@@ -1,0 +1,6 @@
+open class Base {
+    open fun <T> show(value: T): Int = 1
+}
+
+fun main() {
+}

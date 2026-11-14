@@ -1,0 +1,11 @@
+open class Animal {
+    fun sound(): String = "..."
+}
+
+class Dog : Animal() {
+    override fun sound(): String = "woof"
+}
+
+fun main() {
+    println(Dog().sound())
+}

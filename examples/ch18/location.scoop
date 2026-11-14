@@ -1,0 +1,21 @@
+fun log(message: String, location: SourceLocation = currentSourceLocation()) {
+    println(f"[${location.file}:${location.line}] ${location.functionName}: ${message}")
+}
+
+fun warn(message: String, location: SourceLocation = currentSourceLocation()) =
+    log(f"warning: ${message}", location)
+
+class Downloader {
+    fun start() {
+        log("starting")
+        val here = currentSourceLocation()
+        println(f"inside ${here.typeName}.${here.functionName}")
+        println(f"line ${here.line}, column ${here.column}")
+    }
+}
+
+fun main() {
+    log("hello")
+    warn("disk almost full")
+    Downloader().start()
+}

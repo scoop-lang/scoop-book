@@ -1,0 +1,29 @@
+import scoop.collections.*
+
+interface Named {
+    public fun displayName(): String
+}
+
+struct User(val name: String): Named {
+    public override fun displayName(): String = name
+}
+
+struct Box<T>(val value: T)
+
+fun <T: Named> printAll(values: Array<T>) {
+    for (value in values) {
+        println(value.displayName())
+    }
+}
+
+fun main() {
+    val users = [User("Ada"), User("Grace")]
+    printAll(users)
+
+    val linus = User("Linus")
+    val boxed: Box<Named> = Box(linus)
+    println(boxed.value.displayName())
+
+    val named: List<Named> = users.map { user -> user as Named }
+    println(named.size)
+}

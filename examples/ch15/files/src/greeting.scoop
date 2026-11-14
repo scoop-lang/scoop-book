@@ -1,0 +1,7 @@
+package book.files
+
+private val greetingWord = "Hello"
+
+private fun decorate(text: String): String = f"*** ${text} ***"
+
+fun greet(name: String): String = decorate(f"${greetingWord}, ${name}!")

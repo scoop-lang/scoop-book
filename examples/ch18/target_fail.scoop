@@ -1,0 +1,9 @@
+@Target([AnnotationTarget.Field])
+annotation class Column(val name: String)
+
+@Column("accounts")
+struct Account(@Column("account_id") val id: Long)
+
+fun main() {
+    println(typeInfo<Account>().type.displayName)
+}

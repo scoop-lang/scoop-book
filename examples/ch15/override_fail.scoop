@@ -1,0 +1,12 @@
+public interface Named {
+    public fun name(): String
+}
+
+class Dog: Named {
+    override fun name(): String = "dog"
+}
+
+fun main() {
+    val pet: Named = Dog()
+    println(pet.name())
+}

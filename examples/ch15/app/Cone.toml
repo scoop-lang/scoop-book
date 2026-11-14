@@ -1,0 +1,10 @@
+schema = 1
+
+[cone]
+group = "book.app"
+name = "app"
+version = "0.1.0"
+kind = "executable"
+
+[dependencies]
+"book.geometry:geometry" = { version = "0.1.0", path = "../geometry" }

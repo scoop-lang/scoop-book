@@ -1,0 +1,42 @@
+struct Account(val id: Long, val owner: String, val email: String? = None)
+
+enum Shape {
+    Circle(Double),
+    Rect(val width: Double, val height: Double),
+}
+
+fun memberName(name: MemberName): String =
+    when (name) {
+        case MemberName.Named(val text) -> text
+        case MemberName.Positional(val index) -> f"#${index}"
+    }
+
+fun <T> describeType(): String {
+    val info = typeInfo<T>()
+    val text = StringBuilder()
+    text.append(info.type.displayName)
+    when (info.describe().shape) {
+        case TypeShape.Struct(val shape) -> {
+            text.append(" is a struct:")
+            for (field in shape.fields) {
+                text.append(f" ${memberName(field.name)}: ${field.type.displayName}")
+            }
+        }
+        case TypeShape.Enum(val shape) -> {
+            text.append(" is an enum:")
+            for (variant in shape.variants) {
+                text.append(f" ${variant.name}")
+            }
+        }
+        else -> text.append(" is neither a struct nor an enum")
+    }
+    return text.toString()
+}
+
+fun main() {
+    println(describeType<Account>())
+    println(describeType<Shape>())
+    println(describeType<Int>())
+    println(typeInfo<Array<Long>>().type == typeInfo<Array<Long>>().type)
+    println(typeInfo<Array<Long>>().type == typeInfo<Array<Int>>().type)
+}

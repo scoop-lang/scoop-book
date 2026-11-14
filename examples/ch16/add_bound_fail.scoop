@@ -1,0 +1,11 @@
+struct Meters(val value: Double) {
+    operator fun plus(other: Meters): Meters = Meters(value + other.value)
+}
+
+fun <T : Add<T, T>> twice(x: T): T = x + x
+
+fun main() {
+    val a = Meters(1.5) + Meters(2.0)
+    println(a.value)
+    println(twice(Meters(1.0)).value)
+}

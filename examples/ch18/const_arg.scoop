@@ -1,0 +1,10 @@
+annotation class Table(val name: String)
+
+const val ACCOUNTS = "accounts"
+
+@Table(ACCOUNTS)
+struct Account(val id: Long)
+
+fun main() {
+    println(typeInfo<Account>().describe().annotations[0L].key.displayName)
+}

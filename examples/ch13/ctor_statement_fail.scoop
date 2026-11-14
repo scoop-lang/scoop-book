@@ -1,0 +1,9 @@
+class Widget(val name: String) {
+    init {
+        println(f"created ${name}")
+    }
+}
+
+fun main() {
+    Widget("a")
+}

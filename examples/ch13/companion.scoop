@@ -1,0 +1,28 @@
+class User private constructor(val id: Int, val name: String) {
+    companion object {
+        const val GUEST_ID: Int = 0
+        var created: Int = 0
+
+        fun create(name: String): User {
+            created += 1
+            return User(created, name)
+        }
+
+        fun guest(): User = User(GUEST_ID, "guest")
+    }
+}
+
+class Temperature(val celsius: Double) {
+    companion object Factory {
+        fun fromFahrenheit(f: Double): Temperature = Temperature((f - 32.0) * 5.0 / 9.0)
+    }
+}
+
+fun main() {
+    val ada = User.create("Ada")
+    val bob = User.create("Bob")
+    println(f"${ada.id} ${bob.id} ${User.guest().name} created=${User.created}")
+    println(User.Companion.created)
+    println(Temperature.fromFahrenheit(212.0).celsius)
+    println(Temperature.Factory.fromFahrenheit(32.0).celsius)
+}

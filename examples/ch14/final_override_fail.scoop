@@ -1,0 +1,15 @@
+open class Rect {
+    open fun area(): Double = 1.0
+}
+
+open class Square: Rect() {
+    final override fun area(): Double = 4.0
+}
+
+class Tiny: Square() {
+    override fun area(): Double = 0.5
+}
+
+fun main() {
+    println(Tiny().area())
+}

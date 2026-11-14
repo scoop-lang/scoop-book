@@ -1,0 +1,29 @@
+/**
+ * A rectangle measured in whole pixels.
+ *
+ * Use [Rect.area] to compute its size.
+ *
+ * @property width horizontal size, never negative
+ * @property height vertical size, never negative
+ */
+struct Rect(val width: Int, val height: Int) {
+    /** The number of pixels covered by this rectangle. */
+    val area: Int get() = width * height
+}
+
+/// Returns a rectangle scaled by [factor].
+///
+/// @param rect the rectangle to scale
+/// @param factor the scale factor applied to both sides
+/// @return a new rectangle; [rect] itself is unchanged
+@DocAlias("resize")
+fun scale(rect: Rect, factor: Int): Rect = Rect(rect.width * factor, rect.height * factor)
+
+/** Internal helper that should not appear in the generated API pages. */
+@DocHidden
+fun debugString(rect: Rect): String = f"${rect.width}x${rect.height}"
+
+fun main() {
+    val big = scale(Rect(3, 4), 10)
+    println(f"${debugString(big)} area=${big.area}")
+}

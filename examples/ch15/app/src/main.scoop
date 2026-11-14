@@ -1,0 +1,14 @@
+package book.app
+
+import book.geometry.Circle
+import book.geometry.Rect
+import book.geometry.Shape
+import book.geometry.totalArea
+
+fun main() {
+    val shapes: Array<Shape> = [Circle(1.0), Rect.of(2.0, 3.0), Rect.square(1.5)]
+    for (shape in shapes) {
+        println(f"${shape.name}: ${shape.area()}")
+    }
+    println(f"total: ${totalArea(shapes)}")
+}

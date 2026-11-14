@@ -1,0 +1,27 @@
+class Percent private constructor(val value: Int) {
+    companion object {
+        fun of(value: Int): Percent? =
+            if (value in 0 .. 100)
+                Some(Percent(value))
+            else
+                None
+
+        fun parse(value: Int): Percent {
+            if (value !in 0 .. 100) {
+                throw IllegalArgumentException(Some(f"not a percentage: ${value}"))
+            }
+            return Percent(value)
+        }
+    }
+
+    fun applyTo(total: Double): Double = total * value.toDouble() / 100.0
+}
+
+fun main() {
+    val discount = Percent.parse(15)
+    println(discount.applyTo(200.0))
+    when (Percent.of(150)) {
+        case Some(val p) -> println(f"ok: ${p.value}")
+        case None -> println("150 is rejected")
+    }
+}

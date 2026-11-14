@@ -1,0 +1,35 @@
+interface Named {
+    val name: String
+
+    fun greet(): String = f"Hello, ${name}!"
+}
+
+interface Priced {
+    fun price(): Long
+
+    fun label(): String = f"${price()} cents"
+}
+
+class Coffee(override val name: String, val cents: Long): Named, Priced {
+    override fun price(): Long = cents
+
+    override fun greet(): String = f"One ${name}, coming up."
+}
+
+class Tea(override val name: String): Named, Priced {
+    override fun price(): Long = 250L
+}
+
+fun printMenu(items: Array<Priced>) {
+    for (item in items) {
+        println(item.label())
+    }
+}
+
+fun main() {
+    val latte = Coffee("latte", 450L)
+    val green = Tea("green tea")
+    println(latte.greet())
+    println(green.greet())
+    printMenu([latte, green])
+}

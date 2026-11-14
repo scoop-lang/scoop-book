@@ -1,0 +1,47 @@
+open class Animal(val name: String)
+
+class Dog(name: String): Animal(name) {
+    fun fetch(): String = f"${name} fetches the ball"
+}
+
+class Cat(name: String): Animal(name)
+
+fun play(a: Animal): String {
+    if (a !is Dog) {
+        return f"${a.name} ignores you"
+    }
+    return a.fetch()
+}
+
+fun kind(value: Any): String =
+    when (value) {
+        is String -> f"text of ${value.charLength} chars"
+        is Int -> f"int ${value + 1}"
+        is Dog -> value.fetch()
+        else -> "something else"
+    }
+
+fun main() {
+    val rex: Animal = Dog("Rex")
+    val tom: Animal = Cat("Tom")
+    println(play(rex))
+    println(play(tom))
+
+    println(kind("hello"))
+    println(kind(41))
+    println(kind(rex))
+    println(kind(2.5))
+
+    val dog = rex as Dog
+    println(dog.fetch())
+
+    val maybe: Dog? = tom as? Dog
+    println(maybe?.fetch() ?: "not a dog")
+
+    try {
+        val wrong = tom as Dog
+        println(wrong.fetch())
+    } catch (e: ClassCastException) {
+        println("ClassCastException")
+    }
+}

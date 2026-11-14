@@ -1,0 +1,36 @@
+interface Named {
+    public fun displayName(): String
+}
+
+struct User(val name: String): Named, ToString {
+    public override fun displayName(): String = name
+
+    public override fun toString(): String = f"User(${name})"
+}
+
+class Project(val title: String): Named {
+    public override fun displayName(): String = title
+}
+
+fun <T: Named> greeting(value: T): String = f"Hello, ${value.displayName()}!"
+
+fun <T: Compare<T>> largest(values: Array<T>): T {
+    var best = values[0L]
+    for (value in values) {
+        if (value > best) {
+            best = value
+        }
+    }
+    return best
+}
+
+fun <T> describe(value: T): String where T: Named, T: ToString =
+    f"${value} is called ${value.displayName()}"
+
+fun main() {
+    println(greeting(User("Ada")))
+    println(greeting(Project("Scoop")))
+    println(largest([3, 9, 4]))
+    println(largest(["pear", "apple", "plum"]))
+    println(describe(User("Grace")))
+}

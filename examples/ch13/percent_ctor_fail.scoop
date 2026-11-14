@@ -1,0 +1,11 @@
+class Percent private constructor(val value: Int) {
+    companion object {
+        fun of(value: Int): Percent? =
+            if (value in 0 .. 100) Some(Percent(value)) else None
+    }
+}
+
+fun main() {
+    val p = Percent(150)
+    println(p.value)
+}

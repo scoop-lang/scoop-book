@@ -1,0 +1,6 @@
+annotation class Table(val name: String)
+
+fun main() {
+    val table = Table("accounts")
+    println(table.name)
+}

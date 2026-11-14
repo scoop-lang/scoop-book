@@ -1,0 +1,7 @@
+class Account(val owner: String, initial: Long) {
+    fun describe(): String = f"${owner} started with ${initial}"
+}
+
+fun main() {
+    println(Account("Ada", 1L).describe())
+}

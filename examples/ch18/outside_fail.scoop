@@ -1,0 +1,5 @@
+import scoop.compiler.includeStr
+
+fun main() {
+    print(includeStr("../ch02/hello.scoop"))
+}

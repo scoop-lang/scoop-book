@@ -1,0 +1,16 @@
+//! dep: scoop:scoop.json:0.1.0
+
+import scoop.json.*
+
+enum Role {
+    Admin,
+    Member(val since: Int),
+}
+
+struct User(val name: String, val roles: Array<Role>) {
+    public companion object: ValueEncoder<User>, ValueDecoder<User>
+}
+
+fun main() {
+    println(Json.encodeToString(User("Ada", [Role.Admin])))
+}

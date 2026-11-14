@@ -1,0 +1,30 @@
+import scoop.text.*
+
+class Account(val owner: String, initial: Long) {
+    var balance: Long = initial
+    private set(value) {
+        field = value
+    }
+
+    val isEmpty: Boolean
+    get() = balance == 0L
+
+    var note: String = ""
+    set(value) {
+        field = value.uppercaseAscii()
+    }
+
+    fun deposit(amount: Long) {
+        balance += amount
+    }
+}
+
+fun main() {
+    val a = Account("Ada", 100L)
+    a.deposit(50L)
+    a.note = "vip"
+    println(f"${a.owner} ${a.balance} ${a.isEmpty} ${a.note}")
+    val b = a
+    b.deposit(1L)
+    println(f"${a.balance} ${a === b}")
+}

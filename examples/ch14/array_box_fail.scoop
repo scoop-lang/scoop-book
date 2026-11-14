@@ -1,0 +1,12 @@
+interface Describable {
+    fun describe(): String
+}
+
+struct Point(val x: Int, val y: Int): Describable {
+    override fun describe(): String = f"(${x}, ${y})"
+}
+
+fun main() {
+    val items: Array<Describable> = [Point(1, 2), Point(3, 4)]
+    println(items.size)
+}

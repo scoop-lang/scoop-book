@@ -1,0 +1,10 @@
+class User(val name: String) {
+    companion object {
+        fun guest(): User = User("guest")
+    }
+}
+
+fun main() {
+    val ada = User("Ada")
+    println(ada.guest().name)
+}

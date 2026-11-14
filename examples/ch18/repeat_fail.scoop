@@ -1,0 +1,9 @@
+annotation class Table(val name: String)
+
+@Table("accounts")
+@Table("users")
+struct Account(val id: Long)
+
+fun main() {
+    println(typeInfo<Account>().type.displayName)
+}

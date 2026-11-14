@@ -1,0 +1,7 @@
+class Limits {
+    const val MAX: Int = 10
+}
+
+fun main() {
+    println("x")
+}

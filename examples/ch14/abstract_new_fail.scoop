@@ -1,0 +1,8 @@
+abstract class Shape {
+    abstract fun area(): Double
+}
+
+fun main() {
+    val s = Shape()
+    println(s.area())
+}

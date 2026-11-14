@@ -1,0 +1,9 @@
+struct Money(val cents: Long) {
+    operator fun plus(other: Money): Money = Money(cents + other.cents)
+}
+
+fun main() {
+    val total = Money(100L)
+    total += Money(50L)
+    println(total.cents)
+}

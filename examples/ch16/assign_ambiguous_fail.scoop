@@ -1,0 +1,20 @@
+class Tags(val items: ArrayList<String>) {
+    operator fun plus(tag: String): Tags {
+        val copy = ArrayList<String>()
+        for (item in items) {
+            copy.add(item)
+        }
+        copy.add(tag)
+        return Tags(copy)
+    }
+
+    operator fun plusAssign(tag: String) {
+        items.add(tag)
+    }
+}
+
+fun main() {
+    var tags = Tags(ArrayList<String>())
+    tags += "new"
+    println(tags.items.size)
+}

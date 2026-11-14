@@ -1,0 +1,7 @@
+struct Score(val points: Int) {
+    operator fun compareTo(other: Score): Int = points - other.points
+}
+
+fun main() {
+    println(Score(3) < Score(7))
+}

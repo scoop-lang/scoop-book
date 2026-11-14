@@ -1,0 +1,7 @@
+fun label(): String = "x"
+
+const val NAME: String = label()
+
+fun main() {
+    println(NAME)
+}
