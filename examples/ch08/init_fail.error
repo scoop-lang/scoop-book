@@ -1,1 +1,1 @@
-`init` blocks are not allowed in structs
+error[E0311]: `init` blocks are not allowed in structs

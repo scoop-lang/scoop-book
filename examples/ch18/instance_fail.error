@@ -1,1 +1,1 @@
-annotation class `Table` has no runtime constructor
+error[E0510]: annotation class `Table` has no runtime constructor

@@ -1,1 +1,1 @@
-declaration-site `in`/`out` is not supported
+error[E0616]: nominal type parameters are invariant; declaration-site `in`/`out` is not supported

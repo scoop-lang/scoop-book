@@ -14,17 +14,21 @@ struct Account(
     @Column("email", nullable = true) val email: String? = None
 )
 
-fun stringArgument(annotation: AnnotationInfo, index: Long): String =
-    when (annotation.arguments[index].value) {
-        case AnnotationValue.String(val text) -> text
-        else -> "?"
-    }
+fun stringArgument(annotation: AnnotationInfo, index: Long): String = when (annotation
+    .arguments[index]
+    .value
+) {
+    case AnnotationValue.String(val text) -> text
+    else -> "?"
+}
 
-fun booleanArgument(annotation: AnnotationInfo, index: Long): Boolean =
-    when (annotation.arguments[index].value) {
-        case AnnotationValue.Boolean(val flag) -> flag
-        else -> false
-    }
+fun booleanArgument(annotation: AnnotationInfo, index: Long): Boolean = when (annotation
+    .arguments[index]
+    .value
+) {
+    case AnnotationValue.Boolean(val flag) -> flag
+    else -> false
+}
 
 fun <T> printSchema() {
     val description = typeInfo<T>().describe()
@@ -38,11 +42,7 @@ fun <T> printSchema() {
         case TypeShape.Struct(val shape) -> {
             for (field in shape.fields) {
                 for (column in findAnnotations(field.annotations, annotationKey<Column>())) {
-                    val nullable =
-                        if (booleanArgument(column, 1L))
-                            " NULL"
-                        else
-                            " NOT NULL"
+                    val nullable = if (booleanArgument(column, 1L)) " NULL" else " NOT NULL"
                     println(
                         f"  column ${stringArgument(column, 0L)}: ${field.type.displayName}${
                             nullable
@@ -51,6 +51,7 @@ fun <T> printSchema() {
                 }
             }
         }
+
         else -> println("  (not a struct)")
     }
 }

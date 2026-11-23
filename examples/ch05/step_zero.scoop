@@ -1,6 +1,6 @@
 fun main() {
     try {
-        for (i in 1 .. 10 step 0) {
+        for (i in 1..10 step 0) {
             println(i)
         }
     } catch (e: IllegalArgumentException) {

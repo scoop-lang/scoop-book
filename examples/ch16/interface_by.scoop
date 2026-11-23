@@ -6,7 +6,7 @@ interface Logger {
     fun alert(message: String)
 }
 
-class ConsoleLogger: Logger {
+class ConsoleLogger : Logger {
     public override fun info(message: String) {
         println(f"[info] ${message}")
     }
@@ -20,7 +20,7 @@ class ConsoleLogger: Logger {
     }
 }
 
-class CountingLogger(private val inner: Logger): Logger by inner {
+class CountingLogger(private val inner: Logger) : Logger by inner {
     var warnings: Int = 0
 
     public override fun warn(message: String) {

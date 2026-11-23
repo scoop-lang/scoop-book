@@ -1,19 +1,17 @@
-fun describe(score: Int): String =
-    when (score) {
-        100 -> "perfect"
-        90, 95 -> "excellent"
-        in 60 .. 89 -> "pass"
-        in 0 ..< 60 -> "fail"
-        else -> "invalid"
-    }
+fun describe(score: Int): String = when (score) {
+    100 -> "perfect"
+    90, 95 -> "excellent"
+    in 60..89 -> "pass"
+    in 0..<60 -> "fail"
+    else -> "invalid"
+}
 
-fun bmiClass(bmi: Double): String =
-    when {
-        bmi < 18.5 -> "underweight"
-        bmi < 24.0 -> "normal"
-        bmi < 28.0 -> "overweight"
-        else -> "obese"
-    }
+fun bmiClass(bmi: Double): String = when {
+    bmi < 18.5 -> "underweight"
+    bmi < 24.0 -> "normal"
+    bmi < 28.0 -> "overweight"
+    else -> "obese"
+}
 
 fun main() {
     println(describe(100))
@@ -27,14 +25,14 @@ fun main() {
 
     // 分支体可以是块，最后一个表达式是结果
     val day = 6
-    val kind =
-        when (day) {
-            6, 7 -> {
-                println("no alarm today")
-                "weekend"
-            }
-            else -> "workday"
+    val kind = when (day) {
+        6, 7 -> {
+            println("no alarm today")
+            "weekend"
         }
+
+        else -> "workday"
+    }
     println(kind)
 
     // 作为语句、subject 是 Int：可以不穷尽，没有分支命中就什么也不做

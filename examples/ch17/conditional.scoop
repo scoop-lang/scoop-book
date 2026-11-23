@@ -1,5 +1,5 @@
 struct Box<T>(val value: T) {
-    override interface ToString where T: ToString {
+    override interface ToString where T : ToString {
         public override fun toString(): String = f"Box(${value})"
     }
 }

@@ -1,1 +1,3 @@
-named-field variants require every argument to be named
+error[E0711]: no applicable candidate for constructor `Shape.Text` in nominal constructor candidate layer
+note[N0002]: variant Shape.Text(content: String, size: Int)
+cause[E0705]: named-field variants require every argument to be named

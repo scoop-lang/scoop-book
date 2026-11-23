@@ -1,1 +1,1 @@
-initializer of `status` must be of type Status, found Int
+error[E0501]: initializer of `status` must be of type Status, found Int

@@ -1,1 +1,1 @@
-type `User` has no method `guest`
+error[E0402]: type `User` has no method `guest`

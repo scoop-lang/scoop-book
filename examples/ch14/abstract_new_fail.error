@@ -1,1 +1,1 @@
-abstract class `Shape` cannot be instantiated
+error[E0510]: abstract class `Shape` cannot be instantiated

@@ -10,14 +10,13 @@ enum Shape {
     Line(val length: Double, val width: Int = 1)
 }
 
-fun describe(shape: Shape): String =
-    when (shape) {
-        case Shape.Dot -> "a dot"
-        case Shape.Circle(val radius) -> f"a circle, radius ${radius}"
-        case Shape.Rect(val w, val h) -> f"a ${w} x ${h} rectangle"
-        case Shape.Text {val content, val size} -> f"text \"${content}\" at size ${size}"
-        case Shape.Line(val length, val width) -> f"a line, length ${length}, width ${width}"
-    }
+fun describe(shape: Shape): String = when (shape) {
+    case Shape.Dot -> "a dot"
+    case Shape.Circle(val radius) -> f"a circle, radius ${radius}"
+    case Shape.Rect(val w, val h) -> f"a ${w} x ${h} rectangle"
+    case Shape.Text {val content, val size} -> f"text \"${content}\" at size ${size}"
+    case Shape.Line(val length, val width) -> f"a line, length ${length}, width ${width}"
+}
 
 fun main() {
     println(describe(Shape.Dot))

@@ -1,1 +1,1 @@
-non-exhaustive when: missing pattern Yellow
+error[E0904]: non-exhaustive when: missing pattern Yellow

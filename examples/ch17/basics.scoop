@@ -9,11 +9,7 @@ class Stack<T> {
         items.add(item)
     }
 
-    fun pop(): T? =
-        if (items.size == 0L)
-            None
-        else
-            Some(items.removeAt(items.size - 1L))
+    fun pop(): T? = if (items.size == 0L) None else Some(items.removeAt(items.size - 1L))
 
     fun count(): Long = items.size
 }

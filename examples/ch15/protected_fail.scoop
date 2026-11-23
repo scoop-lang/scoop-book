@@ -1,8 +1,8 @@
 open class Account {
     public var balance: Long = 0L
-    private set(value) {
-        field = value
-    }
+        private set(value) {
+            field = value
+        }
 
     protected fun audit(note: String) {
         println(note)

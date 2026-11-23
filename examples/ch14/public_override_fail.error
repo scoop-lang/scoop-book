@@ -1,1 +1,1 @@
-visibility of `displayName` does not cover inherited slot `Named.displayName`
+error[E1016]: visibility of `displayName` does not cover inherited slot `Named.displayName`

@@ -2,13 +2,13 @@
 
 在 Kotlin/JVM 上，很多“框架级”的功能都建立在**运行期反射**之上：ORM 读取 `@Column` 注解把字段映射到数据库列，序列化库遍历类的属性生成 JSON，依赖注入框架按类型查找构造器。程序运行起来之后，再去“看”自己的类型长什么样。
 
-Scoop 没有运行期反射（第 1 章）。取而代之的是一组**编译期能力**：类型的结构在编译时就已经确定，编译器把它整理成普通的描述数据交给程序；注解是这些描述的一部分；编码、解码这类机械的代码由编译器直接生成；配置文件、版本号这类构建时就知道的东西，可以直接嵌入可执行文件。
+Scoop 没有运行期反射（第 1 章）。取而代之的是一组**编译期能力**：类型的结构在编译时就已经确定，编译器把它整理成普通的描述数据交给程序；注解是这些描述的一部分；编码、解码这类机械的代码由编译期运行的代码生成器写出；配置文件、版本号这类构建时就知道的东西，可以直接嵌入可执行文件。
 
 本章介绍：
 
 - 用 `typeInfo<T>()` 取得类型的静态描述；
 - 声明、使用和读取自定义注解；
-- 由 conformance 请求编译器生成编码和解码方法，为第 33 章的 JSON 做铺垫；
+- 用 `@GenerateWith` 请求生成编码和解码方法，为第 33 章的 JSON 做铺垫；
 - 用 `includeStr`、`includeBytes`、`includeDir` 把文件嵌入程序，用 `env` 读取构建时的环境变量；
 - 用 `SourceLocation` 取得调用处的源码位置；
 - 文档注释的写法。
@@ -52,7 +52,7 @@ Scoop 没有运行期反射（第 1 章）。取而代之的是一组**编译期
 - 描述里没有方法列表；
 - 私有成员也会出现在描述里，但这不会让它变得可以访问。
 
-需要“根据类型结构生成代码”时，Scoop 的做法是让编译器在编译期生成（18.4），而不是在运行期根据描述去动态调用。
+需要“根据类型结构生成代码”时，Scoop 的做法是在编译期生成（18.4），而不是在运行期根据描述去动态调用。
 
 ## 18.2　自定义注解
 
@@ -87,7 +87,7 @@ Scoop 没有运行期反射（第 1 章）。取而代之的是一组**编译期
 >
 > Kotlin 的注解有保留策略 `@Retention`：`RUNTIME` 的注解可以在运行期通过 `KClass.annotations` 读到，`SOURCE` 的注解编译后就消失了。Scoop 没有这个区分，也没有运行期的注解对象：所有注解都在编译期记录进静态描述，程序只能通过 `typeInfo<T>()` 读到类型和成员上的注解。函数上的注解是合法的，但目前的描述里没有方法列表，普通程序读不到它们。
 >
-> Kotlin 的 kapt、KSP 这类注解处理器在 Scoop 中也没有对应物。注解不会触发任何用户代码，“看到某个注解就生成一段代码”只发生在编译器内建的规则上，比如 18.4 的 `@Serialize`。
+> Kotlin 的 kapt、KSP 这类通用的注解处理器在 Scoop 中也没有对应物。自定义注解不会触发任何代码。最接近的是 18.4 的 `@GenerateWith`：它请求随工具链发布的生成器，为类型已经声明的接口补齐缺少的方法。生成器只能填写这些方法的方法体，不能新增声明或改动别处的代码。
 
 ## 18.3　注解的规则
 
@@ -149,14 +149,14 @@ Scoop 没有运行期反射（第 1 章）。取而代之的是一组**编译期
 
 想要一个运行期可以使用的配置对象，就声明一个普通的 struct 或 class。
 
-## 18.4　自动生成编码与解码
+## 18.4　生成编码与解码
 
 把值转换成 JSON 之类的外部格式，是反射最常见的用途。Scoop 用两个普通接口描述这件事，它们都在核心库里：
 
 - `ValueEncoder<T>`：有一个方法 `encode(value: T, encoder: Encoder)`，把 `T` 的值写出去；
 - `ValueDecoder<T>`：有一个方法 `decode(decoder: Decoder): T`，读出一个 `T`。
 
-实现这两个接口的对象叫 **codec**。通常由类型的 companion object 来充当：在 companion 上**声明**这两个接口、但不写方法体，编译器就会根据类型的结构生成 `encode` 和 `decode`：
+实现这两个接口的对象叫 **codec**，通常由类型的 companion object 来充当。这两个方法可以手写，但它们多半只是逐个字段地读写，相当机械。所以工具链附带了一个**代码生成器** `scoop.codec`：在 companion 上声明这两个接口，再用 `@GenerateWith` 指定由它生成，编译时生成器就会根据类型的结构写出 `encode` 和 `decode`：
 
 ```scoop
 {{#include ../../examples/ch18/codec.scoop}}
@@ -170,10 +170,13 @@ Scoop 没有运行期反射（第 1 章）。取而代之的是一组**编译期
 
 `scoop.json` 不在单文件程序默认可用的库里，所以第一行用 `//! dep:` 声明了依赖（第 29 章）。程序里要注意这几点：
 
-- `public companion object: ValueEncoder<User>, ValueDecoder<User>` 没有花括号体。这是在请求编译器为 `User` 合成两个方法：编码按字段的声明顺序写出一个 record，解码读出全部字段，再调用主构造器。
+- `@GenerateWith("scoop.codec", ["ValueEncoder<User>", "ValueDecoder<User>"])` 标在 companion 上。第一个参数是生成器的名字，第二个参数列出要生成的接口，每一项都是完整的类型写法。`GenerateWith` 属于核心库，不需要 import。
+- `public companion object : ValueEncoder<User>, ValueDecoder<User>` 没有花括号体，两个接口方法都还没有实现，正好交给生成器补齐：编码按字段的声明顺序写出一个 record；解码读出全部字段，再用具名实参调用主构造器。生成的方法和手写的方法一样要经过类型检查。
 - `Json.encodeToString(ada)` 和 `Json.decodeFromString<User>(text)` 通过 `User` 的 companion 找到 codec。这要求 companion 是 `public` 的，因为 JSON 库在另一个 Cone 中（第 15 章）。
 - `String?` 字段的值为 `None` 时，编码会省略这个字段；解码时缺少的字段使用声明里的默认值，所以 `{"name": "Grace"}` 也能解码。
 - enum 编码成只有一个 key 的对象，key 是 variant 的名字：`{"Member":{"since":2024}}`。
+
+`@GenerateWith` 只负责补齐缺少的方法，不会替类型添加接口，接口要自己写在 companion 的声明里。两个方向互相独立：可以只声明、只列出其中一个接口；companion 里已经手写的方法会被保留，生成器只生成剩下的。比如手写 `decode` 来校验输入，`encode` 仍然可以交给生成器。
 
 `@Serialize` 是核心库提供的注解，用来调整生成的代码：
 
@@ -186,17 +189,31 @@ Scoop 没有运行期反射（第 1 章）。取而代之的是一组**编译期
 
 上例中 `cachedScore` 被忽略：编码结果里没有它，解码回来是默认值 `0`。
 
-**每个字段的类型都要有 codec，而且在定义处就检查。** `Int`、`String`、`Boolean` 等基本类型，以及 `Option`、`Array`、`ArrayList`、tuple，核心库已经提供了 codec；你自己定义的类型要自己声明。上例的 `Role` 也声明了 companion，如果漏掉：
+**每个字段的类型都要有 codec，而且在编译时就检查。** `Int`、`String`、`Boolean` 等基本类型，以及 `Option`、`Array`、`ArrayList`、tuple，核心库已经提供了 codec；你自己定义的类型要自己声明。上例的 `Role` 也声明了 companion，如果漏掉：
 
 ```scoop
 {{#include ../../examples/ch18/codec_field_fail.scoop}}
 ```
 
+下面摘录了报错中的主要几行，省略了位置：
+
 ```text
 {{#include ../../examples/ch18/codec_field_fail.error}}
 ```
 
-错误指向 `User` 的 companion：编译器在生成 `User` 的方法时发现 `Role` 字段无法处理。这类问题不会拖到运行期才暴露。
+前两条错误指向 `User` 的 `roles` 字段，但没有 `E` 开头的编号：它们是生成器 `scoop.codec` 报告的，`note[N0003]` 注明了来源。代码生成器这类外部工具自己报告的问题，使用外部标识 `GENERATOR_DIAGNOSTIC`，而不是 Scoop 的规则编号。生成器没能写出方法，所以后面还跟着缺少方法的普通错误 `E1008`。这类问题不会拖到运行期才暴露。
+
+**忘了写 `@GenerateWith`** 时，companion 声明了接口，却没有人提供方法，得到的就只是普通的“没有实现接口方法”：
+
+```scoop
+{{#include ../../examples/ch18/no_generate_fail.scoop}}
+```
+
+```text
+{{#include ../../examples/ch18/no_generate_fail.error}}
+```
+
+所以在 codec 接口上看到 `E1008` 时，先检查 companion 上有没有 `@GenerateWith`，以及其中是否列全了接口。反过来，`@GenerateWith` 列出了 companion 并没有声明的接口时，报的是 `E1317`。
 
 如果类型完全没有声明 codec，`Json.encodeToString(value)` 的报错就不那么直接了：
 
@@ -208,7 +225,7 @@ Scoop 没有运行期反射（第 1 章）。取而代之的是一组**编译期
 {{#include ../../examples/ch18/no_codec_fail.error}}
 ```
 
-`encodeToString` 有两个重载：只有一个参数的那个要求 `T` 的 companion 实现 `ValueEncoder<T>`，`User` 不满足，编译器只好拿另一个重载 `encodeToString(value, codec)` 来报错。看到这条报错时，先检查类型有没有声明 `public companion object: ValueEncoder<…>`。
+`encodeToString` 有两个重载：只有一个参数的那个要求 `T` 的 companion 实现 `ValueEncoder<T>`，`User` 不满足，编译器只好拿另一个重载 `encodeToString(value, codec)` 来报错。看到这条报错时，先检查类型有没有声明 `public companion object : ValueEncoder<…>`。
 
 codec 也可以显式传入。这时 companion 不必是 `public`：
 
@@ -222,11 +239,21 @@ codec 也可以显式传入。这时 companion 不必是 `public`：
 {{#include ../../examples/ch18/explicit_codec.expected}}
 ```
 
-编译器只为“形状明确”的类型生成代码：struct、enum、tuple，以及没有基类、只有一个主构造器的 final class。开放的 class、带基类的 class、需要特殊表示的类型，要手写 `encode`、`decode`。手写 codec、为泛型类型组合 codec、JSON 的完整用法，都留到第 33 章。
+`scoop.codec` 只为“形状明确”的类型生成代码：struct、enum、tuple，以及没有基类的 final class。开放的 class、带基类的 class、需要特殊表示的类型，要手写 `encode`、`decode`。生成 `decode` 还有一条构造器规则：**主构造器必须是唯一可见的构造器**，因为生成的代码要用它来构造结果。类型有次构造器时，生成器会报 “automatic construction requires the primary constructor to be the only visible constructor”，并建议把这个构造入口改成 companion 上的具名工厂函数。只生成编码时没有这条限制。手写 codec、为泛型类型组合 codec、JSON 的完整用法，都留到第 33 章。
+
+> **深入一点：查看生成的代码**
+>
+> 生成器是随工具链发布的独立程序，`scoop.codec` 对应 `scoop-codec-generator`。编译器把需要补齐的方法交给它，它查询类型的字段、注解和默认值，返回这些方法的方法体，编译器再像对待手写代码一样检查和编译它们。想看看生成了什么，可以让 `scoop build` 把生成的源码保存下来：
+>
+> ```sh
+> scoop build codec.scoop --release --emit generated --dump-dir generated-src
+> ```
+>
+> 结果在 `generated-src` 下以 Cone 标识命名的子目录里，文件名是 `generated.scoop`。这份代码是写给编译器的：局部变量都叫 `generated0` 这样的名字，也没有经过排版，但能看清每个字段是怎样读写的。
 
 > **从 Kotlin 过来**
 >
-> 这套机制对应 kotlinx.serialization：`@Serializable` 对应“companion 声明 `ValueEncoder<T>`、`ValueDecoder<T>`”，`@SerialName("x")` 对应 `@Serialize(rename = "x")`，`@Transient` 对应 `@Serialize(ignore = true)`。区别在于 Scoop 不需要编译器插件，生成规则是语言的一部分；而且编码和解码是两个独立的接口，可以只声明其中一个。
+> 这套机制对应 kotlinx.serialization：`@Serializable` 对应“companion 声明 `ValueEncoder<T>`、`ValueDecoder<T>`，并标注 `@GenerateWith("scoop.codec", [...])`”，`@SerialName("x")` 对应 `@Serialize(rename = "x")`，`@Transient` 对应 `@Serialize(ignore = true)`。区别在于，kotlinx.serialization 依靠编译器插件为类生成序列化器，Scoop 的生成器只为你声明的接口填写方法体，生成的代码照常经过类型检查；而且编码和解码是两个独立的接口，可以只声明其中一个。
 
 ## 18.5　把文件嵌入程序
 
@@ -285,6 +312,8 @@ codec 也可以显式传入。这时 companion 不必是 `public`：
 ```scoop
 {{#include ../../examples/ch18/outside_fail.scoop}}
 ```
+
+下面只摘录错误编号和说明片段，省略与本机目录有关的实际路径：
 
 ```text
 {{#include ../../examples/ch18/outside_fail.error}}
@@ -355,11 +384,11 @@ SCOOP_BOOK_UNSET_EXAMPLE is not set
 {{#include ../../examples/ch18/location.expected}}
 ```
 
-`log` 的参数 `location` 的默认值是 `currentSourceLocation()`。默认值在调用处求值（第 6 章），所以 `main` 第 18 行调用 `log("hello")` 时，得到的就是第 18 行，而不是 `log` 函数内部的位置。
+`log` 的参数 `location` 的默认值是 `currentSourceLocation()`。默认值在调用处求值（第 6 章），所以 `main` 第 19 行调用 `log("hello")` 时，得到的就是第 19 行，而不是 `log` 函数内部的位置。
 
 要点：
 
-- **转发时要继续传递。** `warn` 自己也声明了带默认值的 `location` 参数，再把它传给 `log`，所以报告的是 `main` 中调用 `warn` 的第 19 行。如果 `warn` 写成 `fun warn(message: String) = log(f"warning: ${message}")`，报告的就是 `warn` 函数内部的那一行。
+- **转发时要继续传递。** `warn` 自己也声明了带默认值的 `location` 参数，再把它传给 `log`，所以报告的是 `main` 中调用 `warn` 的第 20 行。如果 `warn` 写成 `fun warn(message: String) = log(f"warning: ${message}")`，报告的就是 `warn` 函数内部的那一行。
 - `file` 不是你电脑上的绝对路径，而是可重现的“逻辑路径”：项目中形如 `group:name:version/src/main.scoop`，单文件程序固定为 `scoop:single-file:0.0.0/main.scoop`。因此构建结果不会因为源码放在哪个目录而改变。
 - 这些信息在编译时就已确定，不依赖调试信息，`--release` 下同样可用。
 - 只能直接调用，不能取函数引用：
@@ -407,8 +436,8 @@ SCOOP_BOOK_UNSET_EXAMPLE is not set
 | `T::class`、`KClass<T>` | `typeInfo<T>()`、`TypeRef`，只读描述 |
 | `inline fun <reified T>` | 普通 `fun <T>` 即可，单态化保证类型已知 |
 | `Class.forName`、反射构造、反射调用 | 不支持 |
-| kapt、KSP 注解处理器 | 不支持；代码生成只由编译器内建规则触发 |
-| `@Serializable` | companion 声明 `ValueEncoder<T>`、`ValueDecoder<T>` |
+| kapt、KSP 注解处理器 | 没有通用的注解处理器；`@GenerateWith` 请求工具链附带的生成器补齐接口方法 |
+| `@Serializable` | companion 声明 `ValueEncoder<T>`、`ValueDecoder<T>`，并标注 `@GenerateWith("scoop.codec", [...])` |
 | `@SerialName("x")`、`@Transient` | `@Serialize(rename = "x")`、`@Serialize(ignore = true)` |
 | 读取 resources 目录的资源文件 | `includeStr`、`includeBytes`、`includeDir`，编译时嵌入 |
 | Gradle 生成的 `BuildConfig.VERSION` | `env("SCOOP_VERSION")`，编译时嵌入 |
@@ -419,7 +448,8 @@ SCOOP_BOOK_UNSET_EXAMPLE is not set
 - **想在运行期按名字找到类型或调用方法**：Scoop 没有这种能力。用接口、`when` 或编译期生成的代码表达需要的行为。
 - **用普通 `val` 或函数调用作为注解参数**：只能用字面量和 `const val`（18.3）。
 - **以为注解会自动产生效果**：自定义注解只是数据，必须有代码通过 `typeInfo` 读取它才会起作用。
-- **companion 不是 `public`，或者字段类型没有 codec**：前者让 `Json.encodeToString(value)` 找不到 codec，后者在 companion 处报错（18.4）。
+- **companion 声明了 codec 接口，却忘了 `@GenerateWith`**：没有人提供方法，报 `E1008`（18.4）。
+- **companion 不是 `public`，或者字段类型没有 codec**：前者让 `Json.encodeToString(value)` 找不到 codec，后者由生成器在编译时报错（18.4）。
 - **忘了 `import scoop.compiler.*`**：`includeStr`、`env` 等不在默认可用的名称中。
 - **在 Cone 的 `src/main.scoop` 中写 `includeStr("assets/x.txt")`**：路径相对于源码文件，应写 `"../assets/x.txt"`。
 - **用 `env` 读取运行时配置**：它读的是编译时的环境。运行时的环境变量用 `scoop.platform`。
@@ -429,7 +459,7 @@ SCOOP_BOOK_UNSET_EXAMPLE is not set
 
 - Scoop 没有运行期反射；`typeInfo<T>()` 提供编译期整理好的只读类型描述：字段、variant、属性、构造器和注解。
 - 注解用 `annotation class` 声明，参数只能是常量；`@Repeatable` 允许重复，`@Target` 限制位置。注解本身没有效果，通过类型描述和 `findAnnotations` 读取。
-- 在 companion 上声明 `ValueEncoder<T>`、`ValueDecoder<T>` 而不写方法体，编译器就会生成编码和解码；`@Serialize` 调整字段名、必填和忽略等行为，缺少字段 codec 在定义处报错。
+- 在 companion 上声明 `ValueEncoder<T>`、`ValueDecoder<T>`，再标注 `@GenerateWith("scoop.codec", [...])`，生成器就会在编译时写出编码和解码方法；`@Serialize` 调整字段名、必填和忽略等行为，缺少字段 codec 在编译时报错。
 - `scoop.compiler` 包的 `includeStr`、`includeBytes`、`includeDir` 在编译时嵌入 Cone 内的文件，`env` 嵌入以 `SCOOP_` 开头的构建环境变量。
 - `currentSourceLocation()` 配合默认参数可以取得调用者的源码位置；多层转发时每一层都要传递。
 - 文档注释用 `/** */` 或 `///`，正文是 Markdown，由 `scoop doc` 处理。

@@ -1,1 +1,1 @@
-`sound` cannot override final method `Animal.sound`
+error[E1014]: `sound` cannot override final method `Animal.sound`

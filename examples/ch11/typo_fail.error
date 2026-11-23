@@ -1,1 +1,2 @@
-enum `Light` has no variant `Gren`; use `val Gren` to bind the matched value
+error[E0402]: enum `Light` has no variant `Gren`
+help[H0901]: use `val Gren` to bind the matched value

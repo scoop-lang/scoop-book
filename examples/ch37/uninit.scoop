@@ -9,8 +9,7 @@ fun main() {
     filled[2] = true
 
     for (i in 0L until 4L) {
-        if (!filled[i])
-            continue
+        if (!filled[i]) continue
         @Unsafe
         {
             // 由程序自己保证这个槽位已经初始化

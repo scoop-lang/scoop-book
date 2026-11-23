@@ -35,10 +35,6 @@ Scoop 的 class 和 Kotlin 的 class 非常接近：主构造器、次构造器�
 
 最后两行说明 class 是**引用类型**：`val b = a` 复制的是引用，`a` 和 `b` 指向同一个对象，通过 `b` 存的钱在 `a` 上也能看到，`a === b` 为 `true`。这和第 8 章的 struct 正好相反。
 
-> **注意 `scoop fmt` 的排版**
->
-> `scoop fmt` 会把属性的 `get()`、`set(value)` 排在和属性声明相同的缩进上，而不是像 Kotlin 习惯那样再缩进一级。这只是排版风格，不影响含义。
-
 ### 普通构造参数只在初始化时可见
 
 不带 `val` / `var` 的主构造参数不会成为对象的一部分。它只能在属性的初始值、`init` 块和基类构造参数里使用，方法里看不到它：
@@ -59,9 +55,9 @@ Scoop 的 class 和 Kotlin 的 class 非常接近：主构造器、次构造器�
 
 ```scoop
 var balance: Long = initial
-private set(value) {
-    field = value
-}
+    private set(value) {
+        field = value
+    }
 ```
 
 Kotlin 里可以只写 `private set`，但 Scoop 要求 setter 带上参数和函数体。类外给 `balance` 赋值会被拒绝：
@@ -149,7 +145,7 @@ Kotlin 允许先声明属性，稍后再赋值（`lateinit var`，或者在 `ini
 - class 有主构造器时，每个次构造器都必须通过 `: this(...)` 直接或间接委托给主构造器。`Rect(4)` 先执行 `Rect(4, 4)`，再执行次构造器自己的函数体。
 - class 没有主构造器时（`Box`），次构造器直接执行；如果有基类，用 `: super(...)` 调用基类构造器（第 14 章）。
 - 次构造器的参数不能写 `val` / `var`。
-- **次构造器必须有函数体**，即使是空的也要写 `{}`。`constructor(side: Int) : this(side, side)` 后面不加花括号会报 “secondary constructors require a block body”。`scoop fmt` 会把它排成 `constructor(side: Int): this(side, side) {}`。
+- **次构造器必须有函数体**，即使是空的也要写 `{}`。`constructor(side: Int) : this(side, side)` 后面不加花括号会报 “secondary constructors require a block body”。正确的写法是 `constructor(side: Int) : this(side, side) {}`。
 
 注意 `Box` 的 `items` 仍然有初始值 `0`，次构造器里再给它赋新值。像 Kotlin 那样只声明 `val width: Int`、留到构造器里赋值，在 Scoop 中不成立，因为属性必须在声明处初始化：
 
@@ -417,7 +413,7 @@ inner class 和外层类有同名成员时，`this.name` 指 inner 自己的，`
 {{#include ../../examples/ch13/anonymous.expected}}
 ```
 
-- `object: Greeter { ... }` 创建一个实现了 `Greeter` 接口的匿名对象，它可以有自己的状态（`count`）。函数 `politeGreeter` 的返回类型要写成 `Greeter`：匿名类型不能出现在非局部函数的签名里。
+- `object : Greeter { ... }` 创建一个实现了 `Greeter` 接口的匿名对象，它可以有自己的状态（`count`）。函数 `politeGreeter` 的返回类型要写成 `Greeter`：匿名类型不能出现在非局部函数的签名里。
 - 不实现任何接口的 `object { ... }` 也可以用，保存在局部变量里时可以访问它自己的成员（`point.x`）。
 - 函数体里还可以声明**局部类**（`class Length`），它只在声明之后、所在的代码块内可用。
 

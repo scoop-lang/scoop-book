@@ -1,1 +1,1 @@
-class `Account` has no property `balance`
+error[E0402]: class `Account` has no property `balance`

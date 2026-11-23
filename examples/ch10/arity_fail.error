@@ -1,1 +1,1 @@
-pattern has 2 element(s), but tuple of type (Int, Int, Int) has 3
+error[E0906]: pattern has 2 element(s), but tuple of type (Int, Int, Int) has 3

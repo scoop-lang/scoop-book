@@ -1,1 +1,1 @@
-type `T` has no method `plus`
+error[E0402]: type `T` has no method `plus`

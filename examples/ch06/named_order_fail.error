@@ -1,1 +1,3 @@
-an unnamed argument cannot follow an out-of-order named argument
+error[E0711]: no applicable candidate for `box` in current-unit top-level candidate layer
+note[N0002]: fun box(width: Int, height: Int, depth: Int): Int
+cause[E0704]: an unnamed argument cannot follow an out-of-order named argument

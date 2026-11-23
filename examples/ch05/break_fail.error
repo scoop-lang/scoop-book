@@ -1,1 +1,1 @@
-`break` is only allowed inside a loop
+error[E0806]: `break` is only allowed inside a loop

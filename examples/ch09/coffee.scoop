@@ -2,30 +2,28 @@ interface Priced {
     fun price(): Int
 }
 
-enum Coffee: Priced, ToString {
+enum Coffee : Priced, ToString {
     Espresso,
     Latte(val shots: Int = 1),
     Custom {name: String, cost: Int}
 
-    val hasMilk: Boolean get() =
-        when (this) {
+    val hasMilk: Boolean
+        get() = when (this) {
             case Latte(_) -> true
             else -> false
         }
 
-    override fun price(): Int =
-        when (this) {
-            case Espresso -> 3
-            case Latte(val shots) -> 4 + shots
-            case Custom {val cost, ..} -> cost
-        }
+    override fun price(): Int = when (this) {
+        case Espresso -> 3
+        case Latte(val shots) -> 4 + shots
+        case Custom {val cost, ..} -> cost
+    }
 
-    public override fun toString(): String =
-        when (this) {
-            case Espresso -> "espresso"
-            case Latte(val shots) -> f"latte with ${shots} shot(s)"
-            case Custom {val name, ..} -> name
-        }
+    public override fun toString(): String = when (this) {
+        case Espresso -> "espresso"
+        case Latte(val shots) -> f"latte with ${shots} shot(s)"
+        case Custom {val name, ..} -> name
+    }
 
     companion object {
         val houseSpecial: Coffee = Coffee.Custom(name = "maple mocha", cost = 7)

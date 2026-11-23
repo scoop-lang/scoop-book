@@ -2,10 +2,8 @@ fun minMax(values: Array<Int>): (Int, Int) {
     var lo = values[0L]
     var hi = values[0L]
     for (v in values) {
-        if (v < lo)
-            lo = v
-        if (v > hi)
-            hi = v
+        if (v < lo) lo = v
+        if (v > hi) hi = v
     }
     return (lo, hi)
 }

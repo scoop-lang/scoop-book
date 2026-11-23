@@ -1,1 +1,1 @@
-type `Shape` has no accessible nested type `Circle`
+error[E0402]: type `Shape` has no accessible nested type `Circle`

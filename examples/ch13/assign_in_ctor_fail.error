@@ -1,1 +1,1 @@
-property `width` without an initializer must be a mutable Option property
+error[E1509]: property `width` without an initializer must be a mutable Option property

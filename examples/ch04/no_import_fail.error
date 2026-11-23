@@ -1,1 +1,1 @@
-type `String` has no method `trim`
+error[E0402]: type `String` has no method `trim`

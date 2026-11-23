@@ -1,1 +1,1 @@
-type `Name` has no applicable member operator `equals` for `==`
+error[E0711]: type `Name` has no applicable member operator `equals` for `==`

@@ -1,1 +1,1 @@
-compile-time environment names must start with `SCOOP_`
+error[E1607]: compile-time environment names must start with `SCOOP_`

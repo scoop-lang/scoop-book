@@ -23,11 +23,7 @@ fun frame(lines: Array<String>, width: Int): String {
 }
 
 fun factorial(n: Int): Long {
-    fun loop(k: Int, acc: Long): Long =
-        if (k <= 1)
-            acc
-        else
-            loop(k - 1, acc * k.toLong())
+    fun loop(k: Int, acc: Long): Long = if (k <= 1) acc else loop(k - 1, acc * k.toLong())
     return loop(n, 1L)
 }
 

@@ -2,7 +2,7 @@ public interface Named {
     public fun name(): String
 }
 
-class Dog: Named {
+class Dog : Named {
     override fun name(): String = "dog"
 }
 

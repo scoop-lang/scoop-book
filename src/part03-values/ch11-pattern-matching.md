@@ -464,11 +464,10 @@ Scoop 在这里还支持解构：`when (val (x, y) = point)` 同时得到 `x` �
    ```scoop
    enum Direction { North, South, East, West }
 
-   fun opposite(d: Direction): Direction =
-       when (d) {
-           case North -> Direction.South
-           case Sotuh -> Direction.North
-           case East -> Direction.West
-           case West -> Direction.East
-       }
+   fun opposite(d: Direction): Direction = when (d) {
+       case North -> Direction.South
+       case Sotuh -> Direction.North
+       case East -> Direction.West
+       case West -> Direction.East
+   }
    ```

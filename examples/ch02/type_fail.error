@@ -1,1 +1,1 @@
-initializer of `n` must be of type Int, found String
+error[E0501]: initializer of `n` must be of type Int, found String

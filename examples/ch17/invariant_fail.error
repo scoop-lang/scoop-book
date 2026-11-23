@@ -1,2 +1,3 @@
-nominal application `Box` is invariant
-construct the target application directly or convert explicitly
+error[E0501]: initializer of `named` must be of type Box<Named>, found Box<User>
+note[N0501]: nominal application `Box` is invariant: first differing type argument 1 (`T`) is `User` in `Box<User>`, but `Named` in `Box<Named>`
+help[H0501]: construct the target application directly or convert explicitly

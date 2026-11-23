@@ -1,1 +1,1 @@
-compound assignment is ambiguous: both `plusAssign` and `plus` are applicable
+error[E0730]: compound assignment is ambiguous: both `plusAssign` and `plus` are applicable

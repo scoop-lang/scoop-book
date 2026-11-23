@@ -1,1 +1,1 @@
-struct `Clicks` cannot implement mutable interface property `count`
+error[E1507]: struct `Clicks` cannot implement mutable interface property `count`

@@ -1,1 +1,1 @@
-unknown variable `square`
+error[E0401]: unknown variable `square`

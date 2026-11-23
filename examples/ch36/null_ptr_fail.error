@@ -1,1 +1,1 @@
-`Ptr` raw address must be nonzero
+error[E1215]: `Ptr` raw address must be nonzero

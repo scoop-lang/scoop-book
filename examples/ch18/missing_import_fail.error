@@ -1,1 +1,1 @@
-unknown function `includeStr`
+error[E0401]: unknown function `includeStr`

@@ -1,1 +1,1 @@
-a subjectless value when requires `else`
+error[E0904]: non-exhaustive when: a subjectless value when requires `else`

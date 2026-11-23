@@ -1,1 +1,1 @@
-class `Animal` is final and cannot be inherited
+error[E1005]: class `Animal` is final and cannot be inherited

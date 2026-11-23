@@ -1,6 +1,6 @@
 struct Secret(val code: Int)
 
-fun <T: ToString> show(value: T): String = f"${value}"
+fun <T : ToString> show(value: T): String = f"${value}"
 
 fun <T> show(value: T): String = "<hidden>"
 

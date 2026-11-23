@@ -1,1 +1,2 @@
-guarded arms do not contribute to exhaustiveness
+error[E0904]: non-exhaustive when: missing pattern Circle(Double.NaN)
+note[N0901]: guarded arms do not contribute to exhaustiveness

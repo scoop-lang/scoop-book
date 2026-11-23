@@ -1,6 +1,6 @@
 import scoop.collections.*
 
-struct Point(val x: Int, val y: Int): ToString, Equals<Point>, Hash {
+struct Point(val x: Int, val y: Int) : ToString, Equals<Point>, Hash {
     public override fun toString(): String = f"(${x}, ${y})"
 
     public override operator fun equals(other: Point): Boolean = x == other.x && y == other.y
@@ -8,7 +8,7 @@ struct Point(val x: Int, val y: Int): ToString, Equals<Point>, Hash {
     public override fun hash(): Long = x.hash() * 31L + y.hash()
 }
 
-fun <T: Equals<T>> same(a: T, b: T): Boolean = a == b
+fun <T : Equals<T>> same(a: T, b: T): Boolean = a == b
 
 fun main() {
     val p = Point(1, 2)

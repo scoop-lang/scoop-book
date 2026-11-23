@@ -1,9 +1,6 @@
 enum Shape {
     Dot,
-    Text {
-        content: String,
-        size: Int
-    }
+    Text {content: String, size: Int}
 }
 
 fun main() {

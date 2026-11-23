@@ -1,1 +1,1 @@
-type `Fixed` has no applicable property delegate operator `getValue`
+error[E1525]: type `Fixed` has no applicable property delegate operator `getValue`

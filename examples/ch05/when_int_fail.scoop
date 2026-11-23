@@ -1,9 +1,8 @@
 fun main() {
     val n = 3
-    val label =
-        when (n) {
-            0 -> "zero"
-            1 -> "one"
-        }
+    val label = when (n) {
+        0 -> "zero"
+        1 -> "one"
+    }
     println(label)
 }

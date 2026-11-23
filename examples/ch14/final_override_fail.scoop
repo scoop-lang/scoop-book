@@ -2,11 +2,11 @@ open class Rect {
     open fun area(): Double = 1.0
 }
 
-open class Square: Rect() {
+open class Square : Rect() {
     final override fun area(): Double = 4.0
 }
 
-class Tiny: Square() {
+class Tiny : Square() {
     override fun area(): Double = 0.5
 }
 

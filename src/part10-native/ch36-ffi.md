@@ -72,7 +72,7 @@ unsafe 上下文有两种：
 
 `@Unsafe` 并不会关闭任何检查，类型检查、空安全等规则照常生效。它只是一个声明：**这里调用了编译器无法验证的操作，正确性由我负责。** 代码评审时，可以重点查看这些块。`@Unsafe` 块中如果有一小段又想恢复检查，可以在里面再写 `@Safe { ... }`。
 
-`scoop fmt` 会把 `@Unsafe` 放在单独的一行，下一行才是块的 `{`，就像注解写在函数前面一样。`@Unsafe` 块是语句，不是表达式，所以不能写 `val n = @Unsafe { ... }`。需要结果时，像 `utf8Length` 那样在块里 `return`，或者先在块外声明一个 `var`，在块里给它赋值。
+本书把 `@Unsafe` 写在单独的一行，下一行才是块的 `{`，就像注解写在函数前面一样；写成同一行的 `@Unsafe {` 含义相同，`scoop fmt` 会保留原来的写法。`@Unsafe` 块是语句，不是表达式，所以不能写 `val n = @Unsafe { ... }`。需要结果时，像 `utf8Length` 那样在块里 `return`，或者先在块外声明一个 `var`，在块里给它赋值。
 
 ### lambda 不继承 unsafe 上下文
 
@@ -115,7 +115,7 @@ C 函数的参数和返回值只能使用 **C-FFI-safe** 的类型：它在 C �
 | `const char *` | `Ptr<Int8>` 或 `Ptr<UInt8>` | 见 36.5 |
 | 函数指针 | `FunPtr<(A, B) -> R>` | 见 36.6 |
 | 按值传递的 struct | `@CLayout` struct | 见 36.8 |
-| 整数常量的 enum | 整型枚举 `enum E: Int { ... }`（第 9.7 节） | C 只能传入已声明的值 |
+| 整数常量的 enum | 整型枚举 `enum E : Int { ... }`（第 9.7 节） | C 只能传入已声明的值 |
 
 C 的类型名本身不会被解析，Scoop 只看你写的类型。如果 C 函数的参数是 `int64_t`，你声明成了 `Int`，编译器无从发现，运行时就会读到错误的值。所以声明时要对照头文件，逐个核对每个参数。
 
@@ -541,6 +541,8 @@ SCOOP_GC_STRESS_MOVE=1 SCOOP_GC_STRESS_MINOR=1 scoop --enable-gc-stress run .
 ## 36.12　几点补充
 
 **C++。** Scoop 只按 C 的调用约定调用外部函数。调用 C++ 库时，先写一层 `extern "C"` 的包装函数，再声明这些包装函数。C++ 异常必须在 C++ 一侧捕获，不能穿过 FFI 边界；`longjmp` 也一样。
+
+**Objective-C 和 Swift。** 在 Apple 平台上，`[[native.sources]]` 里的 `.m` 文件按 Objective-C（启用 ARC）编译，可以用它包装 AppKit、Foundation 等 framework，再以 C 函数的形式提供给 Scoop。Swift 也可以走同一条路：在 `Cone.toml` 中用 `[[native.swift]]` 声明一个 Swift 包的库产品，构建时由 SwiftPM 编译并链接进来，Scoop 照常用 `@Extern` 调用其中用 `@c` 导出的函数。这项功能目前只能在 macOS 上构建，需要 Swift 6.3 或更新版本，完整的例子见 `scoop example language/swift-bridge`。无论哪种语言，边界上都只能出现 C 的类型和调用约定。
 
 **阻塞调用。** 普通的 C 调用期间，GC 照常工作，所以 C 函数可以阻塞，比如等待文件或网络。对于很短的 C 函数，可以标注 `@GCLeaf` 省掉调用前后与 GC 的协调，见第 37 章。
 

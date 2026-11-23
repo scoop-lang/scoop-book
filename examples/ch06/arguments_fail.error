@@ -1,2 +1,6 @@
-required parameter `width` has no argument
-has no parameter named `size`
+error[E0711]: no applicable candidate for `box` in current-unit top-level candidate layer
+note[N0002]: fun box(width: Int, height: Int, depth: Int): Int
+cause[E0708]: required parameter `width` has no argument
+error[E0711]: no applicable candidate for `box` in current-unit top-level candidate layer
+note[N0002]: fun box(width: Int, height: Int, depth: Int): Int
+cause[E0702]: has no parameter named `size`

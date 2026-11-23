@@ -1,15 +1,11 @@
-struct Money(val cents: Long): ToString {
+struct Money(val cents: Long) : ToString {
     operator fun plus(other: Money): Money = Money(cents + other.cents)
 
     operator fun inc(): Money = Money(cents + 1L)
 
     public override fun toString(): String {
         val rest = cents % 100L
-        val pad =
-            if (rest < 10L)
-                "0"
-            else
-                ""
+        val pad = if (rest < 10L) "0" else ""
         return f"${cents / 100L}.${pad}${rest} USD"
     }
 }
@@ -22,7 +18,7 @@ class Basket {
     }
 
     val count: Long
-    get() = items.size
+        get() = items.size
 }
 
 fun main() {

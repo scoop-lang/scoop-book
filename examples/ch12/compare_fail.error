@@ -1,1 +1,1 @@
-cannot derive `equals` for `Option<Connection>`
+error[E1316]: cannot derive `equals` for `Option<Connection>`: field `Option.Some._0` of type `Connection` has no applicable member operator `equals`

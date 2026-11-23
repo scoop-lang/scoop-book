@@ -1,1 +1,2 @@
-function `double` is not a value; use `::double` to create a callable reference
+error[E0405]: function `double` is not a value
+help[H0703]: use `::double` to create a callable reference

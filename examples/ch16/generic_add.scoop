@@ -1,10 +1,10 @@
-struct Vec2(val x: Int, val y: Int): Add<Vec2, Vec2>, ToString {
+struct Vec2(val x: Int, val y: Int) : Add<Vec2, Vec2>, ToString {
     public override operator fun plus(other: Vec2): Vec2 = Vec2(x + other.x, y + other.y)
 
     public override fun toString(): String = f"(${x}, ${y})"
 }
 
-fun <T: Add<T, T>> total(start: T, values: Array<T>): T {
+fun <T : Add<T, T>> total(start: T, values: Array<T>): T {
     var sum = start
     for (value in values) {
         sum = sum + value

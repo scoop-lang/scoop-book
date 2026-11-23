@@ -40,7 +40,7 @@ export PATH="$HOME/.scoop/bin:$PATH"
 如果想安装到别的目录，可以用 `--home DIR` 参数或 `SCOOP_HOME` 环境变量；不想让脚本修改 shell 配置，设置 `SCOOP_NO_MODIFY_PATH=1`。要安装某个确定的版本，把版本号作为参数传给脚本：
 
 ```sh
-curl -fsSL https://scoop-lang.org/install.sh | sh -s -- 0.0.0-dev.20261113
+curl -fsSL https://scoop-lang.org/install.sh | sh -s -- 0.0.0-dev.20261123
 ```
 
 ### Windows
@@ -63,7 +63,7 @@ irm https://scoop-lang.org/install.ps1 | iex
 scoop --version
 ```
 
-能看到类似 `scoop 0.0.0-dev.20261113 (…)` 的输出，就说明安装成功了。括号里是工具链的源码版本号，报告问题时可以附上这一行。
+能看到类似 `scoop 0.0.0-dev.20261123 (…)` 的输出，就说明安装成功了。括号里是工具链的源码版本号，报告问题时可以附上这一行。
 
 ## 2.2　管理工具链版本
 
@@ -78,8 +78,8 @@ scoop-install update
 ```sh
 scoop-install show                # 当前状态
 scoop-install toolchain list      # 已安装的版本
-scoop-install default 0.0.0-dev.20261113   # 切换默认版本
-scoop +0.0.0-dev.20261113 --version        # 临时用某个版本执行一条命令
+scoop-install default 0.0.0-dev.20261123   # 切换默认版本
+scoop +0.0.0-dev.20261123 --version        # 临时用某个版本执行一条命令
 ```
 
 默认安装只包含宿主命令、本机目标平台的预编译基础库，以及供语言服务器做源码导航用的库源码。图形界面库、交叉编译用的其他目标平台等可以按需添加，例如 `scoop-install component add gui --target aarch64-apple-darwin`。`scoop-install target list` 和 `scoop-install component list` 会列出可用的选项。
@@ -88,7 +88,7 @@ scoop +0.0.0-dev.20261113 --version        # 临时用某个版本执行一条�
 
 ```toml
 [toolchain]
-version = "0.0.0-dev.20261113"
+version = "0.0.0-dev.20261123"
 targets = ["aarch64-apple-darwin"]
 ```
 
@@ -180,11 +180,10 @@ scoop run args.scoop --release -- Ada
 ```
 
 ```text
-error[SCOOPC_HIR_ERROR]: missing executable entry: declare exactly one ordinary `fun main(): Unit`, `fun main(): Int`, `fun main(args: Array<String>): Unit`, or `fun main(args: Array<String>): Int`
-note: `fun main(count: Int): Unit` is not eligible because its parameters must be empty or one `Array<String>`
+{{#include ../../examples/ch02/main_fail.error}}
 ```
 
-报错列出了全部合法形式，`note` 指出了这个候选为什么不合格。把 `main` 拼错（比如写成 `mian`）时，得到的是同一条 “missing executable entry” 错误。
+主错误 `E1702` 列出了全部合法形式，附注 `N1701` 指出了这个候选为什么不合格。把 `main` 拼错（比如写成 `mian`）时，得到的也是 `E1702`，但没有候选可供解释。
 
 > **从 Kotlin 过来**
 >
@@ -209,7 +208,7 @@ scoop fmt hello.scoop           # 改写文件
 scoop fmt hello.scoop --check   # 只检查
 ```
 
-Scoop 的格式化风格是固定的，没有配置项。书中所有示例都经过 `scoop fmt` 排版，你会发现它在一些地方和 Kotlin 的习惯写法不同，比如区间写成 `1 .. 5`，单条语句的分支也会换行。
+Scoop 的格式化风格是固定的，没有配置项。书中所有示例都经过 `scoop fmt` 排版。它的风格接近 Kotlin 的常见写法：缩进四个空格，父类型前的冒号两边各有一个空格（`class Dog : Animal()`），区间写成 `1..5`，放得进一行的短 `if` 会留在一行里。
 
 **`scoop check`** 比 `run` 快得多，适合在写代码的过程中频繁执行：
 
@@ -222,7 +221,7 @@ scoop check type_fail.scoop --release
 ```
 
 ```text
-error[SCOOPC_HIR_ERROR]: initializer of `n` must be of type Int, found String
+error[E0501]: initializer of `n` must be of type Int, found String
  --> type_fail.scoop:2:18
   |
 2 |     val n: Int = "x"
@@ -230,6 +229,28 @@ error[SCOOPC_HIR_ERROR]: initializer of `n` must be of type Int, found String
 ```
 
 报错给出了错误代码、说明、文件位置，并用 `^^^` 标出出错的表达式。
+
+### 读懂编号和附属信息
+
+`E0501` 中的 `E` 表示错误，`05` 是“类型与转换”分类，`01` 是这类中的“类型不匹配”规则。编号对应实际规则，同一条规则不会因为换了编译阶段就换编号；具体类型、名称和位置仍要看文案。
+
+| 前缀 | 含义 |
+| --- | --- |
+| `E` | 源码、输入、配置或外部操作违反规则 |
+| `W` | 警告；即使因禁止警告而构建失败，仍保留 W 编号 |
+| `N` | `note`：相关位置、候选或解释 |
+| `H` | `help`：可以采取的修改建议 |
+| `ICE` | 编译器内部错误，应附上工具链版本、完整诊断和最小复现来报告问题 |
+
+先看主错误和位置，再读它下面的附属信息。比如第 6 章的重载报错会用 `note[N0002]` 列出候选，再用 `cause[E0501]` 说明某个候选因类型不匹配而失败。`cause` 复用实际错误规则的 E 编号；`note` 和 `help` 是附属信息，不是独立的严重级别。全部编号可查[诊断规则目录](https://github.com/scoop-lang/scoop/blob/main/docs/diagnostics/RULES.md)。代码生成器这类外部工具自己报告的问题不使用这套编号，而是保留来源的标识，比如第 18 章会见到的 `GENERATOR_DIAGNOSTIC`。
+
+脚本需要处理诊断时，可以读取逐行 JSON，不必解析英文文案：
+
+```sh
+scoop check type_fail.scoop --release --message-format json 2> diagnostics.jsonl
+```
+
+诊断写到标准错误流，记录的 `schema` 为 `2`、`kind` 为 `"diagnostic"`，包含 `code`、`severity`、`message` 和位置。递归的 `notes` 保留原因、说明与建议，子项的 `kind` 分别是 `"cause"`、`"note"`、`"help"`。编辑器通过 LSP 使用相同的编号。
 
 需要强调的是：**`check` 通过，不等于程序能运行。** `check` 只覆盖编译器的前端，生成机器码、链接 C 库这些后续步骤它都不做；程序运行时还可能抛出异常，或者像 `args.scoop` 那样因为缺少参数而返回非零退出码。`check` 是“程序写得对不对”的快速检查，最终还是要用 `run` 或测试（第 30 章）来验证。
 
@@ -303,8 +324,9 @@ scoop example start/hello --format source --file main.scoop > main.scoop
 - 语法高亮、代码折叠和自动缩进；
 - 实时诊断（和 `scoop check` 报的是同样的错误）；
 - 补全、悬停文档、签名提示；
-- 跳转到定义、查找引用、重命名；
-- 在 `main` 和测试方法上方显示 Run／Debug 按钮。
+- 跳转到定义、查找引用、重命名，查看类型层级和调用层级；
+- 提取变量、提取函数、整理 import 等重构操作；
+- 在 `main` 和测试方法上方显示 Run／Debug 按钮，Debug 使用随工具链发布的调试适配器 `scoop-lldb-dap`，可以设断点、单步执行和查看变量。
 
 扩展以 VSIX 文件的形式随工具链发布，位于工具链目录的 `tooling/` 下（默认是 `~/.scoop/toolchains/<版本>-<宿主>/tooling/`）。用命令行安装：
 

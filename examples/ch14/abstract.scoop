@@ -4,15 +4,15 @@ abstract class Shape(val name: String) {
     open fun describe(): String = f"${name}: ${area()}"
 }
 
-open class Rect(val w: Double, val h: Double): Shape("rect") {
+open class Rect(val w: Double, val h: Double) : Shape("rect") {
     final override fun area(): Double = w * h
 }
 
-class Square(side: Double): Rect(side, side) {
+class Square(side: Double) : Rect(side, side) {
     override fun describe(): String = "square, " + super.describe()
 }
 
-class Circle(val r: Double): Shape("circle") {
+class Circle(val r: Double) : Shape("circle") {
     override fun area(): Double = 3.0 * r * r
 }
 

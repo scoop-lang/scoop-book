@@ -1,2 +1,1 @@
-must be of type Long, found Int
-convert this operand explicitly with `toLong()`
+error[E0501]: dependency function argument must be of type Long, found Int; primitive integer operands require one exact type; convert this operand explicitly with `toLong()`

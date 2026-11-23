@@ -2,5 +2,4 @@ interface Converter {
     public fun <T> convert(text: String): T
 }
 
-fun main() {
-}
+fun main() {}

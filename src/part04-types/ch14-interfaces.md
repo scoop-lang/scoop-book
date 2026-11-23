@@ -32,13 +32,11 @@
 规则和 Kotlin 相同：
 
 - class 默认是 `final`，只有声明为 `open`（或 `abstract`、`sealed`）的 class 才能被继承。
-- 一个 class 只能继承一个父类，写在冒号后面，并调用父类的构造器：`Dog(name: String): Animal(name)`。
+- 一个 class 只能继承一个父类，写在冒号后面，并调用父类的构造器：`Dog(name: String) : Animal(name)`。
 - 父类 `open` 了，不代表它的方法都能覆写。方法同样默认 `final`，要覆写的方法必须声明为 `open fun`。
 - 覆写时必须写 `override`。`override` 的方法默认仍然是 `open` 的，子类还可以继续覆写它。
 - 在子类里用 `super.sound()` 调用父类的实现。
 - 通过父类类型调用 `open` 方法时，执行的是对象实际类型的实现：`describe` 是父类里的普通方法，但它调用的 `sound()` 会分派到 `Dog` 或 `Puppy` 的版本。
-
-`scoop fmt` 会把类型和冒号写在一起，即 `class Dog(name: String): Animal(name)`，冒号前不留空格。
 
 违反这些规则都会得到直接的报错。继承一个没有 `open` 的 class：
 
@@ -138,7 +136,7 @@
 
 - 接口里可以声明方法和属性。没有函数体的方法是**抽象**的，实现者必须提供；有函数体的是**默认实现**，实现者可以直接使用，也可以覆写。
 - 接口里的属性（如 `val name: String`）没有存储，由实现者提供。class 可以在主构造器里用 `override val name` 实现它。
-- 一个 class 可以实现任意多个接口，和父类一起写在冒号后面，用逗号分隔：`Coffee(...): Named, Priced`。
+- 一个 class 可以实现任意多个接口，和父类一起写在冒号后面，用逗号分隔：`Coffee(...) : Named, Priced`。
 - 接口是引用类型，可以用作参数、变量和数组元素的类型，`printMenu` 接受的就是 `Array<Priced>`。
 
 两个接口给同一个方法都提供了默认实现时，编译器不会替你挑一个：

@@ -1,1 +1,1 @@
-f-string expression of type `Point` does not implement core `ToString`
+error[E0603]: f-string expression of type `Point` does not implement core `ToString`

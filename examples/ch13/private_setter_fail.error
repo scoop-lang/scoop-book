@@ -1,1 +1,1 @@
-setter of property `balance` is not accessible
+error[E0403]: setter of property `balance` is not accessible

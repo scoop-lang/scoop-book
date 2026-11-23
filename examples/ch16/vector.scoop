@@ -1,4 +1,4 @@
-struct Vec2(val x: Double, val y: Double): ToString {
+struct Vec2(val x: Double, val y: Double) : ToString {
     operator fun plus(other: Vec2): Vec2 = Vec2(x + other.x, y + other.y)
 
     operator fun minus(other: Vec2): Vec2 = Vec2(x - other.x, y - other.y)

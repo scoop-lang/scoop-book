@@ -1,1 +1,1 @@
-operator `compareTo` must return Long, found Int
+error[E0729]: operator `compareTo` must return Long, found Int

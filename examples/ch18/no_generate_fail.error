@@ -1,0 +1,2 @@
+error[E1008]: object `Point.Companion` does not implement interface method `ValueEncoder<Point>.encode`
+error[E1008]: object `Point.Companion` does not implement interface method `ValueDecoder<Point>.decode`

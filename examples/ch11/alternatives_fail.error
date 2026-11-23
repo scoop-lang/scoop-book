@@ -1,1 +1,2 @@
-a case arm accepts one pattern; use separate arms for alternatives
+error[E0914]: a case arm accepts one pattern
+help[H0902]: use separate arms for alternatives

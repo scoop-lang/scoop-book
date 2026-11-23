@@ -1,16 +1,11 @@
 struct User(val id: Int, val name: String)
 
-fun findUser(id: Int): User? =
-    if (id == 1)
-        Some(User(1, "Ada"))
-    else
-        None
+fun findUser(id: Int): User? = if (id == 1) Some(User(1, "Ada")) else None
 
-fun greeting(id: Int): String =
-    when (findUser(id)) {
-        case Some(val user) -> f"Hello, ${user.name}!"
-        case None -> "Hello, guest!"
-    }
+fun greeting(id: Int): String = when (findUser(id)) {
+    case Some(val user) -> f"Hello, ${user.name}!"
+    case None -> "Hello, guest!"
+}
 
 fun main() {
     println(greeting(1))

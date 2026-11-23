@@ -8,11 +8,7 @@ typealias Table<V> = HashMap<String, V>
 
 typealias Check<T> = (T) -> Boolean
 
-fun lookup(id: UserId): String =
-    if (id == 1L)
-        "Ada"
-    else
-        "unknown"
+fun lookup(id: UserId): String = if (id == 1L) "Ada" else "unknown"
 
 fun <T> countMatching(values: Array<T>, check: Check<T>): Int {
     var count = 0

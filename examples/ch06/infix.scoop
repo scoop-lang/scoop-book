@@ -1,6 +1,6 @@
 infix fun Int.pow(exponent: Int): Int {
     var result = 1
-    for (i in 1 .. exponent) {
+    for (i in 1..exponent) {
         result *= this
     }
     return result

@@ -1,1 +1,1 @@
-lambda parameter requires a type when there is no expected function type
+error[E0607]: lambda parameter requires a type when there is no expected function type

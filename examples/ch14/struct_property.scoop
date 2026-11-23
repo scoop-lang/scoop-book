@@ -2,12 +2,12 @@ interface Named {
     val name: String
 }
 
-struct City(val label: String, val country: String): Named {
+struct City(val label: String, val country: String) : Named {
     override val name: String
-    get() = f"${label}, ${country}"
+        get() = f"${label}, ${country}"
 }
 
-class Person(override val name: String): Named
+class Person(override val name: String) : Named
 
 fun main() {
     val names: Array<Named> = [City("Lyon", "France") as Named, Person("Ada")]

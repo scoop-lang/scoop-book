@@ -319,7 +319,7 @@ tuple 是匿名的，所以它不能声明实现任何接口，也就没有 `ToS
 | `is Circle` 判断，smart cast 后访问属性 | `when` 中的 `case Circle(val r)` |
 | `fun f(c: Circle)`，子类作为类型 | 不支持；需要时把数据提取成单独的 struct |
 | `enum class Light { RED, GREEN }` | `enum Light { Red, Green }` |
-| `enum class Status(val code: Int)` | 整型枚举 `enum Status: Int { Ok = 200 }`，或普通 enum 加计算属性 |
+| `enum class Status(val code: Int)` | 整型枚举 `enum Status : Int { Ok = 200 }`，或普通 enum 加计算属性 |
 | `Status.values()`、`ordinal`、`name` | 没有自动生成，需要时自己写 |
 | `Pair`、`Triple`、`a to b` | `(A, B)`、`(A, B, C)`、`(a, b)` |
 | `pair.first`、`pair.second` | `pair._1`、`pair._2` |

@@ -2,7 +2,7 @@ interface Named {
     public fun displayName(): String
 }
 
-struct User(val name: String): Named {
+struct User(val name: String) : Named {
     public override fun displayName(): String = name
 }
 

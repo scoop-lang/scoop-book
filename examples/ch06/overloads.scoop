@@ -1,6 +1,6 @@
 open class Animal
 
-class Dog: Animal()
+class Dog : Animal()
 
 fun describe(x: Int): String = "Int"
 

@@ -1,1 +1,1 @@
-cannot assign to immutable variable `word`
+error[E1501]: cannot assign to immutable variable `word`

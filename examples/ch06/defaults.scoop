@@ -1,5 +1,6 @@
-fun greeting(name: String, prefix: String = "Hello", ending: String = "!"): String =
-    f"${prefix}, ${name}${ending}"
+fun greeting(name: String, prefix: String = "Hello", ending: String = "!"): String {
+    return f"${prefix}, ${name}${ending}"
+}
 
 fun box(width: Int, height: Int = width, depth: Int = 1): Int = width * height * depth
 

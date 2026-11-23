@@ -1,2 +1,4 @@
-automatic encode has no ValueEncoder<Role> field codec
-automatic decode has no ValueDecoder<Role> field codec
+error[GENERATOR_DIAGNOSTIC]: no field ValueEncoder for Role: provide a primary val dependency, a conforming companion, or an explicit encode implementation
+note[N0003]: reported by generator `scoop.codec`
+error[GENERATOR_DIAGNOSTIC]: no field ValueDecoder for Role: provide a primary val dependency, a conforming companion, or an explicit decode implementation
+error[E1008]: object `User.Companion` does not implement interface method `ValueEncoder<User>.encode`

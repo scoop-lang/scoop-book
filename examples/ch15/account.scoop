@@ -1,8 +1,8 @@
 open class Account(val owner: String) {
     public var balance: Long = 0L
-    private set(value) {
-        field = value
-    }
+        private set(value) {
+            field = value
+        }
 
     protected fun audit(note: String) {
         println(f"[audit ${owner}] ${note}")
@@ -14,7 +14,7 @@ open class Account(val owner: String) {
     }
 }
 
-class Savings(owner: String): Account(owner) {
+class Savings(owner: String) : Account(owner) {
     public fun addInterest(rate: Long) {
         val interest = balance * rate / 100L
         deposit(interest)

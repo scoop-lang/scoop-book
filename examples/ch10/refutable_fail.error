@@ -1,1 +1,1 @@
-refutable patterns are only allowed in `when`
+error[E0902]: refutable patterns are only allowed in `when`

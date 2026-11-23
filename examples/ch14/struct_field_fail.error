@@ -1,1 +1,1 @@
-property `name` overrides an inherited property and must be marked `override`
+error[E1015]: property `name` overrides an inherited property and must be marked `override`

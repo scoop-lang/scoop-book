@@ -1,1 +1,1 @@
-`sound` overrides `Animal.sound` and must be marked `override`
+error[E1015]: `sound` overrides `Animal.sound` and must be marked `override`

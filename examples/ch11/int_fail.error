@@ -1,1 +1,1 @@
-non-exhaustive when: missing pattern -2147483648
+error[E0904]: non-exhaustive when: missing pattern -2147483648

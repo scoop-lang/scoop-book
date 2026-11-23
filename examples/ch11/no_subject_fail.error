@@ -1,1 +1,1 @@
-case patterns require a when subject
+error[E0912]: case patterns require a when subject

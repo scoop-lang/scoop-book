@@ -1,4 +1,4 @@
-enum Status: Int {
+enum Status : Int {
     Ok = 200,
     NotFound = 404
 }

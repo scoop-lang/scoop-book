@@ -2,7 +2,7 @@ public interface Named {
     public fun displayName(): String
 }
 
-class Person(val name: String): Named {
+class Person(val name: String) : Named {
     override fun displayName(): String = name
 }
 

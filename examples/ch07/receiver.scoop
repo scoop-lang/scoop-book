@@ -5,12 +5,11 @@ fun buildText(build: StringBuilder.() -> Unit): String {
 }
 
 fun main() {
-    val text =
-        buildText {
-            append("Hello")
-            append(", ")
-            append("Scoop")
-        }
+    val text = buildText {
+        append("Hello")
+        append(", ")
+        append("Scoop")
+    }
     println(text)
 
     val shout: String.() -> String = { this + "!" }

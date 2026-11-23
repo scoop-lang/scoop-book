@@ -2,7 +2,7 @@ abstract class Shape {
     abstract fun area(): Double
 }
 
-class Blob: Shape()
+class Blob : Shape()
 
 fun main() {
     println(Blob().area())

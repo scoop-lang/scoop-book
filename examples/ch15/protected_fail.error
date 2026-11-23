@@ -1,2 +1,2 @@
-setter of property `balance` is not accessible
-method `audit` is not accessible here
+error[E0403]: setter of property `balance` is not accessible
+error[E0403]: method `audit` is not accessible here

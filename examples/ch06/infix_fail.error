@@ -1,2 +1,2 @@
-`infix` requires a member or extension receiver
-infix function `add` must have exactly one parameter, found 2
+error[E0725]: `infix` requires a member or extension receiver
+error[E0726]: infix function `add` must have exactly one parameter, found 2

@@ -1,1 +1,1 @@
-cannot assign to immutable variable `limit`
+error[E1501]: cannot assign to immutable variable `limit`

@@ -1,1 +1,1 @@
-cannot capture mutable local `steps`
+error[E1502]: cannot capture mutable local `steps`

@@ -16,33 +16,30 @@ fun add(a: Expr, b: Expr): Expr = Expr.Add(Node(a), Node(b))
 
 fun mul(a: Expr, b: Expr): Expr = Expr.Mul(Node(a), Node(b))
 
-fun eval(e: Expr): Int =
-    when (e) {
-        case Num(val n) -> n
-        case Neg(val inner) -> -eval(inner.expr)
-        case Add(val a, val b) -> eval(a.expr) + eval(b.expr)
-        case Mul(val a, val b) -> eval(a.expr) * eval(b.expr)
-    }
+fun eval(e: Expr): Int = when (e) {
+    case Num(val n) -> n
+    case Neg(val inner) -> -eval(inner.expr)
+    case Add(val a, val b) -> eval(a.expr) + eval(b.expr)
+    case Mul(val a, val b) -> eval(a.expr) * eval(b.expr)
+}
 
-fun show(e: Expr): String =
-    when (e) {
-        case Num(val n) if n < 0 -> f"(${n})"
-        case Num(val n) -> f"${n}"
-        case Neg(val inner) -> f"-${show(inner.expr)}"
-        case Add(val a, val b) -> f"(${show(a.expr)} + ${show(b.expr)})"
-        case Mul(val a, val b) -> f"${show(a.expr)} * ${show(b.expr)}"
-    }
+fun show(e: Expr): String = when (e) {
+    case Num(val n) if n < 0 -> f"(${n})"
+    case Num(val n) -> f"${n}"
+    case Neg(val inner) -> f"-${show(inner.expr)}"
+    case Add(val a, val b) -> f"(${show(a.expr)} + ${show(b.expr)})"
+    case Mul(val a, val b) -> f"${show(a.expr)} * ${show(b.expr)}"
+}
 
-fun simplify(e: Expr): Expr =
-    when (e) {
-        case Add(val a, val b) ->
+fun simplify(e: Expr): Expr = when (e) {
+    case Add(val a, val b) ->
         when ((simplify(a.expr), simplify(b.expr))) {
             case(Num(0), val x) -> x
             case(val x, Num(0)) -> x
             case(Num(val x), Num(val y)) -> num(x + y)
             case(val x, val y) -> add(x, y)
         }
-        case Mul(val a, val b) ->
+    case Mul(val a, val b) ->
         when ((simplify(a.expr), simplify(b.expr))) {
             case(Num(0), _) -> num(0)
             case(_, Num(0)) -> num(0)
@@ -51,14 +48,14 @@ fun simplify(e: Expr): Expr =
             case(Num(val x), Num(val y)) -> num(x * y)
             case(val x, val y) -> mul(x, y)
         }
-        case Neg(val inner) ->
+    case Neg(val inner) ->
         when (val s = simplify(inner.expr)) {
             case Num(val n) -> num(-n)
             case Neg(val again) -> again.expr
             else -> neg(s)
         }
-        case Num(_) -> e
-    }
+    case Num(_) -> e
+}
 
 fun main() {
     // 2 * 3 + -4

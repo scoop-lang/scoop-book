@@ -1,1 +1,2 @@
-class `Duck` inherits conflicting defaults for `move` from Walker.move and Swimmer.move; declare an explicit override
+error[E1010]: class `Duck` inherits conflicting defaults for `move` from Walker.move and Swimmer.move
+help[H1001]: declare an explicit override

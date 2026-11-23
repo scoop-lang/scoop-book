@@ -1,1 +1,1 @@
-`@CLayout` field is not C-FFI-safe: Person.name: ref type `String` is managed
+error[E1201]: `@CLayout` field is not C-FFI-safe: Person.name: ref type `String` is managed

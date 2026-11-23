@@ -14,9 +14,9 @@ class Grid(val width: Long, val height: Long) {
     }
 
     fun render() {
-        for (row in 0L ..< height) {
+        for (row in 0L..<height) {
             val line = StringBuilder()
-            for (col in 0L ..< width) {
+            for (col in 0L..<width) {
                 line.append(this[row, col])
             }
             println(line.toString())
