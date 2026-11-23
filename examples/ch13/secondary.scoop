@@ -1,5 +1,5 @@
 class Rect(val width: Int, val height: Int) {
-    constructor(side: Int): this(side, side) {}
+    constructor(side: Int) : this(side, side) {}
 
     val area: Int = width * height
 }

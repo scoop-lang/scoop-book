@@ -1,1 +1,1 @@
-`..` may appear at most once in a pattern
+error[E0903]: `..` may appear at most once in a pattern

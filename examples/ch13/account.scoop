@@ -2,17 +2,17 @@ import scoop.text.*
 
 class Account(val owner: String, initial: Long) {
     var balance: Long = initial
-    private set(value) {
-        field = value
-    }
+        private set(value) {
+            field = value
+        }
 
     val isEmpty: Boolean
-    get() = balance == 0L
+        get() = balance == 0L
 
     var note: String = ""
-    set(value) {
-        field = value.uppercaseAscii()
-    }
+        set(value) {
+            field = value.uppercaseAscii()
+        }
 
     fun deposit(amount: Long) {
         balance += amount

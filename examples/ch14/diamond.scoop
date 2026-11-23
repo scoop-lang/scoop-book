@@ -6,7 +6,7 @@ interface Swimmer {
     fun move(): String = "swim"
 }
 
-class Duck: Walker, Swimmer {
+class Duck : Walker, Swimmer {
     override fun move(): String = super < Walker >.move() + " and " + super < Swimmer >.move()
 }
 

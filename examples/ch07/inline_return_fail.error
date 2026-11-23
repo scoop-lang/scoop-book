@@ -1,1 +1,4 @@
-a lambda cannot use bare `return`; use `return@label` for a local return
+error[E0711]: no applicable candidate for `forEachValue` in current-unit top-level candidate layer
+note[N0002]: fun forEachValue(values: Array<Int>, action: (Int) -> Unit): Unit
+cause[E0805]: argument for `action` (expected (Int) -> Unit): a lambda cannot use bare `return`
+help[H0801]: use `return@label` for a local return

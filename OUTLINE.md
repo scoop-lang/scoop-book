@@ -159,10 +159,10 @@
 ### 第 18 章　注解与编译期能力
 - 声明和使用注解
 - 静态类型描述：Scoop 用它替代反射能做的部分事情
-- 由 conformance 自动生成编码/解码：为第 30 章 JSON 做铺垫
+- 用 `@GenerateWith("scoop.codec", …)` 生成编码/解码：为第 33 章 JSON 做铺垫
 - 编译期嵌入：`includeStr`/`includeBytes`/`includeDir`、`env("SCOOP_...")`
 - `SourceLocation`
-- 文档注释（与第 27 章 `scoop doc` 衔接）
+- 文档注释（与第 30 章 `scoop doc` 衔接）
 - 示例：`language/compiler-inputs`
 
 ---
@@ -264,7 +264,7 @@
 - `scoop test --filter/--list/--nocapture`
 - `scoop fmt --check` 在 CI 中的用法
 - `scoop doc` 与文档注释
-- 读懂编译器诊断；`--message-format json`
+- E/W/ICE 诊断编号；cause 原因、N 附注与 H 建议；`--message-format json`（schema 2、递归 notes）
 - release 与 debug 的区别；跨目标编译 `--target`
 - 示例：`test/assertions`
 
@@ -280,14 +280,14 @@
 - 示例：`io/files`
 
 ### 第 32 章　命令行程序
-- `scoop.cli`：参数、选项、子命令、帮助、错误退出
+- `scoop.cli`：参数、选项、子命令、帮助、错误退出；`CliArguments<T>` 与 `@GenerateWith("scoop.cli", …)`，自定义字段用 `CliValueParser<T>`
 - `scoop.log` 与 console provider
 - `scoop.terminal` 和 `scoop.readline`：交互式输入
 - 项目：一个带子命令的文本统计工具
 - 示例：`cli/options`
 
 ### 第 33 章　JSON
-- `scoop.json` 的类型化 codec：把 struct/enum 和 JSON 互相转换
+- `scoop.json` 的类型化 codec：用 `@GenerateWith("scoop.codec", …)` 生成，把 struct/enum 和 JSON 互相转换
 - 自定义字段名、可选字段、错误处理
 - 无类型的 JSON 树
 - 示例：`json/typed`

@@ -8,11 +8,10 @@ class Client {
         connection = Some(Connection(7))
     }
 
-    fun status(): String =
-        when (connection) {
-            case Some(val c) -> f"connected (#${c.id})"
-            case None -> "not connected"
-        }
+    fun status(): String = when (connection) {
+        case Some(val c) -> f"connected (#${c.id})"
+        case None -> "not connected"
+    }
 }
 
 fun main() {

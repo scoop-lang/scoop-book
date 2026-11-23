@@ -3,7 +3,8 @@
 import scoop.json.*
 
 struct Point(val x: Int, val y: Int) {
-    companion object: ValueEncoder<Point>, ValueDecoder<Point>
+    @GenerateWith("scoop.codec", ["ValueEncoder<Point>", "ValueDecoder<Point>"])
+    companion object : ValueEncoder<Point>, ValueDecoder<Point>
 }
 
 fun main() {

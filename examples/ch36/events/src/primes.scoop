@@ -5,19 +5,17 @@ fun primesUpTo(limit: Int, max: Int = Int.MAX_VALUE): List<Int> {
     val found = ArrayList<Int>()
 
     fun accept(p: Int) {
-        if (p > max)
-            throw IllegalArgumentException(Some(f"prime ${p} is larger than ${max}"))
+        if (p > max) throw IllegalArgumentException(Some(f"prime ${p} is larger than ${max}"))
         found.add(p)
     }
 
     @Unsafe
     {
-        val callback =
-            foreignCallback<(Ptr<Unit>, Int) -> Unit>(
-                { p: Int -> accept(p) },
-                0,
-                ForeignCallbackMode.Reusable
-            )
+        val callback = foreignCallback<(Ptr<Unit>, Int) -> Unit>(
+            { p: Int -> accept(p) },
+            0,
+            ForeignCallbackMode.Reusable
+        )
         try {
             eventsEachPrime(limit, callback.function, callback.context)
             rethrowFailure(callback)

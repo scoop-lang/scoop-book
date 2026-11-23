@@ -1,1 +1,1 @@
-integer literal `200` is not representable as Int8
+error[E0107]: integer literal `200` is not representable as Int8

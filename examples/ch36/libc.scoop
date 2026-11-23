@@ -10,14 +10,15 @@ fun utf8Length(text: String): ULong {
     @Unsafe
     {
         // withCString 把字符串临时复制成以 0 结尾的 C 字符串，指针只在回调内有效
-        return text.withCString(
-            fun(p: Ptr<Int8>): ULong {
-                @Unsafe
-                {
-                    return cStrlen(p)
+        return text
+            .withCString(
+                fun(p: Ptr<Int8>): ULong {
+                    @Unsafe
+                    {
+                        return cStrlen(p)
+                    }
                 }
-            }
-        )
+            )
     }
 }
 

@@ -1,1 +1,1 @@
-(Int, Int) is not a subtype of Equals<K>
+error[E0501]: dependency function `HashMap`: (Int, Int) is not a subtype of Equals<K>

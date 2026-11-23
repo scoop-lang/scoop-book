@@ -1,6 +1,6 @@
 open class Animal(val name: String)
 
-class Dog(name: String): Animal(name) {
+class Dog(name: String) : Animal(name) {
     fun fetch(): String = f"${name} fetches the ball"
 }
 

@@ -1,1 +1,1 @@
-inner constructor requires a matching outer instance
+error[E0715]: inner constructor requires a matching outer instance

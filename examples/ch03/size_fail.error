@@ -1,1 +1,1 @@
-property `size` has type Long, expected Int
+error[E0501]: dependency property `size` has type Long, expected Int

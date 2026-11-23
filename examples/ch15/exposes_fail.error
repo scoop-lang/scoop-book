@@ -1,1 +1,1 @@
-signature of function `issue` exposes type `Token` outside its access domain
+error[E0410]: signature of function `issue` exposes type `Token` outside its access domain

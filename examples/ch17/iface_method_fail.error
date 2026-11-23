@@ -1,1 +1,1 @@
-interface method `convert` cannot declare method type parameters
+error[E1017]: interface method `convert` cannot declare method type parameters

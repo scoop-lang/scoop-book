@@ -2,4 +2,4 @@ package book.labels
 
 fun bracket(text: String): String = f"[${text}]"
 
-public fun <T: ToString> label(name: String, value: T): String = f"${bracket(name)} ${value}"
+public fun <T : ToString> label(name: String, value: T): String = f"${bracket(name)} ${value}"

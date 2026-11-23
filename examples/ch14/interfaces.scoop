@@ -10,13 +10,13 @@ interface Priced {
     fun label(): String = f"${price()} cents"
 }
 
-class Coffee(override val name: String, val cents: Long): Named, Priced {
+class Coffee(override val name: String, val cents: Long) : Named, Priced {
     override fun price(): Long = cents
 
     override fun greet(): String = f"One ${name}, coming up."
 }
 
-class Tea(override val name: String): Named, Priced {
+class Tea(override val name: String) : Named, Priced {
     override fun price(): Long = 250L
 }
 

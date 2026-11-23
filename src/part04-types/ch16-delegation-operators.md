@@ -158,7 +158,7 @@ Scoop 的运算符是普通方法调用的另一种写法：`a + b` 就是 `a.pl
 | --- | --- | --- |
 | `+a` / `-a` / `!a` | `a.unaryPlus()` / `a.unaryMinus()` / `a.not()` | 无参数 |
 | `a + b`、`-`、`*`、`/`、`%` | `a.plus(b)`、`minus`、`times`、`div`、`rem` | 一个参数 |
-| `a .. b` / `a ..< b` | `a.rangeTo(b)` / `a.rangeUntil(b)` | 一个参数 |
+| `a..b` / `a..<b` | `a.rangeTo(b)` / `a.rangeUntil(b)` | 一个参数 |
 | `a in b` / `a !in b` | `b.contains(a)` / `!b.contains(a)` | 返回 `Boolean` |
 | `a[i, j]` | `a.get(i, j)` | 至少一个参数 |
 | `a[i, j] = v` | `a.set(i, j, v)` | 返回 `Unit` |

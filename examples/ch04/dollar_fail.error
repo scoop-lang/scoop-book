@@ -1,1 +1,2 @@
-`$name` interpolation requires braces; use `${name}`
+error[E0110]: `$name` interpolation requires braces
+help[H0101]: use `${name}`

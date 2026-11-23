@@ -3,10 +3,9 @@ enum Shape {
     Empty
 }
 
-fun describe(s: Shape): String =
-    when (s) {
-        case Circle(val r) if r > 0.0 -> "circle"
-        case Empty -> "nothing"
-    }
+fun describe(s: Shape): String = when (s) {
+    case Circle(val r) if r > 0.0 -> "circle"
+    case Empty -> "nothing"
+}
 
 fun main() {}

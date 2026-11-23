@@ -1,1 +1,2 @@
-cannot capture mutable local `total`; bind its current value to a `val` snapshot or capture explicit reference state
+error[E1502]: cannot capture mutable local `total`
+help[H1501]: bind its current value to a `val` snapshot or capture explicit reference state

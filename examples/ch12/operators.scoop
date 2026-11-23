@@ -1,18 +1,17 @@
 struct User(val name: String, val nickname: String?)
 
-fun findUser(id: Int): User? =
-    when (id) {
-        1 -> Some(User("Ada", Some("ada")))
-        2 -> Some(User("Bob", None))
-        else -> None
-    }
+fun findUser(id: Int): User? = when (id) {
+    1 -> Some(User("Ada", Some("ada")))
+    2 -> Some(User("Bob", None))
+    else -> None
+}
 
 fun nameLength(id: Int): Long = findUser(id)?.name?.charLength ?: 0L
 
 fun displayName(id: Int): String = findUser(id)?.name ?: "guest"
 
-fun requireUser(id: Int): User =
-    findUser(id) ?: throw IllegalArgumentException(Some(f"no user ${id}"))
+fun requireUser(id: Int): User = findUser(id) ?:
+    throw IllegalArgumentException(Some(f"no user ${id}"))
 
 fun main() {
     // ?. 的结果仍然是 Option

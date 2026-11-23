@@ -1,0 +1,11 @@
+//! dep: scoop:scoop.json:0.1.0
+
+import scoop.json.*
+
+struct Point(val x: Int, val y: Int) {
+    public companion object : ValueEncoder<Point>, ValueDecoder<Point>
+}
+
+fun main() {
+    println(Json.encodeToString(Point(3, 4)))
+}

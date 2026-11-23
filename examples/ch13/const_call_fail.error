@@ -1,1 +1,1 @@
-ordinary functions and constructors are not constant expressions
+error[E1518]: const initializer calls must select a compiler input intrinsic; ordinary functions and constructors are not constant expressions

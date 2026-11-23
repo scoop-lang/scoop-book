@@ -1,1 +1,1 @@
-class `Secret` has no property `code`
+error[E0402]: class `Secret` has no property `code`

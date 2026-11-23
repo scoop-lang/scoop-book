@@ -10,11 +10,7 @@ fun clamp(value: Int, low: Int, high: Int): Int {
 }
 
 fun normalize(count: Int): Int {
-    val count =
-        if (count < 0)
-            0
-        else
-            count
+    val count = if (count < 0) 0 else count
     return count
 }
 

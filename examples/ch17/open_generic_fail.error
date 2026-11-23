@@ -1,1 +1,1 @@
-generic member function `show` in a class must be final
+error[E1017]: generic member function `show` in a class must be final

@@ -1,1 +1,1 @@
-initializer of `initial` must be of type Char, found String
+error[E0501]: initializer of `initial` must be of type Char, found String

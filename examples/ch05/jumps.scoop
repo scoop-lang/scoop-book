@@ -1,28 +1,21 @@
 fun firstNegative(values: Array<Int>): Int {
     for (v in values) {
-        if (v < 0)
-            return v
+        if (v < 0) return v
     }
     return 0
 }
 
 fun half(n: Int): String {
     // return 也是表达式，可以放在 else 分支里
-    val h =
-        if (n % 2 == 0)
-            n / 2
-        else
-            return "odd"
+    val h = if (n % 2 == 0) n / 2 else return "odd"
     return f"half of ${n} is ${h}"
 }
 
 fun main() {
     // continue 跳过本轮，break 结束循环
-    for (n in 1 .. 10) {
-        if (n % 3 == 0)
-            continue
-        if (n > 7)
-            break
+    for (n in 1..10) {
+        if (n % 3 == 0) continue
+        if (n > 7) break
         print(f"${n} ")
     }
     println("")
@@ -54,8 +47,7 @@ fun main() {
     // continue@label：直接进入外层循环的下一轮
     rows@for (row in grid) {
         for (cell in row) {
-            if (cell == 0)
-                continue@rows
+            if (cell == 0) continue@rows
         }
         print(f"${row[0L]}.. ")
     }

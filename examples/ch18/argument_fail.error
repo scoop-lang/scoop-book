@@ -1,1 +1,1 @@
-annotation arguments must refer to a const val
+error[E1304]: annotation arguments must refer to a const val

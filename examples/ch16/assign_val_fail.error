@@ -1,1 +1,1 @@
-operator `plus` is applicable, but compound-assignment fallback is not writable
+error[E1506]: operator `plus` is applicable, but compound-assignment fallback is not writable

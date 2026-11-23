@@ -1,1 +1,1 @@
-value-type property `port` must be a computed val
+error[E1507]: value-type property `port` must be a computed val

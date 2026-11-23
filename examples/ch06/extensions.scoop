@@ -3,10 +3,10 @@ fun String.exclaim(): String = this + "!"
 fun Int.isEven(): Boolean = this % 2 == 0
 
 val String.initial: Char
-get() = this.getCharAt(0L)
+    get() = this.getCharAt(0L)
 
 val Int.squared: Int
-get() = this * this
+    get() = this * this
 
 class Counter(var count: Int)
 

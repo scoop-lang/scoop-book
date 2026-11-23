@@ -1,1 +1,1 @@
-dependency function `encodeToString` expects 2 argument(s), but 1 were supplied
+error[E0701]: dependency function `encodeToString` expects 2 argument(s), but 1 were supplied

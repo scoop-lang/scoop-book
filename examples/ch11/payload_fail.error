@@ -1,1 +1,2 @@
-variant `Circle` of `Shape` has 1 field(s); use `Circle(...)` to match it
+error[E0906]: variant `Circle` of `Shape` has 1 field(s)
+help[H0901]: use `Circle(...)` to match it

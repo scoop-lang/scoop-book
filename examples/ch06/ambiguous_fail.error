@@ -1,3 +1,5 @@
-call to `pair` is ambiguous
-fun pair(a: Int, b: Any): String — tied after pairwise declaration forwarding
-fun pair(a: Any, b: Int): String — tied after pairwise declaration forwarding
+error[E0712]: call to `pair` is ambiguous in current-unit top-level candidate layer
+note[N0002]: fun pair(a: Int, b: Any): String
+note[N0703]: tied after pairwise declaration forwarding
+note[N0002]: fun pair(a: Any, b: Int): String
+note[N0703]: tied after pairwise declaration forwarding

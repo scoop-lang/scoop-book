@@ -1,1 +1,1 @@
-unsafe function `cAbs` may only be called from an unsafe context
+error[E1101]: unsafe function `cAbs` may only be called from an unsafe context

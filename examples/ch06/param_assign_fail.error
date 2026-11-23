@@ -1,1 +1,1 @@
-cannot assign to immutable variable `value`
+error[E1501]: cannot assign to immutable variable `value`

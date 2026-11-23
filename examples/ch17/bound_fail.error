@@ -1,1 +1,3 @@
-type argument `Int` for `T` must satisfy interface upper bound `Named`
+error[E0711]: no applicable candidate for `greeting` in current-unit top-level candidate layer
+note[N0002]: fun greeting<T : Named>(value: T): String
+cause[E0603]: type argument `Int` for `T` must satisfy interface upper bound `Named`

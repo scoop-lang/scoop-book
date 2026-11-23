@@ -5,11 +5,10 @@ class Session(val user: String) {
 }
 
 // 写法一：when 取出值
-fun describe(session: Session?): String =
-    when (session) {
-        case Some(val s) -> f"logged in as ${s.user}"
-        case None -> "anonymous"
-    }
+fun describe(session: Session?): String = when (session) {
+    case Some(val s) -> f"logged in as ${s.user}"
+    case None -> "anonymous"
+}
 
 // 写法二：用 ?: return 提前退出，之后得到的就是普通值
 fun printUser(session: Session?) {

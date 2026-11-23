@@ -1,1 +1,1 @@
-type `Option<String>` has no fields
+error[E0402]: type `Option<String>` has no fields

@@ -8,7 +8,7 @@ fun Greeter.wave(): String = "extension wave"
 
 open class Shape
 
-class Circle: Shape()
+class Circle : Shape()
 
 fun Shape.kind(): String = "shape"
 

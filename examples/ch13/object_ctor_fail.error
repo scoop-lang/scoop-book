@@ -1,1 +1,1 @@
-object `Config` cannot be constructed
+error[E0510]: object `Config` cannot be constructed

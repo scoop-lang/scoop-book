@@ -1,1 +1,1 @@
-`displayName` is marked `override` but does not override any method
+error[E1012]: `displayName` is marked `override` but does not override any method

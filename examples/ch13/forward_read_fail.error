@@ -1,1 +1,1 @@
-field `subtotal` is not initialized during initializer of property `total` in class `Order`
+error[E0810]: field `subtotal` is not initialized during initializer of property `total` in class `Order`; initializing receiver cannot observe a field before its store completes

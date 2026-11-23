@@ -4,7 +4,7 @@ interface Logger {
     fun log(message: String)
 }
 
-class PrefixLogger(val prefix: String): Logger {
+class PrefixLogger(val prefix: String) : Logger {
     override fun log(message: String) {
         println(f"${prefix}${message}")
     }
@@ -20,9 +20,8 @@ fun onTick(tick: Int) {
 @Unsafe
 fun startTicker(count: Int, callback: ValueCallback) {
     try {
-        val ticker =
-            eventsTickerStart(count, callback.function, callback.context) ?:
-                throw IllegalStateException(Some("cannot start ticker"))
+        val ticker = eventsTickerStart(count, callback.function, callback.context) ?:
+            throw IllegalStateException(Some("cannot start ticker"))
         eventsTickerJoin(ticker)
         rethrowFailure(callback)
     } finally {
@@ -34,14 +33,13 @@ fun startTicker(count: Int, callback: ValueCallback) {
 fun runTicker(count: Int, logger: Logger) {
     @Unsafe
     {
-        val callback =
-            context(logger) {
-                foreignCallback<(Ptr<Unit>, Int) -> Unit>(
-                    { t: Int -> onTick(t) },
-                    0,
-                    ForeignCallbackMode.Reusable
-                )
-            }
+        val callback = context(logger) {
+            foreignCallback<(Ptr<Unit>, Int) -> Unit>(
+                { t: Int -> onTick(t) },
+                0,
+                ForeignCallbackMode.Reusable
+            )
+        }
         startTicker(count, callback)
     }
 }
@@ -50,12 +48,11 @@ fun runTicker(count: Int, logger: Logger) {
 fun runTickerWithoutContext(count: Int, logger: Logger) {
     @Unsafe
     {
-        val callback =
-            foreignCallback<(Ptr<Unit>, Int) -> Unit>(
-                { t: Int -> onTick(t) },
-                0,
-                ForeignCallbackMode.Reusable
-            )
+        val callback = foreignCallback<(Ptr<Unit>, Int) -> Unit>(
+            { t: Int -> onTick(t) },
+            0,
+            ForeignCallbackMode.Reusable
+        )
         // 调用时再绑定也没有用
         context(logger) {
             startTicker(count, callback)

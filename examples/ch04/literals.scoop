@@ -8,8 +8,7 @@ fun main() {
     println(quoted)
     println(snow)
 
-    val raw =
-        """C:\new\table
+    val raw = """C:\new\table
     no escapes here: \n \t"""
     println(raw)
 

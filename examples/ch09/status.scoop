@@ -1,4 +1,4 @@
-enum Status: Int {
+enum Status : Int {
     Ok = 200,
     NotFound = 404,
     ServerError = 500
@@ -6,12 +6,11 @@ enum Status: Int {
 
 fun isError(code: Int): Boolean = code >= 400
 
-fun reason(status: Status): String =
-    when (status) {
-        case Status.Ok -> "OK"
-        case Status.NotFound -> "Not Found"
-        case Status.ServerError -> "Internal Server Error"
-    }
+fun reason(status: Status): String = when (status) {
+    case Status.Ok -> "OK"
+    case Status.NotFound -> "Not Found"
+    case Status.ServerError -> "Internal Server Error"
+}
 
 fun main() {
     val status = Status.NotFound

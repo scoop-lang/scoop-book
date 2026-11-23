@@ -1,1 +1,1 @@
-unknown variable `height`
+error[E0401]: unknown variable `height`

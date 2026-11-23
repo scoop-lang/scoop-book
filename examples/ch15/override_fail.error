@@ -1,1 +1,1 @@
-visibility of `name` does not cover inherited slot `Named.name`
+error[E1016]: visibility of `name` does not cover inherited slot `Named.name`

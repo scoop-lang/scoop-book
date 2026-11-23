@@ -1,1 +1,2 @@
-bare pattern `target` cannot match Int; use `val target` to bind the matched value
+error[E0901]: bare pattern `target` cannot match Int
+help[H0901]: use `val target` to bind the matched value

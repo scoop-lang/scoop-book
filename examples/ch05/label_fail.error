@@ -1,1 +1,1 @@
-unknown loop label `outer` in this callable for `break`
+error[E0806]: unknown loop label `outer` in this callable for `break`

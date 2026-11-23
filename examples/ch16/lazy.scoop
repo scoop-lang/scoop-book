@@ -1,15 +1,15 @@
 class Lazy<T>(private val compute: () -> T) {
     private var cached: T? = None
 
-    operator fun getValue(thisRef: Any): T =
-        when (val current = cached) {
-            case Some(val value) -> value
-            case None -> {
-                val value = compute()
-                cached = Some(value)
-                value
-            }
+    operator fun getValue(thisRef: Any): T = when (val current = cached) {
+        case Some(val value) -> value
+
+        case None -> {
+            val value = compute()
+            cached = Some(value)
+            value
         }
+    }
 }
 
 class Report(val title: String) {

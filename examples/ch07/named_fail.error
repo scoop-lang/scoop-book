@@ -1,1 +1,1 @@
-function values do not accept named arguments
+error[E0706]: function values do not accept named arguments

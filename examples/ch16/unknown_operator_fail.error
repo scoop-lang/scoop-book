@@ -1,1 +1,1 @@
-unknown operator role `and`
+error[E0728]: unknown operator role `and`

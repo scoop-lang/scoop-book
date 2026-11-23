@@ -8,7 +8,8 @@ enum Role {
 }
 
 struct User(val name: String, val roles: Array<Role>) {
-    public companion object: ValueEncoder<User>, ValueDecoder<User>
+    @GenerateWith("scoop.codec", ["ValueEncoder<User>", "ValueDecoder<User>"])
+    public companion object : ValueEncoder<User>, ValueDecoder<User>
 }
 
 fun main() {

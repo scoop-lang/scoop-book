@@ -8,8 +8,7 @@ fun main() {
     println("plain: ${name}")
     println(f"price: \$5, braces: {not interpolated}")
 
-    val report =
-        f"""Name: ${name}
+    val report = f"""Name: ${name}
 Born: ${year}
 Path: C:\docs\${name}.txt"""
     println(report)

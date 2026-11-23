@@ -1,1 +1,2 @@
-pattern does not list all fields of struct `Point`; add `..` to ignore the rest
+error[E0907]: pattern does not list all fields of struct `Point`
+help[H0901]: add `..` to ignore the rest

@@ -2,11 +2,11 @@ interface Shape {
     fun area(): Double
 }
 
-struct Circle(val radius: Double): Shape {
+struct Circle(val radius: Double) : Shape {
     override fun area(): Double = 3.14159 * radius * radius
 }
 
-struct Rect(val width: Double, val height: Double): Shape {
+struct Rect(val width: Double, val height: Double) : Shape {
     override fun area(): Double = width * height
 }
 

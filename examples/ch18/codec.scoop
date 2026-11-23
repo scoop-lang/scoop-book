@@ -6,7 +6,8 @@ enum Role {
     Admin,
     Member(val since: Int)
 
-    public companion object: ValueEncoder<Role>, ValueDecoder<Role>
+    @GenerateWith("scoop.codec", ["ValueEncoder<Role>", "ValueDecoder<Role>"])
+    public companion object : ValueEncoder<Role>, ValueDecoder<Role>
 }
 
 struct User(
@@ -15,17 +16,17 @@ struct User(
     val roles: Array<Role> = [],
     @Serialize(ignore = true) val cachedScore: Int = 0
 ) {
-    public companion object: ValueEncoder<User>, ValueDecoder<User>
+    @GenerateWith("scoop.codec", ["ValueEncoder<User>", "ValueDecoder<User>"])
+    public companion object : ValueEncoder<User>, ValueDecoder<User>
 }
 
 fun main() {
-    val ada =
-        User(
-            "Ada",
-            email = Some("ada@example.com"),
-            roles = [Role.Admin, Role.Member(2024)],
-            cachedScore = 99
-        )
+    val ada = User(
+        "Ada",
+        email = Some("ada@example.com"),
+        roles = [Role.Admin, Role.Member(2024)],
+        cachedScore = 99
+    )
     val text = Json.encodeToString(ada)
     println(text)
 

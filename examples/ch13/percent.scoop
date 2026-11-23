@@ -1,13 +1,9 @@
 class Percent private constructor(val value: Int) {
     companion object {
-        fun of(value: Int): Percent? =
-            if (value in 0 .. 100)
-                Some(Percent(value))
-            else
-                None
+        fun of(value: Int): Percent? = if (value in 0..100) Some(Percent(value)) else None
 
         fun parse(value: Int): Percent {
-            if (value !in 0 .. 100) {
+            if (value !in 0..100) {
                 throw IllegalArgumentException(Some(f"not a percentage: ${value}"))
             }
             return Percent(value)

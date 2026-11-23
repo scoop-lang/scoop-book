@@ -5,11 +5,10 @@ enum Shape {
     Rect(val width: Double, val height: Double),
 }
 
-fun memberName(name: MemberName): String =
-    when (name) {
-        case MemberName.Named(val text) -> text
-        case MemberName.Positional(val index) -> f"#${index}"
-    }
+fun memberName(name: MemberName): String = when (name) {
+    case MemberName.Named(val text) -> text
+    case MemberName.Positional(val index) -> f"#${index}"
+}
 
 fun <T> describeType(): String {
     val info = typeInfo<T>()
@@ -22,12 +21,14 @@ fun <T> describeType(): String {
                 text.append(f" ${memberName(field.name)}: ${field.type.displayName}")
             }
         }
+
         case TypeShape.Enum(val shape) -> {
             text.append(" is an enum:")
             for (variant in shape.variants) {
                 text.append(f" ${variant.name}")
             }
         }
+
         else -> text.append(" is neither a struct nor an enum")
     }
     return text.toString()

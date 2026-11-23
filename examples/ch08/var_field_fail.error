@@ -1,1 +1,1 @@
-`var` struct fields are not supported (value types are immutable)
+error[E1507]: `var` struct fields are not supported (value types are immutable)

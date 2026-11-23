@@ -1,1 +1,1 @@
-interface implementation delegation is only allowed in class and object declarations
+error[E1007]: interface implementation delegation is only allowed in class and object declarations

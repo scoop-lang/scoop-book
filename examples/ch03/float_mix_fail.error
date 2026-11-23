@@ -1,1 +1,1 @@
-must be of type Float, found Double
+error[E0501]: dependency function argument must be of type Float, found Double

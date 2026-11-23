@@ -1,1 +1,2 @@
-`lateinit` is not supported; use `var p: T? = None` or the Option omitted-initializer shorthand
+error[E0306]: `lateinit` is not supported
+help[H1502]: use `var p: T? = None` or the Option omitted-initializer shorthand

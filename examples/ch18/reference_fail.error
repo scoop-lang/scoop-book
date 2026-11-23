@@ -1,1 +1,1 @@
-compiler intrinsic `currentSourceLocation` does not support callable references
+error[E0713]: compiler intrinsic `currentSourceLocation` does not support callable references

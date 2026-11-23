@@ -1,1 +1,1 @@
-a class component pattern cannot contain `..`
+error[E0903]: a class component pattern cannot contain `..`

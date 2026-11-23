@@ -2,8 +2,9 @@ fun log(message: String, location: SourceLocation = currentSourceLocation()) {
     println(f"[${location.file}:${location.line}] ${location.functionName}: ${message}")
 }
 
-fun warn(message: String, location: SourceLocation = currentSourceLocation()) =
+fun warn(message: String, location: SourceLocation = currentSourceLocation()) {
     log(f"warning: ${message}", location)
+}
 
 class Downloader {
     fun start() {

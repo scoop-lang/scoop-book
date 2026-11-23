@@ -1,1 +1,1 @@
-unknown variable `null`
+error[E0401]: unknown variable `null`

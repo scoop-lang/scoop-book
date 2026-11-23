@@ -1,1 +1,1 @@
-type `Money` has no method `plus`
+error[E0402]: type `Money` has no method `plus`

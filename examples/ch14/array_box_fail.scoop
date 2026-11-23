@@ -2,7 +2,7 @@ interface Describable {
     fun describe(): String
 }
 
-struct Point(val x: Int, val y: Int): Describable {
+struct Point(val x: Int, val y: Int) : Describable {
     override fun describe(): String = f"(${x}, ${y})"
 }
 

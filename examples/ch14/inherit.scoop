@@ -4,11 +4,11 @@ open class Animal(val name: String) {
     fun describe(): String = f"${name} says ${sound()}"
 }
 
-class Dog(name: String): Animal(name) {
+class Dog(name: String) : Animal(name) {
     override fun sound(): String = "woof"
 }
 
-class Puppy(name: String): Animal(name) {
+class Puppy(name: String) : Animal(name) {
     override fun sound(): String = super.sound() + " yip"
 }
 

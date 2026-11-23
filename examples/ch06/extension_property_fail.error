@@ -1,1 +1,1 @@
-extension property `visits` must be computed or delegated
+error[E1515]: extension property `visits` must be computed or delegated

@@ -1,2 +1,3 @@
-no applicable candidate for `applyTo`
-lambda result must be of type Int, found String
+error[E0711]: no applicable candidate for `applyTo` in current-unit top-level candidate layer
+note[N0002]: fun applyTo(value: Int, operation: (Int) -> Int): Int
+cause[E0501]: argument for `operation` (expected (Int) -> Int): lambda result must be of type Int, found String

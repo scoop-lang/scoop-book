@@ -1,1 +1,1 @@
-type `Animal` has no method `fetch`
+error[E0402]: type `Animal` has no method `fetch`

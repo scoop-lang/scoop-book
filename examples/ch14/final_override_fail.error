@@ -1,1 +1,1 @@
-`area` cannot override final method `Square.area`
+error[E1014]: `area` cannot override final method `Square.area`

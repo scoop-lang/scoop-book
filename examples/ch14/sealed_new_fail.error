@@ -1,1 +1,1 @@
-abstract class `Payment` cannot be instantiated
+error[E0510]: abstract class `Payment` cannot be instantiated

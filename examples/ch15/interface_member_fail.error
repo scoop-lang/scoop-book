@@ -1,1 +1,1 @@
-member `name` of public interface `Named` must be explicitly public
+error[E1016]: member `name` of public interface `Named` must be explicitly public

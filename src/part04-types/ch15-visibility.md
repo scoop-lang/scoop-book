@@ -102,12 +102,12 @@ app/
 `greet` 是 `internal` 的，`main.scoop` 可以调用；`greetingWord` 和 `decorate` 是 `greeting.scoop` 私有的。`main.scoop` 自己也声明了一个 `private fun decorate`，两个同名的私有函数各管各的文件，互不冲突。如果在 `main.scoop` 里读取 `greetingWord`，编译器会报（这是把上例 `main.scoop` 改写后实际得到的输出，路径已省略）：
 
 ```text
-error[SCOOPC_HIR_ERROR]: value `greetingWord` is not accessible here
+error[E0403]: value `greetingWord` is not accessible here
  --> src/main.scoop:4:13
   |
 4 |     println(greetingWord)
   |             ^^^^^^^^^^^^
-note: candidate declared here
+note[N0002]: candidate declared here
  --> src/greeting.scoop:3:13
   |
 3 | private val greetingWord = "Hello"
@@ -159,7 +159,7 @@ note: candidate declared here
 package 只负责给名字分组，不授予任何访问权限。你也不能通过“把自己的代码声明在对方的 package 里”来绕过边界：Scoop 要求一个 Cone 的 package 等于它的 group 或其子包。在 `app`（group 为 `book.app`）里写 `package book.geometry`，得到的是：
 
 ```text
-error[SCOOPC_PACKAGE_ERROR]: package `book.geometry` must equal Cone group `book.app` or one of its subpackages
+error[E2007]: package `book.geometry` must equal Cone group `book.app` or one of its subpackages
 ```
 
 这和 Kotlin 的 `internal` 很像：Kotlin 的 `internal` 表示“同一个模块”（一个 Gradle 模块、一个 Maven 项目），Scoop 的 Cone 就扮演模块的角色。区别只在于哪一个是默认值。
@@ -185,7 +185,7 @@ public class Counter(val start: Int) {
 另一个 Cone 能看到 `Counter` 这个类型，却不能构造它（以下报错都是用一个真实的库 Cone 和应用 Cone 编译得到的）：
 
 ```text
-error[SCOOPC_HIR_ERROR]: constructor `Counter` is not accessible here
+error[E0403]: constructor `Counter` is not accessible here
  --> src/main.scoop:6:13
   |
 6 |     val c = Counter(1)
@@ -195,12 +195,12 @@ error[SCOOPC_HIR_ERROR]: constructor `Counter` is not accessible here
 把构造器改成 `public constructor(val start: Int)` 之后，构造通过了，但成员仍然是 `internal` 的：
 
 ```text
-error[SCOOPC_HIR_ERROR]: type `Counter` has no method `increment`
+error[E0402]: type `Counter` has no method `increment`
  --> src/main.scoop:7:7
   |
 7 |     c.increment()
   |       ^^^^^^^^^
-error[SCOOPC_HIR_ERROR]: class `Counter` has no property `count`
+error[E0402]: class `Counter` has no property `count`
  --> src/main.scoop:8:19
   |
 8 |     println(f"${c.count}")
@@ -279,24 +279,28 @@ struct 和 enum 是例外：它们的字段、enum 的各个分支以及 struct 
 跨 Cone 访问 `internal` 声明时，编译器的报错往往不是“不可访问”，而是“不存在”。以 15.1 的库为例，在 `app` 里使用它的 `internal` 声明：
 
 ```text
-error[SCOOPC_HIR_ERROR]: unknown function `requireNonNegative`; bare enum variants without an exact enum expected type must be qualified as `E.V` or given a type annotation
-error[SCOOPC_HIR_ERROR]: unknown variable `PI`; bare enum variants without an exact enum expected type must be qualified as `E.V` or given a type annotation
-error[SCOOPC_HIR_ERROR]: class `Circle` has no property `radius`
+error[E0401]: unknown function `requireNonNegative`
+help[H0402]: bare enum variants without an exact enum expected type must be qualified as `E.V` or given a type annotation
+error[E0401]: unknown variable `PI`
+help[H0402]: bare enum variants without an exact enum expected type must be qualified as `E.V` or given a type annotation
+error[E0402]: class `Circle` has no property `radius`
 ```
 
 用 exact import 导入一个 `internal` 顶层函数时，报错发生在 import 这一行：
 
 ```text
-error[SCOOPC_HIR_ERROR]: import target is not available in the current compilation unit
+error[E0406]: import target is not available in the current compilation unit
 ```
 
 调用 `private` 或 `internal` 的构造器时，报错则是：
 
 ```text
-error[SCOOPC_HIR_ERROR]: constructor `Rect` is not accessible here
+error[E0403]: constructor `Rect` is not accessible here
 ```
 
 这样设计是因为，从另一个 Cone 看过去，`internal` 声明根本不属于这个库的 API，编译器不会把它们列为候选。代价是报错不会直接告诉你“它存在，但不是 public”。所以，当你确定库里有某个名字、编译器却说 `unknown`、`has no method`、`has no property` 或 `not available` 时，第一件事是去库的源码里检查它（以及它所在的类型）有没有写 `public`。
+
+这些失败分别属于名称查找（`E0401`）、成员查找（`E0402`）、可访问性（`E0403`）和导入（`E0406`）规则。这里的 `H0402` 是名称查找失败时附带的限定名建议，并不表示 `PI` 或 `requireNonNegative` 是 enum 变体；修复时仍要结合主错误与库的公开声明。
 
 ## 15.7　设计一个库的公开面
 

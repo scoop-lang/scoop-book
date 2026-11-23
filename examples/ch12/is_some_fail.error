@@ -1,1 +1,1 @@
-unknown type `Some`
+error[E0401]: unknown type `Some`

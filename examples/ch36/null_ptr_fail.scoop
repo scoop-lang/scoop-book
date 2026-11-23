@@ -5,7 +5,6 @@ fun main() {
     @Unsafe
     {
         val p = cMalloc(16uL)
-        if (p == Ptr<Unit>(0uL))
-            println("out of memory")
+        if (p == Ptr<Unit>(0uL)) println("out of memory")
     }
 }

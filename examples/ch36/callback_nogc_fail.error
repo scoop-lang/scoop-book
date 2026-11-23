@@ -1,1 +1,5 @@
-fun compareInts(a: Ptr<Unit>, b: Ptr<Unit>): Int — native callbacks must be declared `@NoGC`
+error[E0711]: no applicable candidate for `cQsort` in current-unit top-level candidate layer
+note[N0002]: fun cQsort(base: Ptr<Unit>, count: ULong, size: ULong, compare: FunPtr<(Ptr<Unit>, Ptr<Unit>) -> Int>): Unit
+cause[E0711]: argument for `compare` (expected FunPtr<(Ptr<Unit>, Ptr<Unit>) -> Int>): no applicable candidate for native function reference `::compareInts` in current-unit top-level candidate layer
+note[N0002]: fun compareInts(a: Ptr<Unit>, b: Ptr<Unit>): Int
+cause[E1217]: native callbacks must be declared `@NoGC`

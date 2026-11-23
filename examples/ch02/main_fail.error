@@ -1,2 +1,2 @@
-missing executable entry
-is not eligible because its parameters must be empty or one `Array<String>`
+error[E1702]: missing executable entry: declare exactly one ordinary `fun main(): Unit`, `fun main(): Int`, `fun main(args: Array<String>): Unit`, or `fun main(args: Array<String>): Int`
+note[N1701]: `fun main(count: Int): Unit` is not eligible because its parameters must be empty or one `Array<String>`

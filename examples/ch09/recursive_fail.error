@@ -1,1 +1,1 @@
-recursive value layout does not cross a reference boundary
+error[E0509]: recursive value layout does not cross a reference boundary: Expr -> Expr

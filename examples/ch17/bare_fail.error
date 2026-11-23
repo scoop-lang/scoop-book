@@ -1,1 +1,1 @@
-generic struct `Box` requires 1 type argument(s)
+error[E0601]: generic struct `Box` requires 1 type argument(s)

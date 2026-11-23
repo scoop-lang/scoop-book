@@ -4,17 +4,16 @@ interface Parser<T> {
     public fun parse(text: String): T?
 }
 
-object IntParser: Parser<Int> {
+object IntParser : Parser<Int> {
     public override fun parse(text: String): Int? = text.toIntOrNone()
 }
 
-object YesNoParser: Parser<Boolean> {
-    public override fun parse(text: String): Boolean? =
-        when (text) {
-            "yes" -> Some(true)
-            "no" -> Some(false)
-            else -> None
-        }
+object YesNoParser : Parser<Boolean> {
+    public override fun parse(text: String): Boolean? = when (text) {
+        "yes" -> Some(true)
+        "no" -> Some(false)
+        else -> None
+    }
 }
 
 fun <T> parseAll(parser: Parser<T>, inputs: Array<String>): ArrayList<T> {
@@ -32,7 +31,7 @@ interface Describable {
     public fun describe(): String
 }
 
-struct Box<T: ToString>(val value: T): Describable {
+struct Box<T : ToString>(val value: T) : Describable {
     public override fun describe(): String = f"Box(${value})"
 }
 

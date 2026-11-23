@@ -1,1 +1,1 @@
-missing executable entry
+error[E1702]: missing executable entry: declare exactly one ordinary `fun main(): Unit`, `fun main(): Int`, `fun main(args: Array<String>): Unit`, or `fun main(args: Array<String>): Int`

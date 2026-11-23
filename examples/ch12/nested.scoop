@@ -1,11 +1,10 @@
 struct User(val name: String, val email: String?)
 
-fun findUser(id: Int): User? =
-    when (id) {
-        1 -> Some(User("Ada", Some("ada@example.com")))
-        2 -> Some(User("Bob", None))
-        else -> None
-    }
+fun findUser(id: Int): User? = when (id) {
+    1 -> Some(User("Ada", Some("ada@example.com")))
+    2 -> Some(User("Bob", None))
+    else -> None
+}
 
 fun report(id: Int): String {
     // email 本身是 String?，所以 ?. 的结果是 String??

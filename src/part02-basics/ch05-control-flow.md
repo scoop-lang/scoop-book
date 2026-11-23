@@ -44,7 +44,7 @@
 {{#include ../../examples/ch05/if_noelse_fail.error}}
 ```
 
-`else if` 并不是一个单独的语法，它只是“`else` 分支里又放了一个 `if`”。`scoop fmt` 会把它排成上例 `level` 那样，内层的 `if` 缩进一级，正好体现了这种嵌套关系。同样，`scoop fmt` 也会把单条语句的分支体放到下一行，比如 `if (fan > 2)` 后面的 `println`。这些只是排版，不影响含义。
+`else if` 并不是一个单独的语法，它只是“`else` 分支里又放了一个 `if`”。`scoop fmt` 会把它排成上例 `level` 那样，`else if` 紧跟在前一个分支的 `}` 后面，读起来就像一串并列的分支。分支很短、整个 `if` 放得进一行时，`scoop fmt` 会把它留在一行里，比如 `feeling` 和 `if (fan > 2) println(...)`。这些只是排版，不影响含义。
 
 ### 分支类型不一致时
 
@@ -84,7 +84,7 @@
 | --- | --- |
 | `100 ->` | `score == 100` |
 | `90, 95 ->` | 等于其中任意一个；按顺序尝试，一个成立就选中 |
-| `in 60 .. 89 ->` | `score` 在这个区间里（5.3 节） |
+| `in 60..89 ->` | `score` 在这个区间里（5.3 节） |
 | `!in ... ->` | 不在里面 |
 | `else ->` | 前面都不成立；必须放在最后 |
 
@@ -144,16 +144,16 @@ Scoop 提供 Kotlin 中常用的几种区间写法：
 
 | 写法 | 含义 | 例子 |
 | --- | --- | --- |
-| `a .. b` | 从 `a` 升到 `b`，包含 `b` | `1 .. 5` → 1 2 3 4 5 |
-| `a ..< b` | 从 `a` 升到 `b`，不包含 `b` | `1 ..< 5` → 1 2 3 4 |
-| `a until b` | 同 `a ..< b` | `1 until 5` → 1 2 3 4 |
+| `a..b` | 从 `a` 升到 `b`，包含 `b` | `1..5` → 1 2 3 4 5 |
+| `a..<b` | 从 `a` 升到 `b`，不包含 `b` | `1..<5` → 1 2 3 4 |
+| `a until b` | 同 `a..<b` | `1 until 5` → 1 2 3 4 |
 | `a downTo b` | 从 `a` 降到 `b`，包含 `b` | `5 downTo 1` → 5 4 3 2 1 |
-| `r step n` | 把步长换成 `n`，方向和端点不变 | `0 .. 10 step 3` → 0 3 6 9 |
+| `r step n` | 把步长换成 `n`，方向和端点不变 | `0..10 step 3` → 0 3 6 9 |
 
 几个要点：
 
-- `scoop fmt` 会在 `..` 和 `..<` 两边加空格，写成 `1 .. 5`。
-- `5 .. 1` 是**空区间**，不会反过来数。要倒数，用 `downTo`。
+- `scoop fmt` 把区间写成 `1..5`、`1..<5`，`..` 和 `..<` 两边不留空格；`until`、`downTo`、`step` 是单词，两边照常有空格。
+- `5..1` 是**空区间**，不会反过来数。要倒数，用 `downTo`。
 - `step` 的参数必须大于 0；方向由区间本身决定，所以倒数写 `10 downTo 0 step 4`，而不是 `step -4`。`step 0` 或负数不会在编译时报错，而是在运行时抛出 `IllegalArgumentException`：
 
   ```scoop
@@ -168,12 +168,12 @@ Scoop 提供 Kotlin 中常用的几种区间写法：
 
   （`try`/`catch` 是第 19 章的内容，这里只是用它来展示异常。）
 
-- `x in r` 和 `x !in r` 判断一个值是否在区间里，它们就是在调用区间的 `contains` 方法。对带 `step` 的区间，`contains` 还会检查步长是否对齐：`0 .. 10 step 3` 包含 6，但不包含 7。
+- `x in r` 和 `x !in r` 判断一个值是否在区间里，它们就是在调用区间的 `contains` 方法。对带 `step` 的区间，`contains` 还会检查步长是否对齐：`0..10 step 3` 包含 6，但不包含 7。
 - 端点取到类型的最大值（如 `Int.MAX_VALUE`）时，循环也能正确结束，不会因为溢出而变成死循环。
 
 ### 区间的类型
 
-区间的类型取决于端点的类型：`Int` 的区间是 `IntRange`，`Long` 的区间是 `LongRange`（还有无符号的 `UIntRange` 和 `ULongRange`）。它们是不同的类型，两个端点的类型必须相同：`0 .. 10L` 这种混合写法会报错，因为数值之间没有隐式转换（第 3 章）。
+区间的类型取决于端点的类型：`Int` 的区间是 `IntRange`，`Long` 的区间是 `LongRange`（还有无符号的 `UIntRange` 和 `ULongRange`）。它们是不同的类型，两个端点的类型必须相同：`0..10L` 这种混合写法会报错，因为数值之间没有隐式转换（第 3 章）。
 
 Scoop **没有 `Char` 区间**：
 
@@ -185,7 +185,7 @@ Scoop **没有 `Char` 区间**：
 {{#include ../../examples/ch05/char_range_fail.error}}
 ```
 
-需要遍历一段字母时，可以遍历一个写好的字符串，比如 `for (c in "abcde")`，或者用 `Char` 的编号组成整数区间，再用 `toChar()` 转回来：`for (n in 'a'.code .. 'e'.code)`，循环体里用 `n.toChar()`。
+需要遍历一段字母时，可以遍历一个写好的字符串，比如 `for (c in "abcde")`，或者用 `Char` 的编号组成整数区间，再用 `toChar()` 转回来：`for (n in 'a'.code..'e'.code)`，循环体里用 `n.toChar()`。
 
 > **从 Kotlin 过来**
 >
@@ -249,7 +249,7 @@ for (i in 0L until names.size) { ... }
 > | `for (i in list.indices)` | `for (i in 0L until list.size)`，没有 `indices` |
 > | `for ((i, v) in list.withIndex())` | 用下标循环，在循环体里读 `list[i]` |
 > | `for (i in list.lastIndex downTo 0)` | `for (i in list.size - 1L downTo 0L)` |
-> | `repeat(3) { ... }` | `for (i in 1 .. 3) { ... }`，没有 `repeat` |
+> | `repeat(3) { ... }` | `for (i in 1..3) { ... }`，没有 `repeat` |
 
 > **深入一点：`for` 是怎么工作的**
 >
@@ -363,11 +363,11 @@ val h = if (n % 2 == 0) n / 2 else return "odd"
 | --- | --- | --- |
 | `if (a) x else y` | 相同 | 作为值时必须有 `else` |
 | `println(if (a) 1 else "x")` | 编译错误 | 结果是 `Any`，没有 `ToString` |
-| `when (x) { 1, 2 -> ...; in 3..9 -> ... }` | 相同 | 格式化后写作 `in 3 .. 9` |
+| `when (x) { 1, 2 -> ...; in 3..9 -> ... }` | 相同 | — |
 | `when (flag) { true -> ... }` 作为语句 | 编译错误 | `Boolean` subject 必须穷尽 |
 | `for (i in 0 until list.size)` | `for (i in 0L until list.size)` | 下标是 `Long` |
 | `list.indices`、`withIndex()`、`lastIndex` | 没有 | 用 `0L until size` |
-| `repeat(n) { }` | 没有 | 用 `for (i in 1 .. n)` |
+| `repeat(n) { }` | 没有 | 用 `for (i in 1..n)` |
 | `'a'..'z'` | 没有 `Char` 区间 | 遍历字符串或整数 |
 | `(1..5).reversed()` | `5 downTo 1` | 区间只有 `step`、`contains` |
 | `1..10 step 0` | 相同，运行时抛 `IllegalArgumentException` | |
@@ -380,7 +380,7 @@ val h = if (n % 2 == 0) n / 2 else return "odd"
 - **用 `Int` 区间遍历下标**：`0 until names.size` 报 “`size` has type Long, expected Int”，改成 `0L until names.size`。
 - **值位置的 `if` 或无 subject 的 `when` 漏写 `else`**：即使条件在逻辑上已经覆盖全部情况，也要写 `else`。
 - **分支类型不一致**：得到的 `Any` 什么都做不了，报错往往出现在后面使用它的地方，而不是 `if` 本身。
-- **用 `5 .. 1` 倒数**：这是空区间，倒数用 `downTo`。
+- **用 `5..1` 倒数**：这是空区间，倒数用 `downTo`。
 - **`step` 写负数**：步长必须为正，方向由 `..` 或 `downTo` 决定。
 - **在 `Boolean` subject 的 `when` 语句里只写一个分支**：要么补全 `true`/`false`，要么改用 `if`。
 - **在 lambda 里 `break` 外层循环**：lambda 是独立的函数，改用普通循环。
@@ -402,4 +402,4 @@ val h = if (n % 2 == 0) n / 2 else return "odd"
 2. 给定 `val words = ["apple", "kiwi", "banana", "fig"]`，按下标倒序打印每个单词和它的下标。注意下标的类型。
 3. 用 `while` 循环计算一个 `Long` 的各位数字之和；再用 `do-while` 改写，比较输入为 `0L` 时两者的结果。
 4. 用两层 `for` 循环和标签，在 `[[3, 8, 1], [9, 2, 7], [4, 6, 5]]` 中找出第一个大于 8 的数，找到后立即结束全部循环，并打印它的行号和列号。
-5. 把 `for (c in 'a' .. 'e')` 改写成能在 Scoop 中编译通过的版本。
+5. 把 `for (c in 'a'..'e')` 改写成能在 Scoop 中编译通过的版本。

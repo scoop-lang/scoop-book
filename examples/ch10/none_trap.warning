@@ -1,1 +1,2 @@
-binding `None` shadows an enum variant available here; rename the binding or qualify the variant
+warning[W0901]: binding `None` shadows an enum variant available here
+help[H0903]: rename the binding or qualify the variant

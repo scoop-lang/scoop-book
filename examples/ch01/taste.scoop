@@ -5,11 +5,10 @@ enum Shape {
     Rect(Point, Point),
 }
 
-fun area(shape: Shape): Double =
-    when (shape) {
-        case Shape.Circle(_, val r) -> 3.14159 * r * r
-        case Shape.Rect(val a, val b) -> ((b.x - a.x) * (b.y - a.y)).toDouble()
-    }
+fun area(shape: Shape): Double = when (shape) {
+    case Shape.Circle(_, val r) -> 3.14159 * r * r
+    case Shape.Rect(val a, val b) -> ((b.x - a.x) * (b.y - a.y)).toDouble()
+}
 
 fun firstLarge(shapes: Array<Shape>, limit: Double): Shape? {
     for (shape in shapes) {

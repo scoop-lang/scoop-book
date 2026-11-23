@@ -1,2 +1,2 @@
-type `String` has no method `get`
-type `String` has no fields
+error[E0402]: type `String` has no method `get`
+error[E0402]: type `String` has no fields

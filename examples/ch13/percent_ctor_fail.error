@@ -1,1 +1,1 @@
-constructor of type `Percent` is not accessible here
+error[E0403]: constructor of type `Percent` is not accessible here

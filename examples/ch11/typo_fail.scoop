@@ -4,12 +4,11 @@ enum Light {
     Green
 }
 
-fun action(light: Light): String =
-    when (light) {
-        case Red -> "stop"
-        case Gren -> "go"
-        case Yellow -> "slow down"
-    }
+fun action(light: Light): String = when (light) {
+    case Red -> "stop"
+    case Gren -> "go"
+    case Yellow -> "slow down"
+}
 
 fun main() {
     println(action(Light.Yellow))

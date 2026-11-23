@@ -1,1 +1,1 @@
-operator `plus` returns Int, which cannot be assigned to place of type Status
+error[E0501]: operator `plus` returns Int, which cannot be assigned to place of type Status

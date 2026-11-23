@@ -25,14 +25,15 @@ fun sortInPlace(numbers: MutableArray<Int>) {
     @Unsafe
     {
         // 借出数组元素区的地址；回调返回后指针失效
-        numbers.withDataPointer(
-            fun(data: Ptr<Int>, count: Long) {
-                @Unsafe
-                {
-                    cQsort(data.cast<Unit>(), count.toULong(), sizeOf<Int>(), ::compareInts)
+        numbers
+            .withDataPointer(
+                fun(data: Ptr<Int>, count: Long) {
+                    @Unsafe
+                    {
+                        cQsort(data.cast<Unit>(), count.toULong(), sizeOf<Int>(), ::compareInts)
+                    }
                 }
-            }
-        )
+            )
     }
 }
 

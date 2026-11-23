@@ -16,7 +16,7 @@ class Widget(val name: String, size: Int) {
         println("  init 2")
     }
 
-    constructor(name: String): this(name, 1) {
+    constructor(name: String) : this(name, 1) {
         println("  secondary constructor body")
     }
 }

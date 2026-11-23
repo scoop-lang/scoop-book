@@ -124,5 +124,7 @@ done < <(find "${targets[@]}" \( -name Cone.toml -o -name '*.scoop' \) -not -pat
 
 echo
 echo "通过 $passed 个，失败 ${#failed[@]} 个"
-for f in "${failed[@]}"; do echo "  - $f"; done
+if [[ ${#failed[@]} -gt 0 ]]; then
+    for f in "${failed[@]}"; do echo "  - $f"; done
+fi
 [[ ${#failed[@]} -eq 0 ]]
