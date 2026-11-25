@@ -1,6 +1,8 @@
 # 前言
 
-<p align="center"><img src="images/logo.svg" alt="Scoop logo" width="160"></p>
+<p align="center">
+  <a href="images/cover.png"><img src="images/cover.png" alt="《Scoop 程序设计》封面，一只黑脸琵鹭正低头在浅水中觅食" width="320"></a>
+</p>
 
 > **关于本书版本**：Scoop 语言仍在开发中，尚未正式发布，语法、标准库 API 和工具命令都可能变化。本书是持续更新的在线书，会随语言演进修订；如果书中内容与你手上的工具链行为不一致，以工具链为准，也欢迎反馈。
 >
