@@ -1,0 +1,7 @@
+fun main() {
+    try {
+        throw IllegalStateException(Some("not ready"))
+    } catch (e: IllegalStateException) {
+        println(e)
+    }
+}

@@ -1,0 +1,5 @@
+import scoop.time.*
+
+fun main() {
+    val timeout = 5.seconds
+}

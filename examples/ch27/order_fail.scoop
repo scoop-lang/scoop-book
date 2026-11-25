@@ -1,0 +1,4 @@
+fun main() {
+    val ready = AtomicBoolean(false)
+    println(ready.load(MemoryOrder.Release))
+}

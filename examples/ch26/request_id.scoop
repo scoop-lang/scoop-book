@@ -1,0 +1,77 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.text.*
+import scoop.time.*
+
+class RequestId(val value: String)
+
+interface Logger {
+    fun write(message: String)
+}
+
+// 把日志收集起来，最后按请求分组打印
+class MemoryLogger : Logger {
+    val lines = ArrayList<String>()
+
+    public override fun write(message: String) {
+        lines.add(message)
+    }
+}
+
+// 需要上下文的函数：调用方不用传参数，函数从当前任务中取得
+context(id: RequestId, logger: Logger)
+fun log(message: String) {
+    logger.write(f"[${id.value}] ${message}")
+}
+
+context(id: RequestId)
+suspend fun loadUser(name: String): String {
+    currentEventLoop().sleep(5.milliseconds())
+    // 可选的上下文：没有绑定时得到 None
+    when (contextOrNone<Logger>()) {
+        case Some(val logger) -> logger.write(f"[${id.value}] loaded ${name}")
+        case None -> {}
+    }
+    return name
+}
+
+suspend fun handle(id: String, user: String) {
+    // 为这个请求绑定 RequestId，作用到花括号结束
+    context(RequestId(id)) {
+        log("start")
+        coroutineScope {
+            // 子任务继承调用处的绑定
+            val profile = async { loadUser(user) }
+            launch { log("audit") }
+            log("user " + profile.await())
+        }
+        log("end")
+    }
+}
+
+fun main() {
+    val logger = MemoryLogger()
+    eventLoop()
+        .run {
+            val bound: Logger = logger
+            context(bound) {
+                // 两个请求并发执行，各自看到自己的 RequestId
+                coroutineScope {
+                    launch { handle("r1", "ada") }
+                    launch { handle("r2", "grace") }
+                }
+            }
+            try {
+                log("outside any request")
+            } catch (e: MissingContextException) {
+                println(f"missing: ${e.message ?: ""}")
+            }
+        }
+    for (id in ["r1", "r2"]) {
+        for (line in logger.lines.filter { l -> l.startsWith(f"[${id}]") }) {
+            println(line)
+        }
+    }
+}

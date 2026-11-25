@@ -1,0 +1,29 @@
+import scoop.collections.*
+import scoop.random.*
+
+fun roll(random: Random, times: Int): String {
+    val results = ArrayList<Int>()
+    for (i in 1..times) {
+        results.add(random.nextInt(1, 7)) // 1 到 6，不含 7
+    }
+    return results.joinToString()
+}
+
+fun main() {
+    // 同一个种子，得到同一串随机数
+    val a = Random.seeded(42L)
+    val b = Random.seeded(42L)
+    println(roll(a, 5))
+    println(roll(b, 5))
+
+    val random = Random.seeded(7L)
+    println(random.nextBoolean())
+    println(random.nextLong(1000L))
+    println(random.nextDouble() < 1.0)
+    println(random.nextBytes(4L).size)
+
+    // 集合上的随机操作也要显式传入 Random
+    val cards = ["A", "K", "Q", "J"]
+    println(cards.shuffled(random).joinToString())
+    println(cards.random(random))
+}

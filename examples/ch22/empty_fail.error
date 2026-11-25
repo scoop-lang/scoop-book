@@ -1,0 +1,1 @@
+error[E0607]: cannot infer the element type of an empty array literal

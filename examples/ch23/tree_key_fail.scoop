@@ -1,0 +1,7 @@
+import scoop.collections.*
+
+struct Version(val major: Int, val minor: Int)
+
+fun main() {
+    val versions = sortedSetOf(Version(1, 2), Version(1, 0))
+}

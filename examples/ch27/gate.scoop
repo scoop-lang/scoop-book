@@ -1,0 +1,46 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.concurrent.*
+
+class Gate {
+    val mutex = AsyncMutex()
+    val changed = AsyncConditionVariable(mutex)
+    var open = false
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            val gate = Gate()
+            val waiters = ArrayList<Job>()
+            for (i in 1..3) {
+                waiters
+                    .add(
+                        launch {
+                            gate
+                                .mutex
+                                .withLock {
+                                    // withLock 的 receiver 就是 guard，await 时要传给它
+                                    while (!gate.open) {
+                                        gate.changed.await(this)
+                                    }
+                                }
+                        }
+                    )
+            }
+            yieldCoroutine()
+            gate
+                .mutex
+                .withLock {
+                    gate.open = true
+                    gate.changed.broadcast(this)
+                }
+            for (w in waiters) {
+                w.join()
+            }
+            println("all waiters passed the gate")
+        }
+}

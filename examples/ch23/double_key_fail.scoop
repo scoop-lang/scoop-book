@@ -1,0 +1,6 @@
+import scoop.collections.*
+
+fun main() {
+    val labels = HashMap<Double, String>()
+    labels[0.5] = "half"
+}

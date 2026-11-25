@@ -1,0 +1,4 @@
+after cancel: cancelled=true, completed=false
+worker: cancelled
+worker: cleanup
+after join: cancelled=true, completed=true

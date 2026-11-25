@@ -1,0 +1,26 @@
+import scoop.datetime.*
+import scoop.time.*
+
+fun main() {
+    // Instant 是时间轴上的一个绝对时刻
+    val epoch = Instant.fromEpochSeconds(0L)
+    println(epoch)
+
+    // 解析时必须带 Z 或 UTC 偏移；输出总是换算成 UTC
+    val meeting = Instant.parse("2026-11-26T09:30:00+08:00")
+    println(meeting)
+    println(meeting.epochSeconds)
+
+    // 加减 Duration，两个 Instant 相减得到 Duration
+    val end = meeting + 45.minutes()
+    println(end)
+    println((end - meeting).inWholeMinutes)
+    println(end > meeting)
+
+    // 换算成某个 UTC 偏移下的日期和时间
+    val beijing = UtcOffset.parse("+08:00")
+    println(end.toLocalDateTime(beijing))
+
+    // 没有偏移的文本不能解析成 Instant
+    println(Instant.parseOrNone("2026-11-26T09:30:00")?.toString() ?: "rejected: no offset")
+}

@@ -9,6 +9,8 @@
 #   名字以 _fail 结尾的示例预期编译失败，用于演示错误写法；
 #   NAME_fail.error（可选）每行是报错中必须出现的一段文字
 #   NAME.warning（可选）每行是 NAME.scoop 编译警告中必须出现的一段文字
+#   NAME.status（可选）NAME.scoop 运行时的预期退出码，默认 0
+#   NAME.stderr（可选）每行是 NAME.scoop 运行时 stderr 中必须出现的一段文字
 #
 # 用法：scripts/check-examples.sh [examples/chNN ...]
 # 环境变量 SCOOP 可覆盖工具链路径，默认 ~/.scoop/bin/scoop。
@@ -41,14 +43,26 @@ step() {  # step 名称 命令...
     fi
 }
 
-compare() {  # compare 预期文件 命令...
-    local expected="$1"; shift
-    local actual
+compare() {  # compare 预期文件 预期退出码 stderr片段文件 命令...
+    local expected="$1" want_status="$2" stderr_needles="$3"; shift 3
+    local actual status
     actual="$(mktemp)"
-    if ! "$@" >"$actual" 2>"$log"; then
-        echo "  ✗ 运行失败"
+    "$@" >"$actual" 2>"$log"
+    status=$?
+    if [[ "$status" != "$want_status" ]]; then
+        echo "  ✗ 退出码为 $status，预期 $want_status"
         sed 's/^/    /' "$log"
         rm -f "$actual"; return 1
+    fi
+    if [[ -n "$stderr_needles" && -f "$stderr_needles" ]]; then
+        while IFS= read -r needle; do
+            [[ -z "$needle" ]] && continue
+            if ! grep -qF -- "$needle" "$log"; then
+                echo "  ✗ stderr 中没有找到：$needle"
+                sed 's/^/    /' "$log"
+                rm -f "$actual"; return 1
+            fi
+        done < "$stderr_needles"
     fi
     if [[ -f "$expected" ]] && ! diff -u "$expected" "$actual" >"$log"; then
         echo "  ✗ 输出与 $expected 不一致"
@@ -91,7 +105,9 @@ check_single() {
     fi
     local args=()
     [[ -f "$base.args" ]] && read -r -a args < "$base.args"
-    compare "$base.expected" "$SCOOP" run "$file" --release -- ${args[@]+"${args[@]}"}
+    local status=0
+    [[ -f "$base.status" ]] && read -r status < "$base.status"
+    compare "$base.expected" "$status" "$base.stderr" "$SCOOP" run "$file" --release -- ${args[@]+"${args[@]}"}
 }
 
 check_cone() {
@@ -103,7 +119,7 @@ check_cone() {
         step "测试" "$SCOOP" test "$dir" --release || return 1
     fi
     if grep -Eq '^kind *= *"executable"' "$dir/Cone.toml" || ! grep -Eq '^kind *=' "$dir/Cone.toml"; then
-        compare "$dir/expected.txt" "$SCOOP" run "$dir" --release || return 1
+        compare "$dir/expected.txt" 0 "" "$SCOOP" run "$dir" --release || return 1
     fi
 }
 

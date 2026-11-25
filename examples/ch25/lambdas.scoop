@@ -1,0 +1,33 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+// 参数是挂起函数类型
+suspend fun twice(action: suspend () -> Int): Int = action() + action()
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+
+            // 有期望类型时，{ ... } 就是挂起 lambda
+            val typed: suspend () -> Int = {
+                loop.sleep(1.milliseconds())
+                1
+            }
+
+            // 也可以显式写 suspend { ... }
+            val marked = suspend {
+                loop.sleep(1.milliseconds())
+                2
+            }
+
+            // 直接作为参数时，按参数类型确定
+            val inline = twice {
+                loop.sleep(1.milliseconds())
+                3
+            }
+            println(twice(typed) + twice(marked) + inline)
+        }
+}

@@ -1,0 +1,37 @@
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.platform.fs.*
+import scoop.platform.io.*
+
+// 自己写的 withX：打开文件，借给 block 使用，结束时保证关闭
+fun <R> withAppendFile(path: Path, block: (File) -> R): R = File
+    .open(path, OpenOptions(write = true, create = true, append = true))
+    .use(block)
+
+fun main() {
+    val dir = createTempDirectory(prefix = "book-ch21-")
+    try {
+        val path = dir.resolve(Path.fromString("log.txt"))
+
+        // 借用：BufferedSink(file) 不负责关闭 file
+        withAppendFile(path) { file ->
+            val buffered = BufferedSink(file)
+            buffered.use { sink -> sink.writeText("borrowed\n") }
+            println(f"after buffered.close: file closed = ${file.isClosed}")
+            file.writeText("file still usable\n")
+        }
+
+        // 接管：takeOwnership 之后，关闭 BufferedSink 会连同 file 一起关闭
+        val file = File.open(path, OpenOptions(write = true, append = true))
+        val owned = BufferedSink.takeOwnership(file)
+        owned.use { sink -> sink.writeText("owned\n") }
+        println(f"after owned.close: file closed = ${file.isClosed}")
+
+        // 作用域借用：withLock 在 block 结束时解锁
+        withAppendFile(path) { f -> f.withLock { f.writeText("locked\n") } }
+
+        print(path.readText())
+    } finally {
+        dir.deleteRecursively()
+    }
+}

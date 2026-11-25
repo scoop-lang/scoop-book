@@ -1,0 +1,40 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+suspend fun download(name: String, delay: Long): String {
+    currentEventLoop().sleep(Duration.milliseconds(delay))
+    if (name == "bad") throw IllegalStateException(Some(f"cannot download ${name}"))
+    return name
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            try {
+                coroutineScope {
+                    launch {
+                        try {
+                            download("slow", 1000L)
+                            println("slow finished")
+                        } finally {
+                            println("slow task cancelled, cleaning up")
+                        }
+                    }
+                    launch { download("bad", 10L) }
+                }
+            } catch (e: IllegalStateException) {
+                // 失败在 coroutineScope 的边界停下，可以在这里捕获
+                println(f"caught: ${e.message ?: ""}")
+            }
+
+            // 只想单独处理一个任务的失败时，用 coroutineScope 把它包起来
+            val result = try {
+                coroutineScope { async { download("bad", 10L) }.await() }
+            } catch (e: IllegalStateException) {
+                "fallback"
+            }
+            println(result)
+        }
+}

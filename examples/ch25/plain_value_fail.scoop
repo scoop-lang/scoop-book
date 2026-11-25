@@ -1,0 +1,13 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+
+suspend fun twice(action: suspend () -> Int): Int = action() + action()
+
+fun main() {
+    eventLoop()
+        .run {
+            val plain: () -> Int = { 3 }
+            println(twice(plain))
+        }
+}

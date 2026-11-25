@@ -1,0 +1,12 @@
+interface Shape {
+    fun area(): Double
+}
+
+struct Dot(val x: Int, val y: Int) : Shape {
+    public override fun area(): Double = 0.0
+}
+
+fun main() {
+    val dots: Array<Shape> = [Dot(0, 0), Dot(1, 1)]
+    println(dots.size)
+}

@@ -1,0 +1,29 @@
+import scoop.*
+import scoop.text.*
+
+fun parseQuantity(text: String): Result<Int, String> = text
+    .toIntOrNone()
+    .toResult { f"not a number: ${text}" }
+
+fun checkStock(quantity: Int): Result<Int, String> = if (quantity <= 10)
+    Result.Success(quantity)
+else
+    Result.Failure(f"only 10 in stock, asked for ${quantity}")
+
+fun main() {
+    for (text in ["3", "12", "two"]) {
+        val total = parseQuantity(text)
+            .flatMap(::checkStock)
+            .map { quantity -> quantity * 25 }
+        println(total.fold({ price -> f"total: ${price}" }, { error -> f"error: ${error}" }))
+    }
+
+    val failed = parseQuantity("two")
+    println(failed.isFailure)
+    println(failed.getOrElse { 1 })
+    println(failed.recover { 0 }.getOrNone() ?: -1)
+    println(failed.mapError { error -> error.charLength }.errorOrNone() ?: 0L)
+    parseQuantity("4")
+        .onSuccess { quantity -> println(f"ordered ${quantity}") }
+        .onFailure { error -> println(f"rejected: ${error}") }
+}

@@ -1,0 +1,41 @@
+class Resource(val name: String, failOpen: Boolean = false) : Closeable {
+    init {
+        if (failOpen) throw IllegalStateException(Some(f"cannot open ${name}"))
+        println(f"open ${name}")
+    }
+
+    public override fun close() {
+        println(f"close ${name}")
+    }
+}
+
+fun copy(source: String, target: String, failTarget: Boolean) {
+    Resource(source)
+        .use { input ->
+            Resource(target, failOpen = failTarget)
+                .use { output -> println(f"copy ${input.name} -> ${output.name}") }
+        }
+}
+
+// 错误写法：先把两个资源都打开，再进入 use
+fun copyLeaky(source: String, target: String) {
+    val input = Resource(source)
+    val output = Resource(target, failOpen = true)
+    input.use { i -> output.use { o -> println(f"copy ${i.name} -> ${o.name}") } }
+}
+
+fun main() {
+    copy("a.txt", "b.txt", false)
+    println("--")
+    try {
+        copy("c.txt", "d.txt", true)
+    } catch (e: IllegalStateException) {
+        println(e.message ?: "")
+    }
+    println("--")
+    try {
+        copyLeaky("e.txt", "f.txt")
+    } catch (e: IllegalStateException) {
+        println(e.message ?: "")
+    }
+}

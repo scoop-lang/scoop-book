@@ -1,0 +1,22 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+suspend fun download(name: String): String {
+    currentEventLoop().sleep(10.milliseconds())
+    throw IllegalStateException(Some(f"cannot download ${name}"))
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            val task = async { download("bad") }
+            try {
+                println(task.await())
+            } catch (e: IllegalStateException) {
+                println("this catch is not enough")
+            }
+            println("never printed")
+        }
+}

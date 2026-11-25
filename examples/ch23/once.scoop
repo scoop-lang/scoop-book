@@ -1,0 +1,18 @@
+import scoop.sequences.*
+
+fun main() {
+    val words = ["apple", "kiwi"]
+
+    // 从 Iterable 得到的序列可以反复遍历
+    val again = words.asSequence()
+    println(f"${again.count()} ${again.count()}")
+
+    // 从 Iterator 得到的序列只能遍历一次
+    val once = words.iterator().asSequence()
+    println(once.count())
+    try {
+        println(once.count())
+    } catch (e: IllegalStateException) {
+        println("already consumed")
+    }
+}

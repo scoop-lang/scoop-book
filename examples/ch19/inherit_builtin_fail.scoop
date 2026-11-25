@@ -1,0 +1,5 @@
+class InvalidPortException(val port: Int) : IllegalArgumentException(Some(f"invalid port: ${port}"))
+
+fun main() {
+    throw InvalidPortException(70000)
+}

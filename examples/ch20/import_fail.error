@@ -1,0 +1,2 @@
+error[E0401]: unknown type `Result`
+help[H0401]: available with import `scoop`.`Result`

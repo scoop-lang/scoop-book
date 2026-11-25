@@ -1,0 +1,35 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.concurrent.*
+import scoop.platform.concurrent.*
+
+fun work(): Long {
+    var s = 0L
+    for (i in 1L..200000L) {
+        s += i % 7L
+    }
+    return s
+}
+
+fun main() {
+    val threadsUsed = asyncRuntime { workers = 4 }
+        .run {
+            // 多线程执行器上的任务是并行的，共享的 HashSet 必须加锁
+            val lock = AsyncMutex()
+            val seen = HashSet<ThreadId>()
+            coroutineScope {
+                for (i in 1..8) {
+                    launch {
+                        work()
+                        lock.withLock { seen.add(currentThreadId()) }
+                    }
+                }
+            }
+            lock.withLock { seen.size }
+        }
+    println(f"used more than one thread: ${threadsUsed > 1L}")
+}

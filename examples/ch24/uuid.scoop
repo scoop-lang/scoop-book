@@ -1,0 +1,21 @@
+import scoop.collections.*
+import scoop.random.*
+import scoop.uuid.*
+
+fun main() {
+    val id = Uuid.parse("123E4567-E89B-12D3-A456-426614174000")
+    println(id) // 输出总是小写、带横线
+    println(id.toHexString())
+    println(Uuid.parseOrNone("not-a-uuid") ?: Uuid.NIL)
+
+    // 随机生成（version 4）需要显式的 Random
+    val random = Random.seeded(1L)
+    val generated = Uuid.random(random)
+    println(generated)
+
+    // Uuid 是实现了 Equals、Hash、Compare 的 struct，可以直接作为 key
+    val names = HashMap<Uuid, String>()
+    names[id] = "Ada"
+    println(names[Uuid.parse("123e4567e89b12d3a456426614174000")] ?: "?")
+    println(id < generated)
+}

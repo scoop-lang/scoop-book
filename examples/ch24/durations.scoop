@@ -1,0 +1,35 @@
+import scoop.time.*
+
+fun main() {
+    // 用扩展函数或 companion 工厂创建
+    val timeout = 90.seconds()
+    val step = Duration.milliseconds(1500L)
+    val total = timeout + step * 2L
+    println(total)
+    println(total.toIsoString())
+
+    // 比较与换算：inWholeX 向零截断
+    println(timeout > step)
+    println(
+        f"${total.inWholeMinutes} min, ${total.inWholeSeconds} s, ${total.inWholeMilliseconds} ms"
+    )
+
+    // 拆成整秒和纳秒两部分
+    val(seconds, nanos) = step.toComponents()
+    println(f"${seconds} s + ${nanos} ns")
+
+    // 负的时长和绝对值
+    val back = -step
+    println(f"${back} ${back.absoluteValue}")
+
+    // 解析 ISO 8601 文本
+    println(Duration.parse("PT1H30M").inWholeMinutes)
+    println(Duration.parseOrNone("90 minutes") ?: Duration.ZERO)
+
+    // 超出范围时抛出异常，而不是溢出回绕
+    try {
+        println(Long.MAX_VALUE.days())
+    } catch (e: ArithmeticException) {
+        println("too long")
+    }
+}

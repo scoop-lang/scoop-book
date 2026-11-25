@@ -1,0 +1,9 @@
+fun loadConfig(name: String): String {
+    throw IllegalStateException(Some(f"cannot read ${name}"))
+}
+
+fun main() {
+    println("starting")
+    val text = loadConfig("app.toml")
+    println(text)
+}

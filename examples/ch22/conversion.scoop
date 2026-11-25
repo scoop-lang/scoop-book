@@ -1,0 +1,20 @@
+fun main() {
+    val original = [1, 2, 3]
+
+    // Array 和 MutableArray 之间要显式转换，每次都得到新的数组
+    val editable = original.toMutableArray()
+    editable[0L] = 100
+    val frozen = editable.toArray()
+    editable[1L] = 200
+    println(f"${original[0L]} ${editable[0L]} ${frozen[0L]} ${frozen[1L]}")
+
+    // 也可以用构造器：参数是另一种数组
+    val again = MutableArray(frozen)
+    println(again[0L])
+
+    // 复制是浅的：引用类型的元素仍然是同一个对象
+    val builders = [StringBuilder(), StringBuilder()]
+    val copy = builders.toMutableArray()
+    copy[0L].append("shared")
+    println(builders[0L].toString())
+}

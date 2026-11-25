@@ -1,0 +1,2 @@
+error[E1103]: suspend function `use` cannot be called from non-suspend function `main`
+error[E0603]: dependency function `use`: type argument `Socket` for `T` must satisfy upper bound `Disposable`

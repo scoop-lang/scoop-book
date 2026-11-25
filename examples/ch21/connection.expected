@@ -1,0 +1,11 @@
+open db1
+close db1
+db1: select 1
+open db2
+close db2
+failed: empty query
+open db3
+db3: select 3
+close db3
+closed: true
+db3 is closed

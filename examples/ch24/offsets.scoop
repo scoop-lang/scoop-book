@@ -1,0 +1,23 @@
+import scoop.datetime.*
+import scoop.time.*
+
+fun main() {
+    val beijing = UtcOffset.parse("+08:00")
+    val newYork = UtcOffset.fromHoursMinutesSeconds(hours = -5)
+    println(f"${beijing} ${newYork} ${UtcOffset.ZERO}")
+
+    // 带偏移的日期时间
+    val call = OffsetDateTime(LocalDateTime(2026, 11, 26, 21, 0), beijing)
+    println(call)
+    println(call.toInstant())
+
+    // 同一时刻在另一个偏移下的本地时间
+    println(call.withOffsetSameInstant(newYork))
+
+    // 本地时间不变，只换偏移：表示的是另一个时刻
+    println(call.withOffsetSameLocal(newYork).toInstant())
+
+    // LocalDateTime 只有配上偏移才能换算成 Instant
+    val local = LocalDateTime.parse("2026-11-26T21:00:00")
+    println(local.toInstant(beijing) == call.toInstant())
+}

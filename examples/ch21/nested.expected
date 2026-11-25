@@ -1,0 +1,12 @@
+open a.txt
+open b.txt
+copy a.txt -> b.txt
+close b.txt
+close a.txt
+--
+open c.txt
+close c.txt
+cannot open d.txt
+--
+open e.txt
+cannot open f.txt

@@ -1,0 +1,11 @@
+import scoop.text.*
+
+fun main() {
+    try {
+        println("8080".toInt())
+    } catch (e: Exception) {
+        println("something failed")
+    } catch (e: NumberFormatException) {
+        println("not a number")
+    }
+}

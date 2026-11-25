@@ -1,0 +1,17 @@
+class Flaky : Closeable {
+    public override fun close() {
+        throw IllegalStateException(Some("close failed"))
+    }
+}
+
+fun main() {
+    try {
+        try {
+            Flaky().use { _ -> throw IllegalArgumentException(Some("bad input")) }
+        } catch (e: IllegalArgumentException) {
+            println("handled bad input")
+        }
+    } catch (e: ResourceUseException) {
+        println("the inner catch did not see it: " + (e.message ?: ""))
+    }
+}

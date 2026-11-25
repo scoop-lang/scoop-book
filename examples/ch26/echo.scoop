@@ -1,0 +1,53 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.asyncio.*
+import scoop.platform.memory.NativeByteBuffer
+import scoop.platform.net.*
+
+// 服务端：接受一个连接，把收到的内容原样发回去
+suspend fun serveOne(listener: AsyncTcpListener) {
+    listener
+        .accept()
+        .useAsync { stream ->
+            stream.copyTo(stream)
+            stream.shutdownOutput()
+        }
+}
+
+// 客户端：发送一段文本，读回全部响应
+suspend fun request(address: SocketAddress, text: String): String {
+    val loop = currentEventLoop()
+    return loop
+        .connectTcp(address)
+        .useAsync { stream ->
+            NativeByteBuffer
+                .allocate(text.byteLength)
+                .use { buffer ->
+                    buffer.writeBytes(text.toByteArray())
+                    stream.writeFully(buffer)
+                }
+            stream.shutdownOutput() // 告诉对方：不会再发送了
+            String.fromUtf8(stream.readAllBytes())
+        }
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+            // 端口 0：由系统分配一个空闲端口
+            val address = SocketAddress(IpAddress.IPV4_LOOPBACK, 0)
+            loop
+                .listenTcp(address)
+                .useAsync { listener ->
+                    val server = launch {
+                        serveOne(listener)
+                        serveOne(listener)
+                    }
+                    println(request(listener.localAddress, "hello"))
+                    println(request(listener.localAddress, "over TCP"))
+                    server.join()
+                }
+        }
+}

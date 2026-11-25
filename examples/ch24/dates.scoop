@@ -1,0 +1,35 @@
+import scoop.datetime.*
+import scoop.time.*
+
+fun main() {
+    val date = LocalDate(2024, 1, 31)
+    println(f"${date} is a ${date.dayOfWeek}, day ${date.dayOfYear} of the year")
+
+    // 加一个月：目标月份没有 31 日，就取月末
+    println(date.plusMonths(1L))
+    println(date.plusDays(30L))
+    println(date + DatePeriod(years = 1, months = 1))
+
+    // 两个日期相差多少天
+    val release = LocalDate.parse("2026-12-25")
+    println(LocalDate(2026, 11, 26).daysUntil(release))
+
+    // 年月
+    val february = YearMonth(2024, Month.February)
+    println(f"${february} has ${february.lengthOfMonth} days, leap year: ${february.isLeapYear}")
+    println(february.atDay(29))
+
+    // 时间与日期时间
+    val alarm = LocalTime(7, 30)
+    val start = LocalDateTime(release, alarm)
+    println(start)
+    println(LocalTime(23, 0) + 2.hours()) // 按 24 小时回绕
+
+    // 构造时检查合法性
+    try {
+        LocalDate(2026, 2, 30)
+    } catch (e: IllegalArgumentException) {
+        println("no such date")
+    }
+    println(LocalDate.parseOrNone("2026/11/26")?.toString() ?: "bad format")
+}

@@ -1,0 +1,27 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+class Stats {
+    var count = 0
+}
+
+// ANCHOR: counter
+suspend fun countAll(stats: Stats) = coroutineScope {
+    for (i in 1..100) {
+        launch {
+            val before = stats.count
+            currentEventLoop().sleep(1.milliseconds())
+            stats.count = before + 1
+        }
+    }
+}
+
+// ANCHOR_END: counter
+
+fun main() {
+    val stats = Stats()
+    eventLoop().run { countAll(stats) }
+    println(stats.count)
+}

@@ -1,0 +1,45 @@
+import scoop.collections.*
+
+class EventBus {
+    private val handlers = LinkedHashMap<Long, (String) -> Unit>()
+    private var nextId = 0L
+
+    fun subscribe(handler: (String) -> Unit): Subscription {
+        val id = nextId
+        nextId += 1L
+        handlers[id] = handler
+        return Subscription(this, id)
+    }
+
+    fun unsubscribe(id: Long) {
+        handlers.remove(id)
+    }
+
+    fun publish(event: String) {
+        for (handler in handlers.values) {
+            handler(event)
+        }
+    }
+}
+
+// 取消订阅不是“关闭”，所以实现 Disposable 而不是 Closeable
+class Subscription(private val bus: EventBus, private val id: Long) : Disposable {
+    private var active = true
+
+    public override fun dispose() {
+        if (!active) return
+        active = false
+        bus.unsubscribe(id)
+    }
+}
+
+fun main() {
+    val bus = EventBus()
+    val logger = bus.subscribe { event -> println(f"log: ${event}") }
+    bus.subscribe { event -> println(f"audit: ${event}") }.use { _ -> bus.publish("login") }
+    bus.publish("logout")
+    logger.dispose()
+    logger.dispose()
+    bus.publish("ignored")
+    println("done")
+}

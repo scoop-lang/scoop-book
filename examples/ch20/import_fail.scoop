@@ -1,0 +1,6 @@
+fun half(n: Int): Result<Int, String> = if (n % 2 == 0)
+    Result.Success(n / 2)
+else
+    Result.Failure("odd")
+
+fun main() {}

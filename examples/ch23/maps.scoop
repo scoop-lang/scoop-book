@@ -1,0 +1,29 @@
+import scoop.collections.*
+
+fun main() {
+    val stock = HashMap<String, Int>()
+    stock["apple"] = 5
+    stock["pear"] = 2
+
+    // put 返回原来的值；原来没有这个 key 时返回 None
+    println(stock.put("apple", 8) ?: -1)
+    println(stock.put("kiwi", 1) ?: -1)
+
+    // 读取返回 Option
+    println(stock["apple"] ?: 0)
+    println(stock["mango"] ?: 0)
+    println("pear" in stock)
+
+    // remove 也返回原来的值
+    println(stock.remove("pear") ?: -1)
+    println(stock.size)
+
+    // 几种“缺失时怎么办”
+    println(stock.getOrDefault("mango", 0))
+    println(stock.getOrElse("mango") { -1 })
+    try {
+        stock.getValue("mango")
+    } catch (e: NoSuchElementException) {
+        println("no mango")
+    }
+}

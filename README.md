@@ -31,6 +31,8 @@ scripts/check-examples.sh examples/ch08   # 只校验某一章
 | `NAME.expected` | 预期 stdout，可选 |
 | `NAME.args` | 运行参数，可选 |
 | `NAME.warning` | 编译警告中必须出现的文字，每行一段，保留警告及附属信息的编号，可选 |
+| `NAME.status` | 运行时的预期退出码，可选，默认 0 |
+| `NAME.stderr` | 运行时 stderr 中必须出现的文字，每行一段，可选 |
 | `NAME_fail.scoop` | 演示错误写法，预期编译失败 |
 | `NAME_fail.error` | 报错中必须出现的文字，每行一段，保留编号与 error/cause/note/help 角色；书稿可直接 include 它来展示报错 |
 | `NAME/Cone.toml` | Cone 示例；有 `tests/` 时运行测试，可执行 Cone 的预期输出放 `expected.txt` |
@@ -46,5 +48,5 @@ scripts/check-examples.sh examples/ch08   # 只校验某一章
 ## 行文约定
 
 - 正文中的引号用中文引号 “”。mdBook 的智能标点会把英文 `"` 转错。
-- `{{#include}}` 不要放在 `>` 引用块里，否则引入的多行内容会打断引用块。
+- `{{#include}}` 不要放在 `>` 引用块或缩进的列表项里，否则引入的多行内容没有相应的缩进，会打断引用块或列表。需要在列表中间展示代码时，先结束列表；有编号的列表在代码块之后从下一个编号继续写即可。
 - 提示框统一写作 `> **从 Kotlin 过来**` 和 `> **深入一点：标题**`。

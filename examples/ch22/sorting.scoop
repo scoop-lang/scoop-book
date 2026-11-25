@@ -1,0 +1,20 @@
+import scoop.collections.*
+
+fun main() {
+    val scores: MutableArray<Int> = [72, 95, 58]
+
+    // sorted 返回一个新的 List，原数组不变
+    val ranked = scores.sorted()
+    println(f"${ranked.joinToString()} / ${scores.joinToString()}")
+
+    // 需要原地排序时，用 ArrayList
+    val list = scores.toMutableList()
+    list.sort()
+    println(list.joinToString())
+
+    // 按需写回数组
+    for (i in 0L until scores.size) {
+        scores[i] = list[i]
+    }
+    println(scores.joinToString())
+}

@@ -1,0 +1,10 @@
+import scoop.*
+import scoop.text.*
+
+fun parseTimeout(text: String): Result<Int, String> = text
+    .toIntOrNone()
+    .toResult { f"bad timeout: ${text}" }
+
+fun main() {
+    println(parseTimeout("30").getOrThrow())
+}

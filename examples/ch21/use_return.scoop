@@ -1,0 +1,25 @@
+import scoop.text.*
+
+class Config : Closeable {
+    fun read(): String = "port=8080"
+
+    public override fun close() {
+        println("close")
+    }
+}
+
+// use 的结果就是函数的结果
+fun firstLine(): String = Config().use { config -> config.read() }
+
+// lambda 里要提前结束，用 return@use
+fun portLine(): String = Config()
+    .use { config ->
+        val text = config.read()
+        if (!text.startsWith("port=")) return@use "port=80"
+        text
+    }
+
+fun main() {
+    println(firstLine())
+    println(portLine())
+}

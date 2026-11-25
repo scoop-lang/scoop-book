@@ -1,0 +1,16 @@
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.platform.random.*
+import scoop.uuid.*
+
+fun main() {
+    // 操作系统提供的随机源，每次运行结果都不同
+    val dice = SystemRandom.nextInt(1, 7)
+    println(dice in 1..6)
+
+    val id = Uuid.random(SystemRandom)
+    println(id.toString().charLength)
+
+    val token = SystemRandom.nextBytes(16L)
+    println(token.size)
+}

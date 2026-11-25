@@ -1,0 +1,23 @@
+fun main() {
+    // Array：长度固定，元素只读
+    val primes = [2, 3, 5, 7]
+    println(f"${primes.size} primes, first is ${primes[0L]}")
+
+    // MutableArray：长度固定，元素可以改写
+    val scores: MutableArray<Int> = [0, 0, 0]
+    scores[1L] = 90
+    scores[2L] = scores[1L] + 5
+    for (score in scores) {
+        print(f"${score} ")
+    }
+    println("")
+
+    // ArrayList：可以增删元素
+    val names = ArrayList<String>()
+    names.add("Ada")
+    names.add("Grace")
+    names.add(0L, "Alan")
+    val removed = names.removeAt(1L)
+    names[0L] = "Linus"
+    println(f"removed ${removed}, now ${names.size}: ${names[0L]}, ${names[1L]}")
+}

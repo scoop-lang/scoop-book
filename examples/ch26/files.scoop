@@ -1,0 +1,59 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.platform.fs.*
+import scoop.platform.memory.NativeByteBuffer
+
+suspend fun writeText(file: AsyncFile, text: String) {
+    NativeByteBuffer
+        .allocate(text.byteLength)
+        .use { buffer ->
+            buffer.writeBytes(text.toByteArray())
+            file.writeFully(buffer)
+        }
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+            // 平台库的同步函数会阻塞线程，交给阻塞池执行
+            val root = blocking { createTempDirectory(prefix = "book-ch26-") }
+            try {
+                val logs = root.resolve(Path.fromString("logs"))
+                loop.createDirectories(logs)
+
+                val path = logs.resolve(Path.fromString("app.log"))
+                val options = OpenOptions(write = true, create = true, truncate = true)
+                loop
+                    .openFile(path, options)
+                    .useAsync { file ->
+                        writeText(file, "started\n")
+                        writeText(file, "ready\n")
+                    }
+
+                // 一次读入全部内容
+                val text = loop
+                    .openFile(path)
+                    .useAsync { file -> String.fromUtf8(file.readAllBytes()) }
+                print(text)
+                println(f"size: ${loop.metadata(path).size}")
+
+                // 逐项列出目录
+                val names = ArrayList<String>()
+                loop
+                    .openDirectory(logs)
+                    .useAsync { entries ->
+                        while (true) {
+                            val entry = entries.next() ?: break
+                            names.add(entry.name.display())
+                        }
+                    }
+                println(f"entries: ${names.joinToString()}")
+            } finally {
+                blocking { root.deleteRecursively() }
+            }
+        }
+}

@@ -1,0 +1,6 @@
+import scoop.collections.*
+
+fun main() {
+    val colors = listOf("red", "green")
+    colors.add("blue")
+}

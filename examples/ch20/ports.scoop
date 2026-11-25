@@ -1,0 +1,33 @@
+import scoop.*
+import scoop.text.*
+
+// 解析失败的几种原因，每种带着各自需要的数据
+enum PortError {
+    Empty,
+    NotANumber(String),
+    OutOfRange(Int)
+}
+
+fun parsePort(text: String): Result<Int, PortError> {
+    val trimmed = text.trim()
+    if (trimmed == "") return Result.Failure(PortError.Empty)
+    val port = trimmed.toIntOrNone() ?: return Result.Failure(PortError.NotANumber(trimmed))
+    if (port < 1 || port > 65535) return Result.Failure(PortError.OutOfRange(port))
+    return Result.Success(port)
+}
+
+fun describe(error: PortError): String = when (error) {
+    case PortError.Empty -> "port is empty"
+    case PortError.NotANumber(val text) -> f"not a number: ${text}"
+    case PortError.OutOfRange(val port) -> f"out of range: ${port}"
+}
+
+fun main() {
+    for (text in ["8080", " ", "http", "70000"]) {
+        val message = when (parsePort(text)) {
+            case Result.Success(val port) -> f"port ${port}"
+            case Result.Failure(val error) -> describe(error)
+        }
+        println(message)
+    }
+}

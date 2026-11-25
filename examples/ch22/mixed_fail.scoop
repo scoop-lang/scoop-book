@@ -1,0 +1,4 @@
+fun main() {
+    val row = [1, "Ada", true]
+    println(row.size)
+}

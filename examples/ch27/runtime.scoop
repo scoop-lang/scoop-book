@@ -1,0 +1,40 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+
+fun countPrimes(from: Long, until: Long): Long {
+    var count = 0L
+    for (n in from until until) {
+        if (n < 2L) continue
+        var prime = true
+        var d = 2L
+        while (d * d <= n) {
+            if (n % d == 0L) {
+                prime = false
+                break
+            }
+            d += 1L
+        }
+        if (prime) count += 1L
+    }
+    return count
+}
+
+fun main() {
+    // 多线程的运行时：任务分布在 4 个工作线程上并行执行
+    val runtime = asyncRuntime { workers = 4 }
+    val total = runtime
+        .run {
+            val parts = ArrayList<Deferred<Long>>()
+            for (i in 0L until 4L) {
+                parts.add(async { countPrimes(i * 250000L, (i + 1L) * 250000L) })
+            }
+            var sum = 0L
+            for (part in parts) {
+                sum += part.await()
+            }
+            sum
+        }
+    println(f"primes below 1000000: ${total}")
+}

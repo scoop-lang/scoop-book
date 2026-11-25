@@ -1,0 +1,4 @@
+result: ok
+one: body failed
+one: close failed
+both: body failed + close failed

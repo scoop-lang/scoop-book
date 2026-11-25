@@ -1,0 +1,69 @@
+import scoop.*
+import scoop.collections.*
+import scoop.text.*
+
+// 用户输入不合法：预期之内，调用方需要知道原因 → Result
+enum SignupError {
+    NameTooShort(String),
+    NameTaken(String),
+    InvalidAge(String)
+}
+
+// 存储出故障：预期之外，这一层处理不了 → 异常
+class StorageException(message: String) : Exception(Some(message))
+
+class UserStore(val capacity: Long) {
+    private val ages = HashMap<String, Int>()
+
+    // 查询：没有这个用户是正常情况 → Option
+    fun ageOf(name: String): Int? = ages[name]
+
+    fun save(name: String, age: Int) {
+        if (ages.size >= capacity) throw StorageException("store is full")
+        ages[name] = age
+    }
+}
+
+fun validate(store: UserStore, name: String, ageText: String): Result<Int, SignupError> {
+    if (name.charLength < 3L) return Result.Failure(SignupError.NameTooShort(name))
+    when (store.ageOf(name)) {
+        case Some(_) -> return Result.Failure(SignupError.NameTaken(name))
+        case None -> {}
+    }
+    val age = ageText.toIntOrNone() ?: return Result.Failure(SignupError.InvalidAge(ageText))
+    return Result.Success(age)
+}
+
+fun describe(error: SignupError): String = when (error) {
+    case SignupError.NameTooShort(val name) -> f"name too short: ${name}"
+    case SignupError.NameTaken(val name) -> f"name taken: ${name}"
+    case SignupError.InvalidAge(val text) -> f"invalid age: ${text}"
+}
+
+fun signup(store: UserStore, name: String, ageText: String): String {
+    val age = when (validate(store, name, ageText)) {
+        case Result.Success(val value) -> value
+        case Result.Failure(val error) -> return describe(error)
+    }
+    store.save(name, age)
+    return f"welcome, ${name}"
+}
+
+fun main() {
+    val store = UserStore(capacity = 2L)
+    val requests = [
+        ("Ada", "36"),
+        ("Al", "20"),
+        ("Ada", "40"),
+        ("Grace", "x"),
+        ("Grace", "45"),
+        ("Linus", "30")
+    ]
+    try {
+        for ((name, age) in requests) {
+            println(signup(store, name, age))
+        }
+    } catch (e: StorageException) {
+        println(f"service unavailable: ${e.message ?: ""}")
+    }
+}

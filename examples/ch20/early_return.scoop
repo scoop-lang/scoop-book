@@ -1,0 +1,46 @@
+import scoop.*
+import scoop.text.*
+
+struct Endpoint(val host: String, val port: Int)
+
+fun parseHost(text: String): Result<String, String> = if (text == "")
+    Result.Failure("host is empty")
+else
+    Result.Success(text)
+
+fun parsePort(text: String): Result<Int, String> {
+    val port = text.toIntOrNone() ?: return Result.Failure(f"bad port: ${text}")
+    if (port < 1 || port > 65535) return Result.Failure(f"port out of range: ${port}")
+    return Result.Success(port)
+}
+
+// 写法一：遇到 Failure 就提前返回
+fun parseEndpoint(text: String): Result<Endpoint, String> {
+    val parts = text.split(':')
+    if (parts.size != 2L) return Result.Failure(f"expected host:port, got ${text}")
+    val host = when (parseHost(parts[0L])) {
+        case Result.Success(val value) -> value
+        case Result.Failure(val error) -> return Result.Failure(error)
+    }
+    val port = when (parsePort(parts[1L])) {
+        case Result.Success(val value) -> value
+        case Result.Failure(val error) -> return Result.Failure(error)
+    }
+    return Result.Success(Endpoint(host, port))
+}
+
+// 写法二：用 flatMap 和 map 串起来
+fun parseEndpoint2(host: String, port: String): Result<Endpoint, String> = parseHost(host)
+    .flatMap { h -> parsePort(port).map { p -> Endpoint(h, p) } }
+
+fun show(result: Result<Endpoint, String>): String = when (result) {
+    case Result.Success(val endpoint) -> f"${endpoint.host} port ${endpoint.port}"
+    case Result.Failure(val error) -> f"error: ${error}"
+}
+
+fun main() {
+    for (text in ["example.org:443", ":80", "example.org:http", "example.org"]) {
+        println(show(parseEndpoint(text)))
+    }
+    println(show(parseEndpoint2("localhost", "8080")))
+}

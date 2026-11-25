@@ -1,0 +1,26 @@
+import scoop.collections.*
+import scoop.comparisons.*
+
+struct Task(val name: String, val priority: Int)
+
+fun main() {
+    // 自然顺序：最小的元素先出来
+    val numbers = priorityQueueOf(5, 1, 4)
+    numbers.add(3)
+    println(numbers.peek())
+    while (numbers.isNotEmpty()) {
+        print(f"${numbers.removeFirst()} ")
+    }
+    println("")
+
+    // 自定义顺序：priority 大的先出来
+    val byPriority: Comparator<Task> = compareBy { t -> t.priority }
+    val tasks = PriorityQueue<Task>(byPriority.reversed())
+    tasks.add(Task("write docs", 2))
+    tasks.add(Task("fix crash", 9))
+    tasks.add(Task("review", 5))
+    while (true) {
+        val task = tasks.removeFirstOrNone() ?: break
+        println(f"${task.priority} ${task.name}")
+    }
+}

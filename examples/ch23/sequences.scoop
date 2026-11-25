@@ -1,0 +1,36 @@
+import scoop.collections.*
+import scoop.sequences.*
+
+fun main() {
+    val words = ["apple", "kiwi", "banana", "fig", "cherry"]
+
+    println("eager:")
+    val eager = words
+        .map { w ->
+            println("  length of " + w)
+            w.charLength
+        }
+        .filter { n -> n > 4L }
+        .take(1L)
+    println(eager.joinToString())
+
+    println("lazy:")
+    val lazy = words
+        .asSequence()
+        .map { w ->
+            println("  length of " + w)
+            w.charLength
+        }
+        .filter { n -> n > 4L }
+        .take(1L)
+    println("  (nothing computed yet)")
+    println(lazy.toList().joinToString())
+
+    // 无限序列：只要后面用 take 截断
+    val naturals = generateSequence(1) { n -> Some(n + 1) }
+    println(naturals.filter { n -> n % 7 == 0 }.take(3L).toList().joinToString())
+
+    // 返回 None 时结束
+    val powers = generateSequence(1L) { n -> if (n < 500L) Some(n * 2L) else None }
+    println(powers.joinToString())
+}

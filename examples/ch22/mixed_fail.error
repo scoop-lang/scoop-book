@@ -1,0 +1,1 @@
+error[E0501]: array literal elements must have the same type, found Int and String

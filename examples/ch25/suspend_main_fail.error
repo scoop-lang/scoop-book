@@ -1,0 +1,2 @@
+error[E1702]: missing executable entry
+note[N1701]: `fun main(): Unit` is not eligible because it is suspend

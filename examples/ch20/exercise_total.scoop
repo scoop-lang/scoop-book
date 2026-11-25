@@ -1,0 +1,17 @@
+import scoop.*
+import scoop.text.*
+
+// ANCHOR: total
+fun total(prices: List<String>): Int {
+    var sum = 0
+    for (p in prices) {
+        sum += runCatching { p.toInt() }.getOrElse { 0 }
+    }
+    return sum
+}
+
+// ANCHOR_END: total
+
+fun main() {
+    println(total(["1", "x", "3"]))
+}

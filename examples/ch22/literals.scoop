@@ -1,0 +1,38 @@
+interface Shape {
+    fun area(): Double
+}
+
+class Square(val side: Double) : Shape {
+    public override fun area(): Double = side * side
+}
+
+class Rect(val width: Double, val height: Double) : Shape {
+    public override fun area(): Double = width * height
+}
+
+struct Dot(val x: Int, val y: Int) : Shape {
+    public override fun area(): Double = 0.0
+}
+
+fun main() {
+    val small = [1, 2, 3] // Array<Int>
+    val big = [1, 2L, 3] // Array<Long>：整数字面量按 2L 统一成 Long
+    val writable: MutableArray<Int> = [1, 2, 3] // 由类型标注决定
+    val asList: List<String> = ["a", "b"] // 期望类型是接口时，构造 Array
+    val none: Array<String> = [] // 空字面量需要期望类型
+
+    // 引用类型元素取共同的父类型：这里是 Array<Shape>
+    val shapes = [Square(2.0), Rect(2.0, 1.5)]
+    val all: Array<Shape> = shapes
+
+    // 值类型元素不会自动装箱，要显式写 as
+    val withDot: Array<Shape> = [Square(1.0), Dot(0, 0) as Shape]
+
+    val second: Long = big[1L]
+    println(f"${small.size} ${second} ${writable.size} ${asList.size} ${none.size}")
+    var total = 0.0
+    for (s in all) {
+        total += s.area()
+    }
+    println(f"area ${total}, ${withDot.size} shapes")
+}

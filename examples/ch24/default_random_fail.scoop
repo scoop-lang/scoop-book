@@ -1,0 +1,5 @@
+import scoop.random.*
+
+fun main() {
+    val dice = Random.nextInt(1, 7)
+}

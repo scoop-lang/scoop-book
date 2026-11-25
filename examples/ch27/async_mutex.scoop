@@ -1,0 +1,35 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.concurrent.*
+import scoop.time.*
+
+class Account(var balance: Long)
+
+// 检查余额与扣款之间有挂起点，必须放在同一把锁里
+suspend fun withdraw(lock: AsyncMutex, account: Account, amount: Long): Boolean = lock
+    .withLock {
+        if (account.balance < amount) return@withLock false
+        currentEventLoop().sleep(1.milliseconds()) // 比如等待风控服务
+        account.balance -= amount
+        true
+    }
+
+fun main() {
+    eventLoop()
+        .run {
+            val account = Account(100L)
+            val lock = AsyncMutex()
+            val results = ArrayList<Deferred<Boolean>>()
+            for (i in 1..3) {
+                results.add(async { withdraw(lock, account, 40L) })
+            }
+            var succeeded = 0
+            for (r in results) {
+                if (r.await()) succeeded += 1
+            }
+            println(f"${succeeded} withdrawals, balance ${account.balance}")
+        }
+}

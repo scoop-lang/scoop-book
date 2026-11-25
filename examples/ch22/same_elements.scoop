@@ -1,0 +1,14 @@
+import scoop.collections.*
+
+// 数组和列表没有按内容比较的 ==，需要时自己写一个
+fun <T : Equals<T>> sameElements(a: List<T>, b: List<T>): Boolean {
+    if (a.size != b.size) return false
+    return a.zip(b).all { (x, y) -> x == y }
+}
+
+fun main() {
+    val a = [1, 2, 3]
+    val b = arrayListOf(1, 2, 3)
+    println(sameElements(a, b))
+    println(sameElements(a, listOf(1, 2)))
+}

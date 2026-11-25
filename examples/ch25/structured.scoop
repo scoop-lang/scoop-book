@@ -1,0 +1,55 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.text.*
+import scoop.time.*
+
+suspend fun download(name: String): String {
+    currentEventLoop().sleep(20.milliseconds())
+    return name.uppercaseAscii()
+}
+
+// coroutineScope 在挂起函数里建立一个子作用域，等其中所有子任务结束才返回
+suspend fun downloadAll(names: List<String>): List<String> = coroutineScope {
+    val tasks = ArrayList<Deferred<String>>()
+    for (name in names) {
+        tasks.add(async { download(name) })
+    }
+    // 集合的 map 接受普通 lambda，不能在里面 await，所以用 for 循环
+    val results = ArrayList<String>()
+    for (task in tasks) {
+        results.add(task.await())
+    }
+    results
+}
+
+suspend fun warmUp(log: ArrayList<String>) = coroutineScope {
+    // launch 启动不需要结果的任务
+    launch {
+        currentEventLoop().sleep(30.milliseconds())
+        log.add("cache ready")
+    }
+    launch {
+        currentEventLoop().sleep(10.milliseconds())
+        log.add("config loaded")
+    }
+    log.add("warm-up started")
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            println(downloadAll(listOf("a", "b", "c")).joinToString())
+
+            val log = ArrayList<String>()
+            warmUp(log)
+            // warmUp 返回时，它启动的两个任务都已经结束了
+            println(f"${log.size} entries, first: ${log[0L]}")
+
+            // launch 返回的 Job 可以用 join 等待
+            val job = launch { currentEventLoop().sleep(5.milliseconds()) }
+            job.join()
+            println(f"job completed: ${job.isCompleted}")
+        }
+}

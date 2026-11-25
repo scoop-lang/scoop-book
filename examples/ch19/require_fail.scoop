@@ -1,0 +1,8 @@
+fun area(width: Int, height: Int): Int {
+    require(width >= 0)
+    return width * height
+}
+
+fun main() {
+    println(area(3, 4))
+}

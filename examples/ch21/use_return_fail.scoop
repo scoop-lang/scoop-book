@@ -1,0 +1,15 @@
+class Config : Closeable {
+    fun read(): String = "port=8080"
+
+    public override fun close() {
+        println("close")
+    }
+}
+
+fun firstLine(): String {
+    Config().use { config -> return config.read() }
+}
+
+fun main() {
+    println(firstLine())
+}

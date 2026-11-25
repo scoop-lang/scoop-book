@@ -1,0 +1,20 @@
+import scoop.collections.*
+
+// ANCHOR: remove
+fun removeNegatives(values: ArrayList<Int>) {
+    var i = 0L
+    while (i < values.size) {
+        if (values[i] < 0) {
+            values.removeAt(i)
+        }
+        i += 1L
+    }
+}
+
+// ANCHOR_END: remove
+
+fun main() {
+    val values = arrayListOf(1, -2, -3, 4)
+    removeNegatives(values)
+    println(values.joinToString())
+}

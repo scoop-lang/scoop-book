@@ -1,0 +1,29 @@
+import scoop.collections.*
+
+fun main() {
+    // 当栈用：从同一端放入和取出
+    val undo = ArrayDeque<String>()
+    undo.addLast("type a")
+    undo.addLast("type b")
+    undo.addLast("delete")
+    println(undo.removeLast())
+    println(undo.lastOrNone() ?: "-")
+
+    // 当队列用：从一端放入，另一端取出
+    val jobs = ArrayDeque<Int>()
+    for (id in 1..3) {
+        jobs.addLast(id)
+    }
+    jobs.addFirst(0) // 插队
+    while (true) {
+        val job = jobs.removeFirstOrNone() ?: break
+        print(f"job ${job} ")
+    }
+    println("")
+
+    try {
+        jobs.removeFirst()
+    } catch (e: NoSuchElementException) {
+        println("queue is empty")
+    }
+}

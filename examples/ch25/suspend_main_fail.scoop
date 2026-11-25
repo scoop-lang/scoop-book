@@ -1,0 +1,8 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+suspend fun main() {
+    currentEventLoop().sleep(50.milliseconds())
+}

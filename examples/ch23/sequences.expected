@@ -1,0 +1,13 @@
+eager:
+  length of apple
+  length of kiwi
+  length of banana
+  length of fig
+  length of cherry
+5
+lazy:
+  (nothing computed yet)
+  length of apple
+5
+7, 14, 21
+1, 2, 4, 8, 16, 32, 64, 128, 256, 512

@@ -1,0 +1,5 @@
+fun main() {
+    val names = ArrayList<String>()
+    names.add("Ada")
+    names.remove("Ada")
+}

@@ -1,0 +1,16 @@
+import scoop.collections.*
+
+fun main() {
+    val names = arrayListOf("Ada", "Grace", "Ada")
+
+    // 删除第一个等于 "Ada" 的元素
+    val index = names.indexOf("Ada")
+    if (index >= 0L) {
+        names.removeAt(index)
+    }
+    println(names.joinToString())
+
+    // 删除所有等于 "Ada" 的元素
+    names.removeAll(listOf("Ada"))
+    println(names.joinToString())
+}

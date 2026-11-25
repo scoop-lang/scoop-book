@@ -1,0 +1,6 @@
+after buffered.close: file closed = false
+after owned.close: file closed = true
+borrowed
+file still usable
+owned
+locked

@@ -1,0 +1,27 @@
+fun main() {
+    // 按长度创建：对每个下标调用一次 lambda
+    val squares = Array<Long>(5L) { i -> i * i }
+    for (n in squares) {
+        print(f"${n} ")
+    }
+    println("")
+
+    // 相当于 Kotlin 的 IntArray(4)
+    val counters = MutableArray<Int>(4L) { 0 }
+    counters[3L] += 1
+    println(f"${counters[0L]} ${counters[3L]}")
+
+    // 相当于 Kotlin 的 arrayOfNulls<String>(3)
+    val slots = MutableArray<String?>(3L) { None }
+    slots[1L] = Some("taken")
+    for (slot in slots) {
+        println(slot ?: "(empty)")
+    }
+
+    try {
+        val bad = Array<Int>(-1L) { 0 }
+        println(bad.size)
+    } catch (e: IllegalArgumentException) {
+        println("negative size")
+    }
+}

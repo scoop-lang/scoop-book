@@ -1,0 +1,43 @@
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.collections.*
+import scoop.platform.concurrent.*
+
+fun sumRange(from: Long, until: Long): Long {
+    var sum = 0L
+    for (i in from until until) {
+        sum += i
+    }
+    return sum
+}
+
+class Box {
+    var value = 0L
+}
+
+fun main() {
+    // 每个线程把结果写进自己的 Box，主线程 join 之后再读
+    val boxes = ArrayList<Box>()
+    val threads = ArrayList<Thread>()
+    for (t in 0L until 4L) {
+        val box = Box()
+        boxes.add(box)
+        threads.add(Thread.start { box.value = sumRange(t * 1000000L, (t + 1L) * 1000000L) })
+    }
+    for (thread in threads) {
+        thread.join()
+    }
+    println(boxes.fold(0L) { acc, b -> acc + b.value })
+
+    // 线程中未捕获的异常在 join 时重新抛出
+    val failing = Thread.start { throw IllegalStateException(Some("worker failed")) }
+    try {
+        failing.join()
+    } catch (e: IllegalStateException) {
+        println(f"join rethrows: ${e.message ?: ""}")
+    }
+    println(f"finished: ${failing.isFinished}")
+
+    // Thread 实现了 Disposable，use 结束时会 join
+    Thread.start { println("hello from a thread") }.use { _ -> }
+}

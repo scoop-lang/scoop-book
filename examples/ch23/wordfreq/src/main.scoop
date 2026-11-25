@@ -1,0 +1,33 @@
+package book.wordfreq
+
+import scoop.collections.*
+import scoop.comparisons.*
+import scoop.text.*
+
+fun countWords(text: String): LinkedHashMap<String, Int> {
+    val counts = LinkedHashMap<String, Int>()
+    for (word in text.split(' ')) {
+        if (word == "") continue
+        counts[word] = (counts[word] ?: 0) + 1
+    }
+    return counts
+}
+
+fun main() {
+    val text = "the quick fox and the lazy dog and the cat"
+    val counts = countWords(text)
+
+    // LinkedHashMap 按单词第一次出现的顺序遍历
+    for ((word, count) in counts) {
+        print(f"${word}=${count} ")
+    }
+    println("")
+
+    // 按次数从多到少排序；sortedWith 是稳定的，次数相同的保持原来的顺序
+    val byCount: Comparator<Map.Entry<String, Int>> = compareBy { e -> e.value }
+    val ranked = counts.entries.sortedWith(byCount.reversed())
+    for (entry in ranked.take(3L)) {
+        println(f"${entry.key}: ${entry.value}")
+    }
+    println(f"missing: ${counts["zebra"] ?: 0}")
+}

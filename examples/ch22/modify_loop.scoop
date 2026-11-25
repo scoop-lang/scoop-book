@@ -1,0 +1,12 @@
+fun main() {
+    val queue = ArrayList<String>()
+    queue.add("start")
+    // 遍历 ArrayList 时追加的元素也会被遍历到，不会报错
+    for (task in queue) {
+        println(task)
+        if (task == "start") {
+            queue.add("next")
+        }
+    }
+    println(queue.size)
+}

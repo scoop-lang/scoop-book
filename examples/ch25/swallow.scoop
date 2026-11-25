@@ -1,0 +1,30 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+
+import scoop.asyncio.*
+import scoop.concurrent.Channel
+import scoop.time.*
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+            val started = Channel<Unit>(1L)
+            val stubborn = launch {
+                try {
+                    started.send(Unit)
+                    loop.sleep(60.seconds())
+                } catch (e: Exception) {
+                    // 错误写法：把 CancellationException 也一起吞掉了
+                    println("caught and ignored")
+                }
+                println("still running after cancel")
+                loop.sleep(10.milliseconds()) // 任务已被取消，这里再次抛出
+                println("never printed")
+            }
+            started.receive()
+            stubborn.cancel()
+            stubborn.join()
+            println("done")
+        }
+}

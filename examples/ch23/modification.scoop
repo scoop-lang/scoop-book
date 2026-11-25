@@ -1,0 +1,27 @@
+import scoop.collections.*
+
+fun main() {
+    val stock = linkedMapOf(("apple", 0), ("pear", 3), ("kiwi", 0))
+
+    // 遍历时替换已有 key 的 value 是允许的
+    for ((item, count) in stock) {
+        stock[item] = count + 1
+    }
+    println(stock.values.joinToString())
+
+    // 遍历时增删 key 会抛出异常
+    try {
+        for ((item, count) in stock) {
+            if (count == 1) stock.remove(item)
+        }
+    } catch (e: ConcurrentModificationException) {
+        println("modified during iteration")
+    }
+
+    // 先把要删除的 key 收集成快照，再逐个删除
+    val empty = stock.entries.filter { e -> e.value == 1 }.map { e -> e.key }
+    for (item in empty) {
+        stock.remove(item)
+    }
+    println(stock.keys.joinToString())
+}

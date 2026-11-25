@@ -1,0 +1,46 @@
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.collections.*
+import scoop.platform.concurrent.*
+
+// 一个线程之间使用的阻塞队列：取不到元素时，等到有元素为止
+class BlockingQueue<T> {
+    private val lock = Mutex()
+    private val notEmpty = ConditionVariable(lock)
+    private val items = ArrayDeque<T>()
+
+    fun put(item: T) {
+        lock
+            .withLock {
+                items.addLast(item)
+                notEmpty.signal()
+            }
+    }
+
+    fun take(): T = lock
+        .withLock {
+            // 被唤醒不代表条件成立，所以用 while 重新检查
+            while (items.isEmpty()) {
+                notEmpty.await()
+            }
+            items.removeFirst()
+        }
+}
+
+fun main() {
+    val queue = BlockingQueue<Int?>()
+    val consumer = Thread
+        .start {
+            var total = 0
+            while (true) {
+                val item = queue.take() ?: break // None 表示结束
+                total += item
+            }
+            println(f"consumer total: ${total}")
+        }
+    for (i in 1..100) {
+        queue.put(Some(i))
+    }
+    queue.put(None)
+    consumer.join()
+}

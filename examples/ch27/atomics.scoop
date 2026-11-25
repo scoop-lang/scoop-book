@@ -1,0 +1,34 @@
+class Settings(val level: Int)
+
+fun main() {
+    // 整数：原子的加减，返回修改之前的值
+    val hits = AtomicInt(0)
+    println(hits.fetchAdd(5))
+    println(hits.load())
+
+    // 比较并交换：只有当前值等于期望值时才写入
+    println(hits.compareAndSet(5, 10))
+    println(hits.compareAndSet(5, 20))
+    println(hits.load())
+
+    // 基于当前值计算新值，竞争时自动重试
+    println(hits.updateAndGet { v -> v * 2 })
+
+    // 布尔值：一次性的开关
+    val started = AtomicBoolean(false)
+    println(started.exchange(true))
+    println(started.exchange(true))
+
+    // 引用：比较的是对象身份，不是内容
+    val initial = Settings(1)
+    val current = AtomicRef(initial)
+    println(current.compareAndSet(Settings(1), Settings(2)))
+    println(current.compareAndSet(initial, Settings(2)))
+    println(current.load().level)
+
+    // 值类型：Atomic<T> 原子地读写一个完整的 struct 或 tuple
+    val best = Atomic((0, "none"))
+    best.store((42, "answer"))
+    val(score, label) = best.load()
+    println(f"${score} ${label}")
+}

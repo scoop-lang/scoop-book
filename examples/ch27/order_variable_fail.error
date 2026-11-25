@@ -1,0 +1,1 @@
+error[E1221]: atomic memory order must be a constant MemoryOrder variant

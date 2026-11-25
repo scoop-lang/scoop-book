@@ -1,0 +1,2 @@
+error[E0501]: dependency constructor argument must be of type Option<String>, found String
+error[E0701]: dependency constructor `Exception` expects 1 argument(s), but 0 were supplied

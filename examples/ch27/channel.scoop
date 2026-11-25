@@ -1,0 +1,50 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+
+import scoop.asyncio.*
+import scoop.concurrent.*
+
+fun main() {
+    eventLoop()
+        .run {
+            // 容量为 2：最多缓冲 2 条消息，再发送就要等待接收方
+            val numbers = Channel<Int>(2L)
+            launch {
+                for (i in 1..5) {
+                    numbers.send(i)
+                }
+                numbers.close() // 不会再发送了
+            }
+            // 关闭并取完所有消息后，receiveOrNone 返回 None
+            var total = 0
+            while (true) {
+                val n = numbers.receiveOrNone() ?: break
+                total += n
+            }
+            println(f"total: ${total}")
+
+            // 不挂起的尝试
+            val box = Channel<String>(1L)
+            println(box.trySend("first") == TrySendResult.Sent)
+            println(box.trySend("second") == TrySendResult.Full)
+            when (val r = box.tryReceive()) {
+                case TryReceiveResult.Value(val v) -> println(f"got ${v}")
+                case TryReceiveResult.Empty -> println("empty")
+                case TryReceiveResult.Closed -> println("closed")
+            }
+
+            // 关闭之后
+            println(box.close())
+            println(box.close())
+            try {
+                box.send("late")
+            } catch (e: ChannelClosedException) {
+                println("cannot send after close")
+            }
+            try {
+                box.receive()
+            } catch (e: ChannelClosedException) {
+                println("nothing left to receive")
+            }
+        }
+}

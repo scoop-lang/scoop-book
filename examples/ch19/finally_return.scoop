@@ -1,0 +1,12 @@
+fun loadCount(): Int {
+    try {
+        throw IllegalStateException(Some("disk error"))
+    } finally {
+        // 不要这样写：这个 return 让上面的异常消失了
+        return 0
+    }
+}
+
+fun main() {
+    println(loadCount())
+}

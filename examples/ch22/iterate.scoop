@@ -1,0 +1,28 @@
+import scoop.collections.*
+
+fun main() {
+    val words = ["red", "green", "blue"]
+
+    for (word in words) {
+        print(word + " ")
+    }
+    println("")
+
+    // 需要下标时，用 Long 区间
+    for (i in 0L until words.size) {
+        print(f"${i}=${words[i]} ")
+    }
+    println("")
+
+    // 或者用 withIndex，同时得到下标和元素
+    for ((i, word) in words.withIndex()) {
+        print(f"${i}:${word} ")
+    }
+    println("")
+
+    try {
+        println(words[3L])
+    } catch (e: IndexOutOfBoundsException) {
+        println(e.message ?: "out of bounds")
+    }
+}

@@ -1,0 +1,34 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+
+import scoop.asyncio.*
+import scoop.concurrent.Channel
+import scoop.time.*
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+            val started = Channel<Unit>(1L)
+            val worker = launch {
+                try {
+                    started.send(Unit) // 告诉外面：已经进入 try 了
+                    loop.sleep(60.seconds())
+                    println("never")
+                } catch (e: CancellationException) {
+                    println("worker: cancelled")
+                    throw e // 取消异常要继续抛出
+                } finally {
+                    println("worker: cleanup")
+                }
+            }
+            started.receive()
+
+            worker.cancel()
+            println(
+                f"after cancel: cancelled=${worker.isCancelled}, completed=${worker.isCompleted}"
+            )
+            worker.join()
+            println(f"after join: cancelled=${worker.isCancelled}, completed=${worker.isCompleted}")
+        }
+}

@@ -1,0 +1,8 @@
+class MissingKeyException(val key: String) : Exception(None) {
+    override val message: String?
+        get() = Some(f"missing key: ${key}")
+}
+
+fun main() {
+    println(MissingKeyException("port").message ?: "")
+}

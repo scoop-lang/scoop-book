@@ -1,0 +1,16 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+
+fun main() {
+    eventLoop()
+        .run {
+            // 把作用域带出 coroutineScope 之外
+            val escaped = coroutineScope { this }
+            try {
+                escaped.launch { println("late task") }
+            } catch (e: IllegalStateException) {
+                println(e.message ?: "closed")
+            }
+        }
+}

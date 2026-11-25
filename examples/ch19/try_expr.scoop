@@ -1,0 +1,26 @@
+import scoop.text.*
+
+fun portOrDefault(text: String): Int = try {
+    text.toInt()
+} catch (e: NumberFormatException) {
+    8080
+}
+
+fun timeoutSeconds(text: String): Int {
+    val seconds = try {
+        text.toInt()
+    } catch (e: NumberFormatException) {
+        // catch 分支提前返回，不提供值
+        return 30
+    } finally {
+        println(f"parsed ${text}")
+    }
+    return seconds * 2
+}
+
+fun main() {
+    println(portOrDefault("9000"))
+    println(portOrDefault("auto"))
+    println(timeoutSeconds("5"))
+    println(timeoutSeconds("soon"))
+}

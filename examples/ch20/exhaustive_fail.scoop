@@ -1,0 +1,18 @@
+import scoop.*
+
+enum PortError {
+    Empty,
+    NotANumber(String),
+    OutOfRange(Int),
+    Reserved(Int)
+}
+
+fun describe(error: PortError): String = when (error) {
+    case PortError.Empty -> "port is empty"
+    case PortError.NotANumber(val text) -> f"not a number: ${text}"
+    case PortError.OutOfRange(val port) -> f"out of range: ${port}"
+}
+
+fun main() {
+    println(describe(PortError.Reserved(22)))
+}

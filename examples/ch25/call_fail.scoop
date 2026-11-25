@@ -1,0 +1,13 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+suspend fun fetchPrice(item: String): Int {
+    currentEventLoop().sleep(50.milliseconds())
+    return 42
+}
+
+fun main() {
+    println(fetchPrice("apple"))
+}

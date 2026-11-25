@@ -1,0 +1,36 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.asyncio.*
+import scoop.concurrent.*
+import scoop.platform.concurrent.*
+
+fun checksum(seed: Long): Long {
+    var value = seed
+    for (i in 1..1000000) {
+        value = (value * 31L + i.toLong()) % 1000000007L
+    }
+    return value
+}
+
+fun main() {
+    // 一个独立的多线程执行器，用完要关闭
+    multiThreadExecutor { workers = 2 }
+        .use { pool ->
+            eventLoop()
+                .run {
+                    val loopThread = currentThreadId()
+                    // withExecutor：把这一段放到 pool 上执行，结束后回到事件循环
+                    val(sum, onPool) = withExecutor(pool) {
+                        val a = async { checksum(1L) }
+                        val b = async { checksum(2L) }
+                        (a.await() + b.await(), currentThreadId() != loopThread)
+                    }
+                    println(
+                        f"ran on pool: ${onPool}, back on loop: ${currentThreadId() == loopThread}"
+                    )
+                    println(sum)
+                }
+        }
+}

@@ -1,0 +1,22 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+// 挂起函数：可以在中途暂停，等待完成后再继续
+suspend fun fetchPrice(item: String): Int {
+    currentEventLoop().sleep(50.milliseconds()) // 模拟一次网络请求
+    return item.byteLength.toInt() * 10
+}
+
+fun main() {
+    val loop = eventLoop()
+    val total = loop
+        .run {
+            // 同时发出两个请求
+            val apple = async { fetchPrice("apple") }
+            val kiwi = async { fetchPrice("kiwi") }
+            apple.await() + kiwi.await()
+        }
+    println(f"total: ${total}")
+}

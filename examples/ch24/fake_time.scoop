@@ -1,0 +1,45 @@
+import scoop.time.*
+
+// 测试用的时间源：时间只在调用 advance 时前进
+class ManualTimeSource : TimeSource {
+    private var current = Duration.ZERO
+
+    fun advance(by: Duration) {
+        current = current + by
+    }
+
+    public override fun markNow(): TimeMark = TimeMark(this, current)
+}
+
+// 依赖 TimeSource 接口，而不是某个具体的系统时钟
+class Cooldown(private val source: TimeSource, private val period: Duration) {
+    private var last: TimeMark? = None
+
+    fun tryFire(): Boolean {
+        val now = source.markNow()
+        when (last) {
+            case Some(val previous) -> if (now - previous < period) return false
+            case None -> {}
+        }
+        last = Some(now)
+        return true
+    }
+}
+
+fun main() {
+    val clock = ManualTimeSource()
+    val cooldown = Cooldown(clock, 30.seconds())
+    println(cooldown.tryFire())
+    clock.advance(10.seconds())
+    println(cooldown.tryFire())
+    clock.advance(25.seconds())
+    println(cooldown.tryFire())
+
+    // 不同时间源的读数不能相减
+    val other = ManualTimeSource()
+    try {
+        println(clock.markNow() - other.markNow())
+    } catch (e: IllegalArgumentException) {
+        println("different time sources")
+    }
+}

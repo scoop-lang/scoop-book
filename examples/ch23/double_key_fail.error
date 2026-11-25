@@ -1,0 +1,1 @@
+error[E0603]: dependency function `HashMap`: type argument `Double` for `K` must satisfy upper bound `Hash`

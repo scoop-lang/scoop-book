@@ -1,0 +1,13 @@
+import scoop.*
+import scoop.text.*
+
+fun parsePort(text: String): Result<Int, String> = text
+    .toIntOrNone()
+    .toResult { f"bad port: ${text}" }
+
+fun doubledPort(text: String): Result<Int, String> {
+    val port = parsePort(text).getOrElse { error -> return Result.Failure(error) }
+    return Result.Success(port * 2)
+}
+
+fun main() {}

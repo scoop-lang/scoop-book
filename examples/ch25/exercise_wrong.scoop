@@ -1,0 +1,29 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.platform.time.sleep
+import scoop.time.*
+
+// ANCHOR: wrong
+suspend fun process(items: List<String>) = coroutineScope {
+    val job = launch {
+        try {
+            for (item in items) {
+                currentEventLoop().sleep(10.milliseconds())
+                println(item)
+            }
+        } catch (e: Exception) {
+            println("stopped")
+        }
+    }
+    sleep(25.milliseconds()) // 等它处理完前两个
+    job.cancel()
+}
+
+// ANCHOR_END: wrong
+
+fun main() {
+    eventLoop().run { process(listOf("a", "b", "c", "d")) }
+}

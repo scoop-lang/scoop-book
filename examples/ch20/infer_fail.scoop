@@ -1,0 +1,5 @@
+import scoop.*
+
+fun main() {
+    val result = Result.Success(8080)
+}

@@ -1,0 +1,33 @@
+interface Logger {
+    fun write(message: String)
+}
+
+class ConsoleLogger : Logger {
+    public override fun write(message: String) {
+        println(message)
+    }
+}
+
+context(logger: Logger)
+fun log(message: String) {
+    logger.write(message)
+}
+
+fun main() {
+    val console = ConsoleLogger()
+
+    // 绑定的 key 是 ConsoleLogger，不是 Logger
+    context(console) {
+        try {
+            log("first")
+        } catch (e: MissingContextException) {
+            println(f"missing: ${e.message ?: ""}")
+        }
+    }
+
+    // 先转成 Logger 类型，再绑定
+    val logger: Logger = console
+    context(logger) {
+        log("second")
+    }
+}

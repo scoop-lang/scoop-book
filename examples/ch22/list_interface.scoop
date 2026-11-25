@@ -1,0 +1,31 @@
+import scoop.collections.*
+
+// 参数写成 List<Int>，三种容器都能传进来
+fun total(values: List<Int>): Int {
+    var sum = 0
+    for (v in values) {
+        sum += v
+    }
+    return sum
+}
+
+fun main() {
+    val fixed = [1, 2, 3]
+    val writable = MutableArray<Int>(3L) { i -> i.toInt() * 10 }
+    val growable = arrayListOf(100, 200)
+    println(f"${total(fixed)} ${total(writable)} ${total(growable)}")
+
+    // List 是只读的“视图”，不是不可变的值
+    val view: List<Int> = growable
+    growable.add(300)
+    println(f"view sees ${view.size} items")
+
+    // 需要不受后续修改影响时，取快照
+    val frozen = growable.toList()
+    growable.add(400)
+    println(f"frozen has ${frozen.size}, growable has ${growable.size}")
+
+    // listOf 创建的是独立的只读列表
+    val colors = listOf("red", "green")
+    println(colors.joinToString())
+}

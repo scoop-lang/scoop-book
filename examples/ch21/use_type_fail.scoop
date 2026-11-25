@@ -1,0 +1,9 @@
+class Socket {
+    fun close() {
+        println("close")
+    }
+}
+
+fun main() {
+    Socket().use { s -> println("using") }
+}

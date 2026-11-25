@@ -1,0 +1,1 @@
+error[E0808]: cannot throw value of type String: not a subtype of Throwable

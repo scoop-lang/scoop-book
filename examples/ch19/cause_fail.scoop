@@ -1,0 +1,9 @@
+import scoop.text.*
+
+fun main() {
+    try {
+        "x".toInt()
+    } catch (e: NumberFormatException) {
+        throw IllegalStateException(Some("bad config"), e)
+    }
+}

@@ -1,0 +1,2 @@
+error[E0501]: dependency function `getOrElse`: Result<Int, String> is not a subtype of Option<T>
+error[E0805]: a lambda cannot use bare `return`

@@ -1,0 +1,2 @@
+error[E0607]: dependency function `Success`: cannot infer a unique type argument for `E`
+error[E0501]: dependency function `flatMap`: Result<Int, String> is not a subtype of Option<T>

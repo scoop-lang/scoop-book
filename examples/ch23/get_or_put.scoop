@@ -1,0 +1,14 @@
+import scoop.collections.*
+
+fun main() {
+    val words = ["apple", "avocado", "banana", "blueberry", "cherry"]
+
+    // getOrPut：key 不存在时创建一个新值放进去，再返回它
+    val byLetter = LinkedHashMap<Char, ArrayList<String>>()
+    for (word in words) {
+        byLetter.getOrPut(word.getCharAt(0L)) { ArrayList<String>() }.add(word)
+    }
+    for ((letter, list) in byLetter) {
+        println(f"${letter}: ${list.joinToString()}")
+    }
+}

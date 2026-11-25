@@ -1,0 +1,42 @@
+import scoop.collections.*
+import scoop.comparisons.*
+
+struct Version(val major: Int, val minor: Int)
+
+fun show(versions: Iterable<Version>): String = versions
+    .joinToString { v -> f"${v.major}.${v.minor}" }
+
+fun main() {
+    val versions = [Version(2, 1), Version(1, 5), Version(1, 12), Version(2, 0)]
+
+    // compareBy 按某个字段比较，thenBy 指定相等时的下一个字段
+    val byVersion: Comparator<Version> = compareBy<Version, Int> { v -> v.major }
+        .thenBy { v -> v.minor }
+    println(show(versions.sortedWith(byVersion)))
+    println(show(versions.sortedWith(byVersion.reversed())))
+
+    // 没有 Compare 的类型，用 Comparator 建立 TreeSet
+    val ordered = TreeSet<Version>(byVersion)
+    for (v in versions) {
+        ordered.add(v)
+    }
+    println(show(ordered))
+
+    // TreeSet 认为 compare 结果为 0 的两个元素是同一个
+    val byMajor = TreeSet<Version>(compareBy { v -> v.major })
+    for (v in versions) {
+        byMajor.add(v)
+    }
+    println(show(byMajor))
+
+    // 任意比较逻辑：comparatorOf 包装一个返回 Long 的函数
+    val byLength = comparatorOf<String> { a, b -> a.charLength - b.charLength }
+    println(["ccc", "a", "bb"].sortedWith(byLength).joinToString())
+
+    // 自然顺序的逆序
+    val desc = TreeSet<Int>(reverseOrder<Int>())
+    desc.add(1)
+    desc.add(3)
+    desc.add(2)
+    println(desc.joinToString())
+}

@@ -1,0 +1,36 @@
+// Kotlin 的 require / check 在 Scoop 中不存在，需要时自己写
+fun requireArg(condition: Boolean, message: () -> String) {
+    if (!condition) throw IllegalArgumentException(Some(message()))
+}
+
+fun checkState(condition: Boolean, message: () -> String) {
+    if (!condition) throw IllegalStateException(Some(message()))
+}
+
+class Counter(val limit: Int) {
+    private var count = 0
+
+    fun add(amount: Int) {
+        requireArg(amount > 0) { f"amount must be positive: ${amount}" }
+        checkState(count + amount <= limit) { f"limit ${limit} exceeded" }
+        count += amount
+    }
+
+    val current: Int get() = count
+}
+
+fun main() {
+    val counter = Counter(10)
+    counter.add(4)
+    try {
+        counter.add(-1)
+    } catch (e: IllegalArgumentException) {
+        println(e.message ?: "")
+    }
+    try {
+        counter.add(7)
+    } catch (e: IllegalStateException) {
+        println(e.message ?: "")
+    }
+    println(counter.current)
+}

@@ -1,0 +1,46 @@
+import scoop.collections.*
+import scoop.comparisons.*
+
+struct Order(val customer: String, val item: String, val amount: Int)
+
+fun main() {
+    val orders = [
+        Order("ada", "book", 30),
+        Order("bob", "pen", 5),
+        Order("ada", "lamp", 45),
+        Order("cy", "book", 30),
+        Order("bob", "ink", 12)
+    ]
+
+    // 分组：结果是 Map<String, List<Order>>，按 key 第一次出现的顺序
+    for ((name, list) in orders.groupBy { o -> o.customer }) {
+        val total = list.fold(0) { sum, o -> sum + o.amount }
+        println(f"${name}: ${list.size} orders, total ${total}")
+    }
+
+    // 按条件一分为二
+    val(big, small) = orders.partition { o -> o.amount >= 20 }
+    println(f"${big.size} big, ${small.size} small")
+
+    // 变换、去重、拼接
+    println(orders.map { o -> o.item }.distinct().joinToString())
+
+    // 排序后取前两个
+    val byAmount: Comparator<Order> = compareBy { o -> o.amount }
+    val top = orders.sortedWith(byAmount.reversed()).take(2L)
+    println(top.joinToString { o -> f"${o.item}(${o.amount})" })
+
+    // 查找与统计
+    println(orders.count { o -> o.amount > 10 })
+    println(orders.firstOrNone { o -> o.customer == "zed" }?.item ?: "none")
+    println(orders.map { o -> o.amount }.maxOrNone() ?: 0)
+
+    // 建立索引：每个 item 对应最后一个订单
+    val lastByItem = orders.associateBy { o -> o.item }
+    println(lastByItem["book"]?.customer ?: "-")
+
+    // 分块与滑动窗口
+    val amounts = orders.map { o -> o.amount }
+    println(amounts.chunked(2L).map { c -> c.joinToString("+") }.joinToString(" | "))
+    println(amounts.windowed(2L).map { w -> w[1L] - w[0L] }.joinToString())
+}

@@ -1,0 +1,4 @@
+fun main() {
+    val primes = [2, 3, 5, 7]
+    primes[0L] = 1
+}

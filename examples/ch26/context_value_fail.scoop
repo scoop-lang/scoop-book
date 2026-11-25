@@ -1,0 +1,4 @@
+context(userId: Int)
+fun greet(): String = f"user ${userId}"
+
+fun main() {}

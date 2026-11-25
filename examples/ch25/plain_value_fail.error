@@ -1,0 +1,2 @@
+error[E0711]: no applicable candidate for `twice`
+cause[E0501]: argument for `action` has type () -> Int, which is not a subtype of suspend () -> Int

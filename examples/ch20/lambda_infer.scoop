@@ -1,0 +1,18 @@
+import scoop.*
+import scoop.text.*
+
+fun parseQuantity(text: String): Result<Int, String> = text
+    .toIntOrNone()
+    .toResult { f"not a number: ${text}" }
+
+fun main() {
+    val checked = parseQuantity("12")
+        .flatMap { quantity ->
+            if (quantity <= 10) {
+                Result.Success<Int, String>(quantity)
+            } else {
+                Result.Failure<Int, String>("out of stock")
+            }
+        }
+    println(checked.errorOrNone() ?: "ok")
+}

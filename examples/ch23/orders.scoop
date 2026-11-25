@@ -1,0 +1,34 @@
+import scoop.collections.*
+
+fun main() {
+    // 插入顺序：按 key 第一次放入的顺序遍历
+    val linked = LinkedHashMap<String, Int>()
+    linked["banana"] = 3
+    linked["apple"] = 1
+    linked["cherry"] = 2
+    linked["banana"] = 30 // 更新已有的 key，不改变位置
+    linked.remove("apple")
+    linked["apple"] = 10 // 删除后重新放入，排到最后
+    for ((k, v) in linked) {
+        print(f"${k}=${v} ")
+    }
+    println("")
+
+    // 排序顺序：按 key 从小到大遍历
+    val sorted = sortedMapOf<String, Int>()
+    for ((k, v) in linked) {
+        sorted[k] = v
+    }
+    for ((k, v) in sorted) {
+        print(f"${k}=${v} ")
+    }
+    println("")
+
+    // 排序的 Map 还能按大小查找相邻的 key
+    val prices = sortedMapOf((10, "cheap"), (50, "normal"), (200, "premium"))
+    println(prices.floorEntry(80)?.value ?: "-") // 不大于 80 的最大 key
+    println(prices.ceilingEntry(80)?.value ?: "-") // 不小于 80 的最小 key
+    println(prices.firstEntryOrNone()?.value ?: "-")
+    val middle = prices.copyOfRange(10, 200)
+    println(middle.size)
+}

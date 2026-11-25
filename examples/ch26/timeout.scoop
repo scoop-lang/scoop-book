@@ -1,0 +1,47 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+class TimeoutFlag {
+    var fired = false
+}
+
+// 在 limit 之内完成就返回 Some(结果)，超时返回 None
+suspend fun <T> withTimeoutOrNone(limit: Duration, block: suspend CoroutineScope.() -> T): T? {
+    val loop = currentEventLoop()
+    return coroutineScope {
+        val task = async(block)
+        val flag = TimeoutFlag()
+        val timer = loop
+            .schedule(limit) { _ ->
+                flag.fired = true
+                task.cancel()
+            }
+        try {
+            Some(task.await())
+        } catch (e: CancellationException) {
+            // 是定时器取消的，就是超时；否则是外面取消了我们，继续抛出
+            if (flag.fired) None else throw e
+        } finally {
+            timer.dispose()
+        }
+    }
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+            val fast = withTimeoutOrNone(200.milliseconds()) {
+                loop.sleep(10.milliseconds())
+                "fast"
+            }
+            val slow = withTimeoutOrNone(20.milliseconds()) {
+                loop.sleep(10.seconds())
+                "slow"
+            }
+            println(fast ?: "timed out")
+            println(slow ?: "timed out")
+        }
+}

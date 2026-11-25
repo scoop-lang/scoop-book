@@ -1,0 +1,29 @@
+import scoop.text.*
+
+fun parsePort(text: String): Int {
+    // 不是整数时，toInt 抛出 NumberFormatException
+    val port = text.toInt()
+    if (port < 1 || port > 65535) {
+        throw IllegalArgumentException(Some(f"port out of range: ${port}"))
+    }
+    return port
+}
+
+fun report(text: String) {
+    try {
+        val port = parsePort(text)
+        println(f"listening on ${port}")
+    } catch (e: NumberFormatException) {
+        println(f"not a number: ${text}")
+    } catch (e: IllegalArgumentException) {
+        println(e.message ?: "invalid port")
+    } finally {
+        println("-- checked")
+    }
+}
+
+fun main() {
+    report("8080")
+    report("http")
+    report("70000")
+}

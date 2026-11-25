@@ -1,0 +1,31 @@
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.platform.concurrent.*
+
+class Config {
+    var name = ""
+    var port = 0
+}
+
+fun main() {
+    val config = Config()
+    val ready = AtomicBoolean(false)
+
+    val writer = Thread
+        .start {
+            config.name = "api"
+            config.port = 8080
+            // Release：在这之前的写入，对读到 true 的线程都可见
+            ready.store(true, MemoryOrder.Release)
+        }
+    val reader = Thread
+        .start {
+            // Acquire：读到 true 之后，能看到 writer 在 Release 之前的写入
+            while (!ready.load(MemoryOrder.Acquire)) {
+                yield()
+            }
+            println(f"${config.name}:${config.port}")
+        }
+    writer.join()
+    reader.join()
+}

@@ -1,0 +1,51 @@
+import scoop.collections.*
+import scoop.text.*
+
+// 应用自己的异常基类。class 默认是 final 的，要被继承就得写 open
+open class ConfigException(message: String, val cause: Throwable? = None) : Exception(Some(message))
+
+class MissingKeyException(val key: String) : ConfigException(f"missing key: ${key}")
+
+class InvalidValueException(val key: String, val value: String, cause: Throwable?) :
+    ConfigException(f"invalid value for ${key}: ${value}", cause)
+
+fun requireInt(settings: HashMap<String, String>, key: String): Int {
+    val text = settings[key] ?: throw MissingKeyException(key)
+    try {
+        return text.toInt()
+    } catch (e: NumberFormatException) {
+        // 换成更有意义的异常，原来的异常作为 cause 保留下来
+        throw InvalidValueException(key, text, Some(e))
+    }
+}
+
+fun describe(failure: Throwable): String = when (failure) {
+    is Exception -> failure.message ?: "(no message)"
+    else -> "(not an Exception)"
+}
+
+fun load(settings: HashMap<String, String>) {
+    try {
+        val port = requireInt(settings, "port")
+        val workers = requireInt(settings, "workers")
+        println(f"port=${port} workers=${workers}")
+    } catch (e: MissingKeyException) {
+        println(f"please set ${e.key}")
+    } catch (e: ConfigException) {
+        println(e.message ?: "bad config")
+        when (e.cause) {
+            case Some(val inner) -> println("  cause: " + describe(inner))
+            case None -> {}
+        }
+    }
+}
+
+fun main() {
+    val settings = HashMap<String, String>()
+    settings["port"] = "8080"
+    load(settings)
+    settings["workers"] = "four"
+    load(settings)
+    settings["workers"] = "4"
+    load(settings)
+}

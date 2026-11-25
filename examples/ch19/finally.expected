@@ -1,0 +1,10 @@
+normal
+  body finished
+  cleanup after normal
+  result: normal
+early
+  cleanup after early
+  result: returned early
+fail
+  cleanup after fail
+  caught: step failed

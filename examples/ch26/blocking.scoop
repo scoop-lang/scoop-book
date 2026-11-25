@@ -1,0 +1,33 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.asyncio.*
+import scoop.platform.concurrent.*
+import scoop.platform.time.*
+import scoop.time.*
+
+// 一个同步的、耗时的操作，比如调用某个没有异步版本的库
+fun slowLookup(key: String): Int {
+    sleep(100.milliseconds())
+    return key.byteLength.toInt()
+}
+
+fun main() {
+    // 阻塞池默认有 4 个线程，这里显式设为 2 个
+    val loop = eventLoop { blocking { threads = 2 } }
+    loop
+        .run {
+            val loopThread = currentThreadId()
+
+            // blocking 在阻塞池的线程上执行普通函数，并挂起等待结果
+            val elsewhere = blocking { currentThreadId() != loopThread }
+            println(f"runs on another thread: ${elsewhere}")
+
+            val start = MonotonicTimeSource.markNow()
+            val a = async { blocking { slowLookup("alpha") } }
+            val b = async { blocking { slowLookup("beta") } }
+            val total = a.await() + b.await()
+            val elapsed = start.elapsedNow()
+            println(f"total ${total}, in parallel: ${elapsed < 180.milliseconds()}")
+        }
+}

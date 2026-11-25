@@ -1,0 +1,5 @@
+fun main() {
+    val ready = AtomicBoolean(false)
+    val order = MemoryOrder.Acquire
+    println(ready.load(order))
+}

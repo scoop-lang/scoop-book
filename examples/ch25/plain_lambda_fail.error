@@ -1,0 +1,1 @@
+error[E1103]: suspend function `sleep` cannot be called from non-suspend function

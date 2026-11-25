@@ -1,0 +1,24 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+fun main() {
+    eventLoop()
+        .run {
+            val search = launch {
+                var candidate = 0L
+                while (true) {
+                    candidate += 1L
+                    // 计算循环里没有挂起点，要定期让出，并检查是否被取消
+                    if (candidate % 10000L == 0L) {
+                        yieldCoroutine()
+                    }
+                }
+            }
+            currentEventLoop().sleep(20.milliseconds())
+            search.cancel()
+            search.join()
+            println("search stopped")
+        }
+}

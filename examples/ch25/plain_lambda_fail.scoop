@@ -1,0 +1,12 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+            val work = { loop.sleep(1.milliseconds()) }
+        }
+}

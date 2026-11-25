@@ -1,0 +1,44 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+
+import scoop.asyncio.*
+import scoop.concurrent.Channel
+import scoop.time.*
+
+suspend fun flushLog() {
+    currentEventLoop().sleep(5.milliseconds())
+    println("  log flushed")
+}
+
+suspend fun runAndCancel(cleanup: suspend () -> Unit) {
+    coroutineScope {
+        val started = Channel<Unit>(1L)
+        val task = launch {
+            try {
+                started.send(Unit)
+                currentEventLoop().sleep(60.seconds())
+            } finally {
+                cleanup()
+            }
+        }
+        started.receive()
+        task.cancel()
+        task.join()
+    }
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            println("plain finally:")
+            runAndCancel {
+                try {
+                    flushLog()
+                } catch (e: CancellationException) {
+                    println("  flush interrupted")
+                }
+            }
+            println("nonCancellableScope:")
+            runAndCancel { nonCancellableScope { flushLog() } }
+        }
+}

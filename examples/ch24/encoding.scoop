@@ -1,0 +1,23 @@
+import scoop.io.encoding.*
+import scoop.text.*
+
+fun main() {
+    val data = "Scoop?".toByteArray()
+
+    // Hex：默认小写，可以指定大写
+    println(data.toHexString())
+    println(data.toHexString(uppercase = true))
+    val back = "53636f6f703f".hexToByteArray()
+    println(String.fromUtf8(back))
+    println("0x12".hexToByteArrayOrNone()?.size ?: -1L)
+
+    // Base64：标准字母表和 URL 安全的字母表
+    println(Base64.Default.encode(data))
+    println(Base64.UrlSafe.encode(data))
+    // 不写结尾的 =
+    val noPadding = Base64.UrlSafe.withPadding(Base64.PaddingOption.Absent)
+    println(noPadding.encode("hi".toByteArray()))
+
+    println(String.fromUtf8(Base64.Default.decode("U2Nvb3A/")))
+    println(Base64.Default.decodeOrNone("not base64!")?.size ?: -1L)
+}

@@ -1,0 +1,3 @@
+error[E1103]: suspend function `use` cannot be called from non-suspend function `firstLine`
+error[E0805]: a lambda cannot use bare `return`
+help[H0801]: use `return@label` for a local return

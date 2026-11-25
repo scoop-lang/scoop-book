@@ -1,0 +1,28 @@
+import scoop.text.*
+
+class UsageException(message: String) : Exception(Some(message))
+
+fun parseCount(text: String): Int = try {
+    text.toInt()
+} catch (e: NumberFormatException) {
+    throw UsageException(f"count must be an integer: ${text}")
+}
+
+fun run(args: Array<String>) {
+    // args[0L] 是程序路径（第 2 章）
+    if (args.size != 3L) throw UsageException("usage: repeat <count> <word>")
+    val count = parseCount(args[1L])
+    for (i in 1..count) {
+        println(f"${i}: ${args[2L]}")
+    }
+}
+
+fun main(args: Array<String>): Int {
+    try {
+        run(args)
+        return 0
+    } catch (e: UsageException) {
+        eprintln(e.message ?: "usage error")
+        return 2
+    }
+}

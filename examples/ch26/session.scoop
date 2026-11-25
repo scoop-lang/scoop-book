@@ -1,0 +1,43 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.time.*
+
+// 关闭时需要异步地把缓冲的数据写出去，所以实现 AsyncCloseable
+class Session(val name: String) : AsyncCloseable {
+    private val pending = ArrayList<String>()
+    private var closed = false
+
+    fun record(event: String) {
+        if (closed) throw IllegalStateException(Some("session is closed"))
+        pending.add(event)
+    }
+
+    public override suspend fun close() {
+        if (closed) return
+        closed = true
+        currentEventLoop().sleep(5.milliseconds()) // 模拟异步写出
+        println(f"${name}: flushed ${pending.size} events")
+    }
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            Session("s1")
+                .useAsync { s ->
+                    s.record("login")
+                    s.record("view")
+                }
+            try {
+                Session("s2")
+                    .useAsync { s ->
+                        s.record("login")
+                        throw IllegalArgumentException(Some("bad request"))
+                    }
+            } catch (e: IllegalArgumentException) {
+                println(f"failed: ${e.message ?: ""}")
+            }
+        }
+}

@@ -1,0 +1,32 @@
+class Flaky(private val failClose: Boolean) : Closeable {
+    public override fun close() {
+        if (failClose) throw IllegalStateException(Some("close failed"))
+    }
+}
+
+fun describe(failure: Throwable): String = when (failure) {
+    is Exception -> failure.message ?: "(no message)"
+    else -> "(not an Exception)"
+}
+
+fun attempt(failBody: Boolean, failClose: Boolean) {
+    try {
+        val result = Flaky(failClose)
+            .use { _ ->
+                if (failBody) throw IllegalArgumentException(Some("body failed"))
+                "ok"
+            }
+        println(f"result: ${result}")
+    } catch (e: ResourceUseException) {
+        println(f"both: ${describe(e.primaryFailure)} + ${describe(e.cleanupFailure)}")
+    } catch (e: Exception) {
+        println(f"one: ${e.message ?: ""}")
+    }
+}
+
+fun main() {
+    attempt(failBody = false, failClose = false)
+    attempt(failBody = true, failClose = false)
+    attempt(failBody = false, failClose = true)
+    attempt(failBody = true, failClose = true)
+}

@@ -1,0 +1,45 @@
+class Connection(val name: String) : Closeable {
+    private var closed = false
+
+    init {
+        println(f"open ${name}")
+    }
+
+    val isClosed: Boolean get() = closed
+
+    fun query(sql: String): String {
+        if (closed) throw IllegalStateException(Some(f"${name} is closed"))
+        if (sql == "") throw IllegalArgumentException(Some("empty query"))
+        return f"${name}: ${sql}"
+    }
+
+    public override fun close() {
+        if (closed) return
+        closed = true
+        println(f"close ${name}")
+    }
+}
+
+fun main() {
+    // use 的结果就是 lambda 的结果
+    val row = Connection("db1").use { c -> c.query("select 1") }
+    println(row)
+
+    // 抛出异常时同样会关闭
+    try {
+        Connection("db2").use { c -> c.query("") }
+    } catch (e: IllegalArgumentException) {
+        println(f"failed: ${e.message ?: ""}")
+    }
+
+    // use 结束后，对象还在，但已经关闭了
+    val conn = Connection("db3")
+    conn.use { c -> println(c.query("select 3")) }
+    println(f"closed: ${conn.isClosed}")
+    conn.close()
+    try {
+        conn.query("select 4")
+    } catch (e: IllegalStateException) {
+        println(e.message ?: "")
+    }
+}

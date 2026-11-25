@@ -1,0 +1,3 @@
+error[E0711]: no applicable candidate for `sortedSetOf` in star import layer
+cause[E0501]: dependency function `sortedSetOf`: Version is not a subtype of Comparator<T>
+cause[E0501]: dependency function `sortedSetOf`: Version is not a subtype of Compare<T>

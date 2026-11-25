@@ -1,0 +1,28 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.time.*
+
+class Flag {
+    var fired = false
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+
+            // sleep：挂起当前任务一段时间
+            loop.sleep(10.milliseconds())
+
+            // schedule：到期时调用一个普通函数，返回值可以用来撤销
+            val reminder = Flag()
+            loop.schedule(20.milliseconds()) { _ -> reminder.fired = true }
+            val cancelled = Flag()
+            val handle = loop.schedule(20.milliseconds()) { _ -> cancelled.fired = true }
+            handle.dispose() // 到期之前撤销，回调不会被调用
+
+            loop.sleep(50.milliseconds())
+            println(f"reminder fired: ${reminder.fired}, cancelled fired: ${cancelled.fired}")
+        }
+}

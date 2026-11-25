@@ -1,0 +1,14 @@
+fun describe(e: Exception): String = e.message ?: "(no message)"
+
+fun main() {
+    val errors: Array<Exception> = [
+        IllegalArgumentException(),
+        IllegalArgumentException(Some("width must be positive")),
+        IllegalStateException(None),
+        Exception(Some("generic failure")),
+        ArithmeticException()
+    ]
+    for (e in errors) {
+        println(describe(e))
+    }
+}

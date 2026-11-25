@@ -1,0 +1,1 @@
+error[E0607]: dependency function `Success`: cannot infer a unique type argument for `E`

@@ -1,0 +1,61 @@
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.collections.*
+import scoop.platform.concurrent.*
+
+class Counter {
+    var value = 0L
+}
+
+fun runThreads(count: Int, body: () -> Unit) {
+    val threads = ArrayList<Thread>()
+    for (i in 1..count) {
+        threads.add(Thread.start(body))
+    }
+    for (thread in threads) {
+        thread.join()
+    }
+}
+
+// ANCHOR: racy
+// 错误：多个线程同时读写 counter.value，没有任何同步，这是数据竞争
+fun racyCount(): Long {
+    val counter = Counter()
+    runThreads(4) {
+        for (i in 1..100000) {
+            counter.value += 1L
+        }
+    }
+    return counter.value
+}
+
+// ANCHOR_END: racy
+
+// 用锁保护共享的字段
+fun lockedCount(): Long {
+    val counter = Counter()
+    val lock = Mutex()
+    runThreads(4) {
+        for (i in 1..100000) {
+            lock.withLock { counter.value += 1L }
+        }
+    }
+    return lock.withLock { counter.value }
+}
+
+// 用原子类型
+fun atomicCount(): Long {
+    val counter = AtomicLong(0L)
+    runThreads(4) {
+        for (i in 1..100000) {
+            counter.fetchAdd(1L)
+        }
+    }
+    return counter.load()
+}
+
+fun main() {
+    // racyCount 不能运行：数据竞争的结果是未定义的
+    println(lockedCount())
+    println(atomicCount())
+}

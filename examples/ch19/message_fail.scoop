@@ -1,0 +1,4 @@
+fun main() {
+    val full = Exception("disk is full")
+    val empty = Exception()
+}

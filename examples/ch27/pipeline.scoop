@@ -1,0 +1,48 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.concurrent:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.concurrent.*
+
+struct Order(val id: Int, val amount: Long)
+
+fun main() {
+    val summary = asyncRuntime { workers = 4 }
+        .run {
+            val orders = Channel<Order>(16L)
+            val revenue = AtomicLong(0L)
+            val processed = AtomicInt(0)
+            coroutineScope {
+                // 两个生产者
+                val producers = ArrayList<Job>()
+                for (p in 0..1) {
+                    producers
+                        .add(
+                            launch {
+                                for (i in 1..1000) {
+                                    orders.send(Order(p * 1000 + i, (i % 10).toLong()))
+                                }
+                            }
+                        )
+                }
+                // 三个消费者：并行地从同一个 Channel 中取订单
+                for (c in 1..3) {
+                    launch {
+                        while (true) {
+                            val order = orders.receiveOrNone() ?: break
+                            revenue.fetchAdd(order.amount)
+                            processed.fetchAdd(1)
+                        }
+                    }
+                }
+                // 所有生产者结束后关闭 Channel，消费者取完剩下的订单就会退出
+                for (p in producers) {
+                    p.join()
+                }
+                orders.close()
+            }
+            f"${processed.load()} orders, revenue ${revenue.load()}"
+        }
+    println(summary)
+}

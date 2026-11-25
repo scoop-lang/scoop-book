@@ -1,0 +1,21 @@
+fun step(mode: String): String {
+    try {
+        if (mode == "fail") throw IllegalStateException(Some("step failed"))
+        if (mode == "early") return "returned early"
+        println("  body finished")
+    } finally {
+        println(f"  cleanup after ${mode}")
+    }
+    return "normal"
+}
+
+fun main() {
+    for (mode in ["normal", "early", "fail"]) {
+        println(mode)
+        try {
+            println("  result: " + step(mode))
+        } catch (e: IllegalStateException) {
+            println("  caught: " + (e.message ?: ""))
+        }
+    }
+}

@@ -1,0 +1,25 @@
+import scoop.collections.*
+
+fun main() {
+    val tags = linkedSetOf("kotlin", "native")
+    // add 返回是否真的加入了；已经存在时返回 false
+    println(tags.add("gc"))
+    println(tags.add("kotlin"))
+    println("gc" in tags)
+    println(tags.joinToString())
+
+    val wanted = setOf("native", "values", "gc")
+    println((tags union wanted).joinToString())
+    println((tags intersect wanted).joinToString())
+    println((tags subtract wanted).joinToString())
+
+    // TreeSet 按从小到大的顺序保存
+    val scores = sortedSetOf(72, 95, 58, 95)
+    println(scores.joinToString())
+    println(scores.firstOrNone() ?: -1)
+    println(scores.higher(72) ?: -1)
+
+    // 去重
+    val unique = ["b", "a", "b", "c", "a"].toSet()
+    println(unique.joinToString())
+}

@@ -1,0 +1,36 @@
+import scoop.*
+import scoop.text.*
+
+class ConfigException(message: String) : Exception(Some(message))
+
+// 异常 → Result：只捕获预期之内的那一种异常
+fun parseTimeout(text: String): Result<Int, String> = try {
+    Result.Success(text.toInt())
+} catch (e: NumberFormatException) {
+    Result.Failure(f"timeout must be a number: ${text}")
+}
+
+// Result → 异常：先把错误换成异常类型，再 getOrThrow
+fun requireTimeout(text: String): Int = parseTimeout(text)
+    .mapError { message -> ConfigException(message) }
+    .getOrThrow()
+
+fun main() {
+    // runCatching 把任何异常都变成 Failure
+    val caught = runCatching { "12x".toInt() }
+    when (caught) {
+        case Result.Success(val n) -> println(f"parsed ${n}")
+        case Result.Failure(val error) ->
+            println(f"NumberFormatException: ${error is NumberFormatException}")
+    }
+    println(runCatching { "12".toInt() }.getOrThrow())
+
+    println(parseTimeout("30").getOrElse { 0 })
+    println(parseTimeout("soon").errorOrNone() ?: "")
+    println(requireTimeout("45"))
+    try {
+        requireTimeout("later")
+    } catch (e: ConfigException) {
+        println(f"config error: ${e.message ?: ""}")
+    }
+}

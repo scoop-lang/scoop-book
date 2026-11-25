@@ -1,0 +1,8 @@
+import scoop.collections.*
+
+struct Point(val x: Int, val y: Int)
+
+fun main() {
+    val visits = HashMap<Point, Int>()
+    visits[Point(0, 0)] = 1
+}

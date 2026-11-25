@@ -1,0 +1,28 @@
+import scoop.bytes.*
+import scoop.text.*
+
+fun main() {
+    // 写一个小小的二进制记录：3 字节标记、版本号、条目数、比例
+    val builder = ByteArrayBuilder()
+    builder.append("SCP".toByteArray())
+    builder.writeUInt16(2u, ByteOrder.BigEndian)
+    builder.writeInt32(1000, ByteOrder.LittleEndian)
+    builder.writeDouble(0.5, ByteOrder.BigEndian)
+    val record = builder.toByteArray()
+    println(f"${record.size} bytes: ${record.toHexString()}")
+
+    // 按同样的格式读回来
+    val reader = ByteArrayReader(record)
+    val magic = String.fromUtf8(reader.readBytes(3L))
+    val version = reader.readUInt16(ByteOrder.BigEndian)
+    val count = reader.readInt32(ByteOrder.LittleEndian)
+    val ratio = reader.readDouble(ByteOrder.BigEndian)
+    println(f"${magic} v${version} count=${count} ratio=${ratio}, ${reader.remaining} left")
+
+    // 读过了头会抛出异常，position 不变
+    try {
+        reader.readInt32(ByteOrder.BigEndian)
+    } catch (e: IndexOutOfBoundsException) {
+        println(f"short input at ${reader.position}")
+    }
+}

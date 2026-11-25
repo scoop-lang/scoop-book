@@ -1,0 +1,28 @@
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.platform.time.*
+import scoop.time.*
+
+fun work(): Long {
+    var sum = 0L
+    for (i in 1L..1000000L) {
+        sum += i % 7L
+    }
+    return sum
+}
+
+fun main() {
+    // 墙上时钟：现在是什么时刻
+    val now = SystemClock.now()
+    println(now > Instant.parse("2026-01-01T00:00:00Z"))
+
+    // 单调时钟：经过了多长时间
+    val start = MonotonicTimeSource.markNow()
+    val result = work()
+    val elapsed = start.elapsedNow()
+    println(f"result ${result}, elapsed >= 0: ${elapsed >= Duration.ZERO}")
+
+    // measureTime 是上面写法的简写
+    val spent = measureTime { work() }
+    println(spent < 10.seconds())
+}

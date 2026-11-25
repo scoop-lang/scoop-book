@@ -1,0 +1,18 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+
+import scoop.asyncio.*
+import scoop.collections.*
+import scoop.time.*
+
+suspend fun download(name: String): String {
+    currentEventLoop().sleep(20.milliseconds())
+    return name
+}
+
+fun main() {
+    eventLoop()
+        .run {
+            val tasks = listOf("a", "b").map { name -> async { download(name) } }
+            val results = tasks.map { task -> task.await() }
+        }
+}

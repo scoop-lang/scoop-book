@@ -1,0 +1,38 @@
+//! dep: scoop:scoop.asyncio:0.1.0
+//! dep: scoop:scoop.platform:0.1.0
+
+import scoop.asyncio.*
+import scoop.platform.concurrent.*
+import scoop.platform.time.*
+import scoop.time.*
+
+fun main() {
+    eventLoop()
+        .run {
+            val loop = currentEventLoop()
+            val mainThread = currentThreadId()
+
+            // 两个任务都在同一个线程上执行
+            val other = async { currentThreadId() == mainThread }
+            println(f"same thread: ${other.await()}")
+
+            // 挂起的等待：两个任务的等待可以重叠
+            val start1 = MonotonicTimeSource.markNow()
+            coroutineScope {
+                launch { loop.sleep(100.milliseconds()) }
+                launch { loop.sleep(100.milliseconds()) }
+            }
+            val overlapped = start1.elapsedNow()
+
+            // 阻塞线程的 sleep：一个任务睡着时，整个线程都停了，另一个任务只能等
+            val start2 = MonotonicTimeSource.markNow()
+            coroutineScope {
+                launch { sleep(100.milliseconds()) }
+                launch { sleep(100.milliseconds()) }
+            }
+            val serialized = start2.elapsedNow()
+
+            println(f"suspending sleeps overlap: ${overlapped < 180.milliseconds()}")
+            println(f"blocking sleeps add up: ${serialized >= 200.milliseconds()}")
+        }
+}

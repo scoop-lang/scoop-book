@@ -1,0 +1,20 @@
+import scoop.collections.*
+
+class Tag(var name: String) : Equals<Tag>, Hash {
+    public override operator fun equals(other: Tag): Boolean = name == other.name
+
+    public override fun hash(): Long = name.hash()
+}
+
+fun main() {
+    val tag = Tag("draft")
+    val counts = HashMap<Tag, Int>()
+    counts[tag] = 1
+    println(counts[Tag("draft")] ?: 0)
+
+    // 放进 Map 之后又修改了决定 hash 的字段
+    tag.name = "final"
+    println(counts[Tag("final")] ?: 0)
+    println(counts[Tag("draft")] ?: 0)
+    println(counts.size)
+}
