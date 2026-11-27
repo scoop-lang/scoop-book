@@ -1,0 +1,149 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+import scoop.graphics.Paint
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+fun log(line: String) {
+    println(line)
+    flushOutput()
+}
+
+/** A value type: change it by building a modified copy. */
+struct Filter(val text: String, val onlyOpen: Boolean)
+
+/** All the states of the demo, owned by one plain object. */
+class DemoModel {
+    val open = state(false)
+    val details = state(1)
+    // A mutable list inside a State: modifying it in place notifies nobody.
+    val tags = state(ArrayList<String>())
+    val filter = state(Filter("", false))
+    val stamp = state(0)
+}
+
+/** Reads `details` only while `open` is true. */
+class DetailsView(private val model: DemoModel, scope: ComponentScope) : Component(scope) {
+    public override fun render(): View {
+        log("render  details")
+        val text = if (model.open.value)
+            f"Details, revision ${model.details.value}"
+        else
+            "Collapsed"
+        return label(text)
+    }
+}
+
+class TagsView(private val model: DemoModel, scope: ComponentScope) : Component(scope) {
+    public override fun render(): View {
+        log("render  tags")
+        return label(f"Tags: ${model.tags.value.size}")
+    }
+}
+
+class FilterView(private val model: DemoModel, scope: ComponentScope) : Component(scope) {
+    public override fun render(): View {
+        log("render  filter")
+        val filter = model.filter.value
+        return label(if (filter.onlyOpen) "Showing open items" else "Showing all items")
+    }
+}
+
+class StampView(private val model: DemoModel, scope: ComponentScope) : Component(scope) {
+    public override fun render(): View {
+        log("render  stamp")
+        return label(f"Stamp: ${model.stamp.value}")
+    }
+}
+
+class DependencyDemo(private val model: DemoModel, scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        log("render  demo")
+        val model = this.model
+        val page = column {
+            spacing = 10.0
+            add(component({ s -> DetailsView(model, s) }))
+            row {
+                spacing = 8.0
+                button(
+                    "Toggle details",
+                    {
+                        log("-- toggle details")
+                        model.open.value = !model.open.value
+                    }
+                )
+                button(
+                    "Edit details",
+                    {
+                        log("-- edit details")
+                        model.details.value += 1
+                    }
+                )
+            }
+            add(component({ s -> TagsView(model, s) }))
+            row {
+                spacing = 8.0
+                button(
+                    "Add tag in place",
+                    {
+                        log("-- add tag in place")
+                        model.tags.value.add("tag")
+                    }
+                )
+                button(
+                    "Add tag by replacing",
+                    {
+                        log("-- add tag by replacing")
+                        val next = ArrayList<String>()
+                        for (tag in model.tags.value)
+                            next.add(tag)
+                        next.add("tag")
+                        model.tags.value = next
+                    }
+                )
+            }
+            add(component({ s -> FilterView(model, s) }))
+            row {
+                button(
+                    "Toggle filter",
+                    {
+                        log("-- toggle filter")
+                        val current = model.filter.value
+                        // A struct cannot change; build a copy with one field replaced.
+                        model.filter.value = current.{onlyOpen: !current.onlyOpen}
+                    }
+                )
+            }
+            add(component({ s -> StampView(model, s) }))
+            row {
+                button(
+                    "Write the same value",
+                    {
+                        log("-- write the same value")
+                        model.stamp.value = model.stamp.value
+                    }
+                )
+            }
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    val model = DemoModel()
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Dependencies", { scope -> DependencyDemo(model, scope) })
+    }
+}

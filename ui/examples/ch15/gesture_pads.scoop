@@ -1,0 +1,134 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+enum PadKind {
+    PressAndHold, Drag, Swipe, Transform
+}
+
+/** What a pad recognizes, and where it reports what it saw. */
+struct PadInput(val kind: PadKind, val report: (String) -> Unit)
+
+fun swipeName(direction: SwipeDirection): String = when (direction) {
+    case Left -> "left"
+    case Right -> "right"
+    case Up -> "up"
+    case Down -> "down"
+}
+
+/** A self-drawn pad that registers one kind of gesture on its input area. */
+class Pad(private val props: Props<PadInput>, scope: ComponentScope) : Element<Unit>(scope) {
+    private val area = scope.createArea()
+
+    init {
+        // Read props.value when the gesture happens, not when the pad is created.
+        val report = { text: String -> props.value.report(text) }
+        when (props.value.kind) {
+            case PressAndHold -> {
+                scope.press(area) { report("press") }
+                scope.longPress(area) { _ -> report("long press") }
+            }
+
+            case Drag ->
+                scope
+                    .drag(area, DragOptions(DragAxis.Horizontal)) { event ->
+                        when (event) {
+                            case Started(_) -> report("drag started")
+                            case Moved(val sample) ->
+                                report(f"dragging, moved ${sample.displacement.toInt()}")
+                            case Ended(val sample) ->
+                                report(f"drag ended, moved ${sample.displacement.toInt()}")
+                            case Cancelled(_, _) -> report("drag cancelled")
+                        }
+                    }
+            case Swipe ->
+                scope
+                    .swipeGesture(area, SwipeGestureOptions(mouse = true)) { sample ->
+                        report(f"swipe ${swipeName(sample.direction)}")
+                    }
+            case Transform ->
+                scope
+                    .transformGesture(area) { event ->
+                        when (event) {
+                            case Changed(val sample) ->
+                                report(
+                                    f"scale ${(sample.scale * 100.0).toInt()}%, rotation ${
+                                        (sample.rotation * 57.3).toInt()
+                                    }°"
+                                )
+                            case Discrete(val sample) ->
+                                report(f"scale ${(sample.scale * 100.0).toInt()}%")
+                            else -> {}
+                        }
+                    }
+        }
+    }
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        val size = constraints.constrain(Size(constraints.maxWidth ?: 360.0, 72.0))
+        context.measureChild(0L, Constraints(maxWidth = Some(size.width - 32.0)))
+        context.placeChild(0L, Point(16.0, 26.0))
+        return LayoutResult(LayoutMetrics(size), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        val bounds = Rect(0.0, 0.0, context.size.width, context.size.height)
+        context.place(area, bounds)
+        context
+            .draw { paint ->
+                paint.canvas.drawRoundRect(bounds, 10.0, 10.0, Paint(Color(0.93, 0.95, 0.99)))
+            }
+        context.children()
+    }
+}
+
+class GestureDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val last = state("Try the pads below.")
+
+    private fun pad(kind: PadKind, caption: String): View {
+        val last = this.last
+        return element(
+            PadInput(kind, { text -> last.value = text }),
+            { p, s -> Pad(p, s) },
+            [label(caption)]
+        )
+    }
+
+    public override fun render(): View {
+        val status = label(f"Last gesture: ${last.value}") { style { weight = Some(600) } }
+        val pads = [
+            pad(PadKind.PressAndHold, "Click or tap; touch and hold for a long press"),
+            pad(PadKind.Drag, "Drag sideways"),
+            pad(PadKind.Swipe, "Swipe left or right (the mouse works too)"),
+            pad(PadKind.Transform, "Pinch or rotate on a trackpad")
+        ]
+        val page = column {
+            spacing = 12.0
+            alignment = CrossAlignment.Stretch
+            add(status)
+            addAll(pads)
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Gestures", { scope -> GestureDemo(scope) })
+    }
+}

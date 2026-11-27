@@ -1,0 +1,150 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.graphics.text:0.1.0
+import scoop.graphics.Color
+import scoop.graphics.Paint
+import scoop.graphics.text.TextAlignment
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.component.label as textView
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+val sentence = "Constraints flow down and sizes flow up: text wraps only inside a finite width."
+
+/** Paints the box a view actually occupies, so its size becomes visible. */
+fun tinted(content: View): View = frame(content) {
+    style { background(Some(Paint(Color(0.84, 0.90, 1.0)))) }
+}
+
+fun heading(text: String): View = textView(text) { style { weight = Some(700) } }
+
+/** One side of an experiment: a caption above the content, at most 300 wide. */
+fun panel(caption: String, content: View): View = frame(
+    column {
+        spacing = 6.0
+        label(caption) {
+            style {
+                fontSize = Some(12.0)
+                color = Some(Color(0.45, 0.45, 0.50))
+            }
+        }
+        add(content)
+    }
+) {
+    width = Some(300.0)
+    alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+}
+
+fun experiment(title: String, left: View, right: View): View = column {
+    spacing = 8.0
+    add(heading(title))
+    row {
+        spacing = 40.0
+        add(left)
+        add(right)
+    }
+}
+
+/** A frame that asks for 120, placed in a column with the given cross alignment. */
+fun fixedInColumn(value: CrossAlignment): View {
+    val fixed = tinted(frame(textView("width = 120")) { width = Some(120.0) })
+    return column {
+        alignment = value
+        // The separator fills the bounded width, which makes the column 300 wide.
+        separator()
+        add(fixed)
+    }
+}
+
+fun saveButton(): View = button("Save", {})
+
+// Each experiment is built by a top-level function: inside a builder block,
+// row { }, column { }, frame(...) and button(...) would be the block's appending members.
+fun boundedLabel(): View = experiment(
+    "1. A label fills a bounded width",
+    panel("Inside a 300-wide panel", tinted(textView("Short text"))),
+    panel("Inside a row", row { add(tinted(textView("Short text"))) })
+)
+
+fun boundedSentence(): View = experiment(
+    "2. The same sentence, bounded and unbounded",
+    panel("Bounded: wraps", tinted(textView(sentence))),
+    panel(
+        "Horizontal scroll area: one line",
+        scrollArea(tinted(textView(sentence))) { axes = ScrollAxes.Horizontal }
+    )
+)
+
+fun crowdedRow(): View = experiment(
+    "3. A row that does not fit",
+    panel(
+        "Default: everything shrinks",
+        row {
+            spacing = 8.0
+            alignment = CrossAlignment.Center
+            add(tinted(textView("Quarterly report for the analytical engine project")))
+            add(saveButton())
+        }
+    ),
+    panel(
+        "shrink = 0.0 keeps the button",
+        row {
+            spacing = 8.0
+            alignment = CrossAlignment.Center
+            add(tinted(textView("Quarterly report for the analytical engine project")))
+            item(saveButton()) { shrink = 0.0 }
+        }
+    )
+)
+
+fun stretchedFrame(): View = experiment(
+    "4. Stretch raises the minimum width",
+    panel("alignment = Stretch", fixedInColumn(CrossAlignment.Stretch)),
+    panel("alignment = Start", fixedInColumn(CrossAlignment.Start))
+)
+
+fun centeredText(): View = experiment(
+    "5. Centering text",
+    panel(
+        "column alignment = Center",
+        column {
+            alignment = CrossAlignment.Center
+            add(tinted(textView("Centered?")))
+        }
+    ),
+    panel(
+        "Paragraph alignment = Center",
+        tinted(textView("Centered") { settings { alignment = TextAlignment.Center } })
+    )
+)
+
+class ConstraintsLab(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val page = column {
+            spacing = 18.0
+            add(boundedLabel())
+            add(boundedSentence())
+            add(crowdedRow())
+            add(stretchedFrame())
+            add(centeredText())
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Constraints", { scope -> ConstraintsLab(scope) })
+    }
+}

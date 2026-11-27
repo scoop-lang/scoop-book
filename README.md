@@ -1,52 +1,51 @@
-# 《Scoop 程序设计》
+# Scoop 图书
 
-Scoop 语言的在线教程，使用 [mdBook](https://rust-lang.github.io/mdBook/) 构建，在线阅读：<https://book.scoop-lang.org>。大纲见 [OUTLINE.md](OUTLINE.md)。
+Scoop 语言的中文在线教程，在线阅读：<https://book.scoop-lang.org>。仓库中有两本书，都用 [mdBook](https://rust-lang.github.io/mdBook/) 构建，和首页一起发布在同一个网址下：
+
+| 目录 | 书 | 网址 |
+| --- | --- | --- |
+| `programming/` | 《Scoop 程序设计》 | <https://book.scoop-lang.org/programming/> |
+| `ui/` | 《Scoop UI 编程指南》 | <https://book.scoop-lang.org/ui/> |
+| `site/` | 首页：两本书的封面和入口 | <https://book.scoop-lang.org/> |
+
+每本书的写作约定、示例校验方法见各自目录下的 README.md。
 
 ## 目录结构
 
 ```text
-book.toml                 mdBook 配置
-src/                      书稿；SUMMARY.md 是目录
-examples/chNN/            各章示例，书稿用 {{#include}} 引入
-scripts/check-examples.sh 用本机工具链校验示例
-theme/                    ```scoop 代码块的高亮
+programming/              《Scoop 程序设计》：book.toml、src/、examples/、scripts/、theme/
+ui/                       《Scoop UI 编程指南》：结构相同，另有截图脚本
+site/                     首页、404 页、样式、封面缩略图、CNAME
+scripts/build-site.sh     构建两本书并组装成完整站点
+.github/workflows/        推送到 main 后构建并部署到 GitHub Pages
 ```
 
 ## 常用命令
 
 ```sh
-mdbook serve --open          # 本地预览
-mdbook build                 # 输出到 book/
-scripts/check-examples.sh    # 校验全部示例（默认使用 ~/.scoop/bin/scoop）
-scripts/check-examples.sh examples/ch08   # 只校验某一章
+mdbook serve programming --open    # 只预览一本书
+mdbook serve ui --open
+scripts/build-site.sh              # 构建两本书和首页，输出到 _site/
+python3 -m http.server -d _site 8000   # 在 http://localhost:8000 预览完整站点
 ```
-
-示例按 `0.0.0-dev.20261123`（`3910a8c5`）版工具链校验。这个版本包含[诊断编号](https://github.com/scoop-lang/scoop/pull/146)、[Kotlin 风格的 `scoop fmt`](https://github.com/scoop-lang/scoop/pull/183) 和[用 `@GenerateWith` 生成 codec](https://github.com/scoop-lang/scoop/pull/150)，更早的工具链无法通过编号断言、格式检查和第 18 章的 codec 示例。可用 `SCOOP=/path/to/toolchain/bin/scoop scripts/check-examples.sh` 显式选择工具链。
-
-## 示例约定
-
-| 文件 | 含义 |
-| --- | --- |
-| `NAME.scoop` | 单文件示例：依次执行 fmt --check、check、run |
-| `NAME.expected` | 预期 stdout，可选 |
-| `NAME.args` | 运行参数，可选 |
-| `NAME.warning` | 编译警告中必须出现的文字，每行一段，保留警告及附属信息的编号，可选 |
-| `NAME.status` | 运行时的预期退出码，可选，默认 0 |
-| `NAME.stderr` | 运行时 stderr 中必须出现的文字，每行一段，可选 |
-| `NAME_fail.scoop` | 演示错误写法，预期编译失败 |
-| `NAME_fail.error` | 报错中必须出现的文字，每行一段，保留编号与 error/cause/note/help 角色；书稿可直接 include 它来展示报错 |
-| `NAME/Cone.toml` | Cone 示例；有 `tests/` 时运行测试，可执行 Cone 的预期输出放 `expected.txt` |
-
-书中出现的完整程序都应放在 `examples/` 下并能通过校验，不要直接把代码写进书稿。示例提交前先用 `scoop fmt` 格式化。
-
-`.error` 和 `.warning` 是字面文本片段断言，不是完整输出快照。保留理解当前规则所需的主诊断、候选、原因和建议，不记录本机绝对路径。正文引用省略了路径或其他候选的片段时，应说明摘录范围；诊断树中相同的原因可能出现在不同候选下。
 
 ## 发布
 
-推送到 `main` 后，GitHub Actions（`.github/workflows/deploy.yml`）用 mdBook 构建并部署到 GitHub Pages。自定义域名由 `book.toml` 中的 `cname` 写入构建产物。CI 只构建书，不校验示例；推送前请先在本机运行 `scripts/check-examples.sh`。
+推送到 `main` 后，GitHub Actions（`.github/workflows/deploy.yml`）运行 `scripts/build-site.sh`，把 `_site/` 部署到 GitHub Pages；Pull Request 只构建、不部署。CI 只构建书，不校验示例，推送前请先在本机用各书的 `scripts/check-examples.sh` 校验。
 
-## 行文约定
+站点的结构：
 
-- 正文中的引号用中文引号 “”。mdBook 的智能标点会把英文 `"` 转错。
-- `{{#include}}` 不要放在 `>` 引用块或缩进的列表项里，否则引入的多行内容没有相应的缩进，会打断引用块或列表。需要在列表中间展示代码时，先结束列表；有编号的列表在代码块之后从下一个编号继续写即可。
-- 提示框统一写作 `> **从 Kotlin 过来**` 和 `> **深入一点：标题**`。
+- `/` 是 `site/` 中的首页；
+- `/programming/` 和 `/ui/` 是两本书，各自的 `book.toml` 用 `site-url` 声明了这个路径；
+- 自定义域名写在 `site/CNAME`。
+
+《Scoop 程序设计》原来直接发布在站点根目录。为了不让已有的链接失效，`build-site.sh` 为它的每个页面在根目录生成一个跳转页，例如 `/part01-start/ch01-why-scoop.html` 跳转到 `/programming/part01-start/ch01-why-scoop.html`。
+
+## 封面
+
+两本书的封面在 `programming/src/images/cover.png` 和 `ui/src/images/cover.png`，书的前言中引用它们。首页使用缩小后的副本，更换封面后重新生成：
+
+```sh
+sips -s format jpeg -s formatOptions 82 -Z 900 programming/src/images/cover.png --out site/covers/programming.jpg
+sips -s format jpeg -s formatOptions 82 -Z 900 ui/src/images/cover.png --out site/covers/ui.jpg
+```

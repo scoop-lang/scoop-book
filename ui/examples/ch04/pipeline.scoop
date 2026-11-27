@@ -1,0 +1,164 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.Insets
+import scoop.ui.style.ThemeMode
+import scoop.ui.style.ThemeSource
+import scoop.ui.style.currentThemeSource
+import scoop.ui.style.read
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** Prints one line at once. GUI programs buffer standard output, so flush it explicitly. */
+fun log(line: String) {
+    println(line)
+    flushOutput()
+}
+
+/** Input of a tile: a name to print and the shared State the tile shows. */
+struct TileInput(val name: String, val count: State<Int>)
+
+/** A child component that prints each step of its life. */
+class Tile(private val props: Props<TileInput>, scope: ComponentScope) : Component(scope) {
+    // Local state: kept as long as this instance lives, lost when it is remounted.
+    private val local = state(0)
+
+    init {
+        log(f"create  ${props.value.name}")
+    }
+
+    public override fun onMount() {
+        log(f"mount   ${props.value.name}")
+    }
+
+    public override fun onUnmount() {
+        log(f"unmount ${props.value.name}")
+    }
+
+    public override fun render(): View {
+        val input = props.value
+        val local = this.local
+        log(f"render  ${input.name}")
+        return row {
+            spacing = 8.0
+            alignment = CrossAlignment.Center
+            label(f"${input.name}: ${input.count.value}")
+            button("+1", { input.count.value += 1 })
+            // Three writes in one callback still lead to a single render.
+            button(
+                "+3",
+                {
+                    input.count.value += 1
+                    input.count.value += 1
+                    input.count.value += 1
+                }
+            )
+            button(f"Local ${local.value}", { local.value += 1 }) {
+                variant = ButtonVariant.Outline
+            }
+        }
+    }
+}
+
+/** A self-drawn element that prints when it is updated, measured and assembled. */
+class Swatch(private val props: Props<Color>, scope: ComponentScope) : Element<Unit>(scope) {
+    private val area = scope.createArea()
+
+    // An ordinary field rather than a State: the element asks for a new frame itself.
+    private var hollow = false
+
+    init {
+        scope
+            .press(area) {
+                hollow = !hollow
+                log("press   swatch")
+                scope.requestFrame()
+            }
+    }
+
+    public override fun update(): UiInvalidation {
+        log("update  swatch")
+        // Only the color can change, so a new scene is enough; the layout stays valid.
+        return UiInvalidation.Scene
+    }
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        log("measure swatch")
+        return LayoutResult(LayoutMetrics(constraints.constrain(Size(240.0, 24.0))), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        log("scene   swatch")
+        val color = props.value
+        val hollow = this.hollow
+        context.place(area, Rect(0.0, 0.0, context.size.width, context.size.height))
+        context
+            .draw { paint ->
+                val width = paint.size.width
+                val height = paint.size.height
+                paint.canvas.drawRoundRect(Rect(0.0, 0.0, width, height), 6.0, 6.0, Paint(color))
+                if (hollow) {
+                    val inner = Rect(4.0, 4.0, width - 8.0, height - 8.0)
+                    paint.canvas.drawRoundRect(inner, 3.0, 3.0, Paint(Color(1.0, 1.0, 1.0)))
+                }
+            }
+    }
+}
+
+class Pipeline(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val left = state(0)
+    private val right = state(0)
+    private val rightKey = state(1L)
+    private val warm = state(false)
+
+    init {
+        log("create  Pipeline")
+    }
+
+    public override fun render(): View {
+        log("render  Pipeline")
+        val left = this.left
+        val right = this.right
+        val rightKey = this.rightKey
+        val warm = this.warm
+        val color = if (warm.value) Color(0.93, 0.45, 0.2) else Color(0.2, 0.45, 0.93)
+        val content = column {
+            spacing = 12.0
+            // The tiles receive the State objects, not their values:
+            // Pipeline itself never reads left.value or right.value.
+            add(component(TileInput("left", left), { p, s -> Tile(p, s) }))
+            add(
+                component(
+                    TileInput("right", right),
+                    { p, s -> Tile(p, s) },
+                    ViewKey.Number(rightKey.value)
+                )
+            )
+            add(element(color, { p, s -> Swatch(p, s) }))
+            row {
+                spacing = 8.0
+                button("Toggle color", { warm.value = !warm.value })
+                button("Remount right", { rightKey.value += 1L })
+            }
+        }
+        val page = this.theme.read(scope).tokens.palette.background.background
+        return frame(content) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(page))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Pipeline", { scope -> Pipeline(scope) })
+    }
+}

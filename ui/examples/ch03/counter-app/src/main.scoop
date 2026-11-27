@@ -1,0 +1,13 @@
+package example.app
+
+import scoop.ui.*
+import scoop.ui.style.ThemeMode
+import scoop.ui.style.ThemeSource
+import scoop.ui.style.shadcn.shadcnTheme
+
+fun main() {
+    val model = CounterModel(limit = 10)
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Counter", { scope -> CounterView(model, scope) })
+    }
+}

@@ -1,0 +1,70 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+import scoop.graphics.Paint
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** A profile card. The like count is local state of the card instance. */
+class Profile(private val props: Props<String>, scope: ComponentScope) : Component(scope) {
+    private val likes = state(0)
+
+    public override fun render(): View {
+        val name = props.value
+        val likes = this.likes
+        return row {
+            spacing = 8.0
+            alignment = CrossAlignment.Center
+            label(f"${name}: ${likes.value} likes")
+            button("Like", { likes.value += 1 })
+        }
+    }
+}
+
+class Switcher(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val showAlice = state(true)
+    private val keyed = state(false)
+
+    /** With keys on, each user gets a key of their own; otherwise the position decides. */
+    private fun keyFor(name: String): ViewKey = if (keyed.value)
+        ViewKey.Text(name)
+    else
+        ViewKey.Position
+
+    public override fun render(): View {
+        val showAlice = this.showAlice
+        val keyed = this.keyed
+        val alice = component("Alice", { p, s -> Profile(p, s) }, keyFor("Alice"))
+        val bob = component("Bob", { p, s -> Profile(p, s) }, keyFor("Bob"))
+        val page = column {
+            spacing = 12.0
+            // Two branches, the same component class at the same position.
+            if (showAlice.value) add(alice) else add(bob)
+            row {
+                spacing = 8.0
+                button("Switch user", { showAlice.value = !showAlice.value })
+                button(
+                    if (keyed.value) "Keys: on" else "Keys: off",
+                    { keyed.value = !keyed.value }
+                ) { variant = ButtonVariant.Outline }
+            }
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Branches", { scope -> Switcher(scope) })
+    }
+}

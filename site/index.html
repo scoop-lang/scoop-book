@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scoop 图书</title>
+  <meta name="description" content="Scoop 语言的中文在线教程：《Scoop 程序设计》和《Scoop UI 编程指南》。">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="site.css">
+</head>
+<body>
+  <header>
+    <h1>Scoop 图书</h1>
+    <p>Scoop 语言的中文在线教程，随工具链持续更新。</p>
+  </header>
+
+  <main class="shelf">
+    <article class="book">
+      <a class="cover" href="programming/">
+        <img src="covers/programming.jpg" width="600" height="900"
+             alt="《Scoop 程序设计》封面，一只黑脸琵鹭正低头在浅水中觅食">
+      </a>
+      <div class="info">
+        <h2><a href="programming/">Scoop 程序设计</a></h2>
+        <p>面向有 Kotlin 经验的开发者，系统讲解 Scoop 语言：值类型与模式匹配、类与泛型、错误处理、标准库、并发与异步、工程化，以及与原生代码打交道。</p>
+        <a class="read" href="programming/">开始阅读</a>
+      </div>
+    </article>
+
+    <article class="book">
+      <a class="cover" href="ui/">
+        <img src="covers/ui.jpg" width="600" height="900"
+             alt="《Scoop UI 编程指南》封面，一只黑脸琵鹭朝右迈步，脚尖在浅水中点出涟漪">
+      </a>
+      <div class="info">
+        <h2><a href="ui/">Scoop UI 编程指南</a> <span class="tag">写作中</span></h2>
+        <p>《Scoop 程序设计》的姊妹篇，讲解怎样用 <code>scoop.ui</code> 编写原生桌面应用：组件与状态、布局与文字、输入与交互、主题与自绘控件、桌面集成与测试。</p>
+        <a class="read" href="ui/">开始阅读</a>
+      </div>
+    </article>
+  </main>
+
+  <footer>
+    <a href="https://scoop-lang.org">scoop-lang.org</a>
+    <span aria-hidden="true">·</span>
+    <a href="https://github.com/scoop-lang/scoop-book">GitHub</a>
+  </footer>
+</body>
+</html>
