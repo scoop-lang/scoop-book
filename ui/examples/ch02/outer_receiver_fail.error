@@ -1,0 +1,2 @@
+error[E0716]: implicit use of an outer receiver is not allowed
+help[H0402]: use `this@label` or an explicit object reference

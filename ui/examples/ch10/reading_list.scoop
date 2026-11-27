@@ -1,0 +1,141 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+import scoop.graphics.Paint
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+fun log(line: String) {
+    println(line)
+    flushOutput()
+}
+
+/** One book. Its progress is a State of its own, so only its readers update. */
+class Book(val id: Long, val title: String) {
+    val progress = state(0)
+
+    fun advance() {
+        if (progress.value < 100) progress.value += 25
+    }
+}
+
+/** The business store: a plain class that knows nothing about views. */
+class ReadingList {
+    val books = state<Array<Book>>(
+        [Book(1L, "Structure and Interpretation"), Book(2L, "The Little Schemer")]
+    )
+    private var nextId = 3L
+
+    val finished: Int
+        get() {
+            var count = 0
+            for (book in books.value)
+                if (book.progress.value == 100) count += 1
+            return count
+        }
+
+    fun add(title: String) {
+        val next = ArrayList<Book>()
+        for (book in books.value)
+            next.add(book)
+        next.add(Book(nextId, title))
+        nextId += 1L
+        books.value = next.toArray()
+    }
+
+    fun remove(id: Long) {
+        val next = ArrayList<Book>()
+        for (book in books.value)
+            if (book.id != id) next.add(book)
+        books.value = next.toArray()
+    }
+}
+
+/** An optional dependency: the app works with or without it. */
+class ReadingGoal(val booksPerYear: Int)
+
+context(list: ReadingList)
+fun currentReadingList(): ReadingList = list
+
+class Header(scope: ComponentScope) : Component(scope) {
+    private val list = currentReadingList()
+    private val goal = contextOrNone<ReadingGoal>()
+
+    public override fun render(): View {
+        log("render  header")
+        val goalText = when (goal) {
+            case Some(val value) -> f"Goal: ${value.booksPerYear} books a year"
+            case None -> "No yearly goal set"
+        }
+        return label(f"${list.finished} of ${list.books.value.size} finished · ${goalText}")
+    }
+}
+
+class BookRow(private val props: Props<Book>, scope: ComponentScope) : Component(scope) {
+    private val list = currentReadingList()
+
+    public override fun render(): View {
+        val book = props.value
+        val list = this.list
+        log(f"render  row ${book.id}")
+        return row {
+            spacing = 8.0
+            alignment = CrossAlignment.Center
+            item(textCell(book.title)) { grow = 1.0 }
+            label(f"${book.progress.value}%")
+            button("Read 25%", { book.advance() }) { enabled = book.progress.value < 100 }
+            button("Remove", { list.remove(book.id) }) { variant = ButtonVariant.Ghost }
+        }
+    }
+}
+
+fun textCell(text: String): View = label(text)
+
+class BookList(scope: ComponentScope) : Component(scope) {
+    private val list = currentReadingList()
+
+    public override fun render(): View {
+        log("render  list")
+        val books = list.books.value
+        return column {
+            spacing = 6.0
+            alignment = CrossAlignment.Stretch
+            for (book in books)
+                add(component(book, { p, s -> BookRow(p, s) }, ViewKey.Number(book.id)))
+        }
+    }
+}
+
+class ReadingApp(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val list = currentReadingList()
+
+    public override fun render(): View {
+        log("render  app")
+        val list = this.list
+        val page = column {
+            spacing = 14.0
+            alignment = CrossAlignment.Stretch
+            add(component({ s -> Header(s) }))
+            add(component({ s -> BookList(s) }))
+            row { button("Add a book", { list.add("A new book") }) }
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(frame(page) { width = Some(520.0) }) {
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    val list = ReadingList()
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        context(list) {
+            runUiApplication("Reading list", { scope -> ReadingApp(scope) })
+        }
+    }
+}

@@ -1,0 +1,29 @@
+package example.app
+
+import scoop.ui.state
+
+/** The counter's business state. It does not depend on any window, so tests can use it directly. */
+class CounterModel(val limit: Int) {
+    val count = state(0)
+
+    val canIncrement: Boolean
+        get() = count.value < limit
+
+    val canDecrement: Boolean
+        get() = count.value > 0
+
+    val summary: String
+        get() = f"${count.value} / ${limit}"
+
+    fun increment() {
+        if (canIncrement) count.value += 1
+    }
+
+    fun decrement() {
+        if (canDecrement) count.value -= 1
+    }
+
+    fun reset() {
+        count.value = 0
+    }
+}

@@ -1,0 +1,34 @@
+package example.app
+
+import scoop.test.*
+
+@Test
+private class CounterModelTests {
+    private val model = CounterModel(limit = 3)
+
+    @Test
+    fun `starts at zero and cannot go below it`() {
+        assertEquals(0, model.count.value)
+        assertFalse(model.canDecrement)
+        model.decrement()
+        assertEquals(0, model.count.value)
+    }
+
+    @Test
+    fun `stops at the limit`() {
+        for (i in 0 until 5)
+            model.increment()
+        assertEquals(3, model.count.value)
+        assertFalse(model.canIncrement)
+        assertEquals("3 / 3", model.summary)
+    }
+
+    @Test
+    fun `reset returns to zero`() {
+        model.increment()
+        model.increment()
+        model.reset()
+        assertEquals("0 / 3", model.summary)
+        assertTrue(model.canIncrement)
+    }
+}

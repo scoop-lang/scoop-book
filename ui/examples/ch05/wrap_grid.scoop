@@ -1,0 +1,122 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.graphics.text:0.1.0
+import scoop.graphics.Paint
+import scoop.graphics.text.TextAlignment
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.component.label as textView
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** Badges flow onto a new line when the current one is full. */
+fun tags(names: Array<String>): View = wrap {
+    spacing = 6.0
+    lineSpacing = 6.0
+    for (name in names)
+        badge(name)
+}
+
+fun key(text: String): View = textView(text) { style { weight = Some(600) } }
+
+/** A row hugs its content, so the badge keeps its natural width inside a cell. */
+fun status(text: String): View = row { badge(text) }
+
+/** A fixed column for the names and a fractional column for the values. */
+fun facts(): View = grid {
+    columns = [GridTrack.Fixed(96.0), GridTrack.Fraction(1.0)]
+    rows = [GridTrack.Auto, GridTrack.Auto, GridTrack.Auto, GridTrack.Auto, GridTrack.Auto]
+    columnGap = 12.0
+    rowGap = 8.0
+    item(key("Language")) {
+        column = 0L
+        row = 0L
+    }
+    item(textView("Scoop")) {
+        column = 1L
+        row = 0L
+    }
+    item(key("Backend")) {
+        column = 0L
+        row = 1L
+    }
+    item(textView("LLVM, native code")) {
+        column = 1L
+        row = 1L
+    }
+    item(key("Version")) {
+        column = 0L
+        row = 2L
+    }
+    // The label fills its cell; align the text inside the label instead.
+    item(textView("0.1.0") { settings { alignment = TextAlignment.End } }) {
+        column = 1L
+        row = 2L
+    }
+    item(key("Status")) {
+        column = 0L
+        row = 3L
+    }
+    // The badge is narrower than the cell, so the cell alignment can move it.
+    item(status("stable")) {
+        column = 1L
+        row = 3L
+        horizontal = CrossAlignment.End
+    }
+    // One cell spanning both columns; its text wraps at the full grid width.
+    item(
+        textView(
+            "A note spanning both columns wraps at the combined width of the two tracks and the gap."
+        )
+    ) {
+        column = 0L
+        row = 4L
+        columnSpan = 2L
+    }
+}
+
+class ProjectCard(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val card = column {
+            spacing = 14.0
+            alignment = CrossAlignment.Stretch
+            typography("scoop-ui-book", TypographyRole.H4)
+            add(
+                tags(
+                    [
+                        "layout",
+                        "constraints",
+                        "text",
+                        "state",
+                        "forms",
+                        "focus",
+                        "overlays",
+                        "themes",
+                        "custom drawing"
+                    ]
+                )
+            )
+            separator()
+            add(facts())
+        }
+        val page = this.theme.read(scope).tokens.palette.background.background
+        return frame(
+            frame(card) {
+                width = Some(360.0)
+                padding = Some(Insets.all(20.0))
+                surface = Some(SurfaceKind.Elevated)
+            }
+        ) { style { background(Some(Paint(page))) } }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Project", { scope -> ProjectCard(scope) })
+    }
+}

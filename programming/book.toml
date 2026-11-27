@@ -8,6 +8,6 @@ src = "src"
 build-dir = "book"
 
 [output.html]
-# GitHub Pages 自定义域名；构建时写入 book/CNAME
-cname = "book.scoop-lang.org"
+# 发布在 https://book.scoop-lang.org/programming/；域名由站点根目录的 site/CNAME 提供
+site-url = "/programming/"
 additional-js = ["theme/scoop-highlight.js"]

@@ -1,0 +1,51 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.graphics.text:0.1.0
+import scoop.graphics.Paint
+import scoop.graphics.text.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** Four English sentences inside a right-to-left scope. */
+fun sentences(): View = direction(
+    column {
+        spacing = 10.0
+        alignment = CrossAlignment.Stretch
+        // A: no settings, so the paragraph inherits the RTL direction.
+        label("A: inherited direction.")
+        // B: any settings block starts from the default ParagraphStyle, which is LTR.
+        label("B: settings { maxLines } only.") { settings { maxLines = Some(2L) } }
+        // C: state the direction again together with other settings.
+        label("C: settings { direction = Rtl }.") { settings { direction = TextDirection.Rtl } }
+        // D: English text in an RTL interface: LTR paragraph, aligned to the logical end.
+        label("D: Ltr, aligned to the End.") {
+            settings {
+                direction = TextDirection.Ltr
+                alignment = TextAlignment.End
+            }
+        }
+    },
+    LayoutDirection.Rtl
+)
+
+class RtlDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(frame(sentences()) { width = Some(420.0) }) {
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("RTL paragraphs", { scope -> RtlDemo(scope) })
+    }
+}

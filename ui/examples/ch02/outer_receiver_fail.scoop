@@ -1,0 +1,27 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.ThemeMode
+import scoop.ui.style.ThemeSource
+import scoop.ui.style.shadcn.shadcnTheme
+
+class Counter(scope: ComponentScope) : Component(scope) {
+    private val count = state(0)
+
+    public override fun render(): View =
+        column {
+            spacing = 16.0
+            // Error: `count` is a member of Counter, but this block's receiver is the column builder.
+            label(f"Clicked ${count.value} times")
+            button("+1", { count.value += 1 })
+        }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Counter", { scope -> Counter(scope) })
+    }
+}

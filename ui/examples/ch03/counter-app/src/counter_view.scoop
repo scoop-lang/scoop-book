@@ -1,0 +1,36 @@
+package example.app
+
+import scoop.graphics.Paint
+import scoop.graphics.text.TextAlignment
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.currentThemeSource
+import scoop.ui.style.read
+
+/** Shows a CounterModel. The view keeps no data of its own; every button calls the model. */
+class CounterView(private val model: CounterModel, scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val model = this.model
+        val content = column {
+            spacing = 16.0
+            alignment = CrossAlignment.Center
+            typography("Counter", TypographyRole.H3) {
+                settings { alignment = TextAlignment.Center }
+            }
+            label(model.summary) { settings { alignment = TextAlignment.Center } }
+            row {
+                spacing = 8.0
+                button("-1", { model.decrement() }) {
+                    variant = ButtonVariant.Outline
+                    enabled = model.canDecrement
+                }
+                button("+1", { model.increment() }) { enabled = model.canIncrement }
+                button("Reset", { model.reset() }) { variant = ButtonVariant.Ghost }
+            }
+        }
+        val pageColor = this.theme.read(scope).tokens.palette.background.background
+        return frame(content) { style { background(Some(Paint(pageColor))) } }
+    }
+}

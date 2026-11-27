@@ -1,0 +1,158 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.window:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+import scoop.window.*
+
+/** Describes what arrived, in one line. */
+fun describe(content: DragContent): String = when (content) {
+    case Text(val text) -> f"text: ${text}"
+    case Url(val url) -> f"URL: ${url}"
+    case Files(val paths) -> f"${paths.size} file(s)"
+}
+
+/** A self-drawn area that offers a piece of text to drag out. */
+class DragChip(scope: ComponentScope) : Element<Unit>(scope) {
+    private val area = scope.createArea()
+    private val source = scope
+        .dragSource(area) { _ -> Some(DragSourceData(DragContent.Text("Dragged from Scoop"))) }
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        val size = constraints.constrain(Size(constraints.maxWidth ?: 300.0, 56.0))
+        context.measureChild(0L, Constraints(maxWidth = Some(size.width - 32.0)))
+        context.placeChild(0L, Point(16.0, 18.0))
+        return LayoutResult(LayoutMetrics(size), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        val bounds = Rect(0.0, 0.0, context.size.width, context.size.height)
+        context.place(area, bounds)
+        context
+            .draw { paint ->
+                paint.canvas.drawRoundRect(bounds, 8.0, 8.0, Paint(Color(0.88, 0.93, 1.0)))
+            }
+        context.children()
+    }
+}
+
+/** A self-drawn area that accepts dropped files or text and reports them. */
+class DropZone(private val props: Props<(String) -> Unit>, scope: ComponentScope) :
+    Element<Unit>(
+        scope
+    ) {
+    private val area = scope.createArea()
+    private val target = scope
+        .dropTarget(
+            area,
+            DropAreaHandlers(
+                offer = { offer, _ ->
+                    // Choose one of the formats that are actually offered.
+                    if (offer.formats.contains(DragFormat.Files) && offer.effects.copy)
+                        DropDecision.Accept(DragFormat.Files, DragEffect.Copy)
+                    else if (offer.formats.contains(DragFormat.Text) && offer.effects.copy)
+                        DropDecision.Accept(DragFormat.Text, DragEffect.Copy)
+                    else
+                        DropDecision.Reject
+                },
+                drop = { dropped, _ ->
+                    props.value(describe(dropped.content))
+                    // true means the data has really been taken.
+                    true
+                }
+            )
+        )
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        val size = constraints.constrain(Size(constraints.maxWidth ?: 300.0, 120.0))
+        context.measureChild(0L, Constraints(maxWidth = Some(size.width - 32.0)))
+        context.placeChild(0L, Point(16.0, 50.0))
+        return LayoutResult(LayoutMetrics(size), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        val bounds = Rect(0.0, 0.0, context.size.width, context.size.height)
+        // While something acceptable hovers over the zone, highlight it.
+        val color = when (target.hover) {
+            case Some(_) -> Color(0.80, 0.92, 0.82)
+            case None -> Color(0.95, 0.95, 0.96)
+        }
+        context.place(area, bounds)
+        context.draw { paint -> paint.canvas.drawRoundRect(bounds, 8.0, 8.0, Paint(color)) }
+        context.children()
+    }
+}
+
+class TransferDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val pasted = state("Nothing pasted yet.")
+    private val dropped = state("Nothing dropped yet.")
+
+    private fun copy() {
+        // One clipboard item with two representations of the same content.
+        scope
+            .nativeWindow
+            .clipboard
+            .writeTexts(
+                [
+                    ClipboardText("text/plain", "Hello from Scoop"),
+                    ClipboardText("text/html", "<b>Hello</b> from Scoop")
+                ]
+            )
+    }
+
+    private fun paste() {
+        pasted.value = when (val text = scope.nativeWindow.clipboard.readText()) {
+            case Some(val value) -> f"Pasted: ${value}"
+            case None -> "The clipboard has no plain text."
+        }
+    }
+
+    public override fun render(): View {
+        val copy: () -> Unit = { this.copy() }
+        val paste: () -> Unit = { this.paste() }
+        val dropped = this.dropped
+        val chip = element({ s -> DragChip(s) }, [label("Drag me: Dragged from Scoop")])
+        val zone = element(
+            { text: String -> dropped.value = f"Dropped ${text}" },
+            { p, s -> DropZone(p, s) },
+            [label(dropped.value)]
+        )
+        val page = column {
+            spacing = 12.0
+            alignment = CrossAlignment.Stretch
+            typography("Clipboard", TypographyRole.H4)
+            row {
+                spacing = 8.0
+                button("Copy", copy)
+                button("Paste", paste) { variant = ButtonVariant.Outline }
+            }
+            label(this @TransferDemo.pasted.value)
+            typography("Drag and drop", TypographyRole.H4)
+            add(chip)
+            add(zone)
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Transfer", { scope -> TransferDemo(scope) })
+    }
+}

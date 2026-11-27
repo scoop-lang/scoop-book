@@ -1,0 +1,22 @@
+schema = 1
+
+[cone]
+group = "example.app"
+name = "counter-app"
+version = "0.1.0"
+kind = "executable"
+
+[dependencies]
+"scoop:scoop.graphics" = "0.1.0"
+"scoop:scoop.graphics.text" = "0.1.0"
+"scoop:scoop.ui" = "0.1.0"
+"scoop:scoop.ui.component" = "0.1.0"
+"scoop:scoop.ui.style" = "0.1.0"
+"scoop:scoop.ui.style.shadcn" = "0.1.0"
+
+[test-dependencies]
+"scoop:scoop.test" = "0.1.0"
+
+# 在 Windows 上生成 GUI 程序，启动时不再附带控制台窗口；其他平台忽略这一节。
+[windows]
+subsystem = "gui"

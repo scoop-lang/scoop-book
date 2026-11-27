@@ -1,0 +1,116 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.graphics.text:0.1.0
+import scoop.graphics.Color
+import scoop.graphics.Paint
+import scoop.graphics.text.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.component.label as textView
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+val sample =
+    "Scoop lays out text with SkParagraph and HarfBuzz. Long paragraphs wrap at the available width, and the last visible line can end with an ellipsis."
+
+fun caption(text: String): View = textView(text) {
+    style {
+        fontSize = Some(12.0)
+        color = Some(Color(0.45, 0.45, 0.50))
+    }
+}
+
+fun tinted(content: View): View = frame(content) {
+    style { background(Some(Paint(Color(0.94, 0.95, 0.97)))) }
+}
+
+/** The same paragraph in a 230-wide box with the given alignment. */
+fun aligned(value: TextAlignment): View = frame(
+    tinted(textView(sample) { settings { alignment = value } })
+) { width = Some(230.0) }
+
+fun alignments(): View = row {
+    spacing = 16.0
+    add(aligned(TextAlignment.Start))
+    add(aligned(TextAlignment.End))
+    add(aligned(TextAlignment.Justify))
+}
+
+fun clamped(): View = textView(sample) { settings { maxLines = Some(1L) } }
+
+val note = "Line height and letter spacing change how dense a paragraph feels."
+
+/** Default spacing on the left, lineHeight 1.6 and letterSpacing 1.0 on the right. */
+fun spaced(): View {
+    val airy = textView(note) {
+        style {
+            lineHeight = Some(Some(1.6))
+            letterSpacing = Some(1.0)
+        }
+    }
+    return row {
+        spacing = 16.0
+        // Inside the block, frame(...) is the member that appends a child.
+        frame(tinted(textView(note))) { width = Some(300.0) }
+        frame(tinted(airy)) { width = Some(300.0) }
+    }
+}
+
+fun faces(): View = row {
+    spacing = 16.0
+    label("Serif") { style { families = Some(["serif"]) } }
+    label("Monospace") { style { families = Some(["monospace"]) } }
+    label("Light 300") { style { weight = Some(300) } }
+    label("Bold 700") { style { weight = Some(700) } }
+    label("Italic") { style { slant = Some(FontSlant.Italic) } }
+}
+
+fun scripts(): View = textView("中文、日本語、한국어、العربية and English share one paragraph.")
+
+/** In a right-to-left scope, Start means the right edge. */
+fun rightToLeft(): View = direction(
+    column {
+        spacing = 4.0
+        label("مرحبا بالعالم")
+        label("Start is the right edge here.")
+    },
+    LayoutDirection.Rtl
+)
+
+class ParagraphDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val page = column {
+            spacing = 8.0
+            alignment = CrossAlignment.Stretch
+            add(caption("settings { alignment = Start / End / Justify }"))
+            add(alignments())
+            add(caption("settings { maxLines = Some(1L) }"))
+            add(clamped())
+            add(caption("style { lineHeight = Some(Some(1.6)); letterSpacing = Some(1.0) }"))
+            add(spaced())
+            add(caption("style { families / weight / slant }"))
+            add(faces())
+            add(caption("Mixed scripts in one paragraph"))
+            add(scripts())
+            add(caption("direction(..., LayoutDirection.Rtl)"))
+            add(rightToLeft())
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Paragraphs", { scope -> ParagraphDemo(scope) })
+    }
+}

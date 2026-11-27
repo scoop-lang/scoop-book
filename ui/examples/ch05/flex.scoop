@@ -1,0 +1,100 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+import scoop.graphics.Paint
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.component.label as textView
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+fun caption(text: String): View = textView(text) {
+    style {
+        fontSize = Some(12.0)
+        weight = Some(600)
+    }
+}
+
+/** Three badges; `value` decides where the leftover space of the row goes. */
+fun badges(value: MainAlignment): View = row {
+    spacing = 6.0
+    justify = value
+    badge("A")
+    badge("B")
+    badge("C")
+}
+
+/** A caption with a fixed 110-wide basis, then the badges taking the remaining width. */
+fun justified(name: String, value: MainAlignment): View = row {
+    spacing = 12.0
+    alignment = CrossAlignment.Center
+    item(caption(name)) { basis = FlexBasis.Fixed(110.0) }
+    item(badges(value)) { grow = 1.0 }
+}
+
+/** The title grows, which pushes the buttons to the end of the row. */
+fun toolbar(): View = row {
+    spacing = 8.0
+    alignment = CrossAlignment.Center
+    item(textView("Untitled document")) { grow = 1.0 }
+    separator {
+        axis = FlexAxis.Vertical
+        length = Some(24.0)
+    }
+    button("Share", {}) { variant = ButtonVariant.Outline }
+    button("Save", {})
+}
+
+/** Different font sizes lined up on a common text baseline. */
+fun baselineRow(): View = row {
+    spacing = 8.0
+    alignment = CrossAlignment.Baseline
+    label("42") {
+        style {
+            fontSize = Some(32.0)
+            weight = Some(700)
+        }
+    }
+    label("tasks done this week")
+}
+
+class FlexDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val panel = column {
+            spacing = 10.0
+            alignment = CrossAlignment.Stretch
+            add(justified("Start", MainAlignment.Start))
+            add(justified("Center", MainAlignment.Center))
+            add(justified("End", MainAlignment.End))
+            add(justified("SpaceBetween", MainAlignment.SpaceBetween))
+            add(justified("SpaceAround", MainAlignment.SpaceAround))
+            add(justified("SpaceEvenly", MainAlignment.SpaceEvenly))
+            separator()
+            add(caption("grow = 1.0 on the title"))
+            add(toolbar())
+            add(caption("The same toolbar inside direction(..., LayoutDirection.Rtl)"))
+            direction(toolbar(), LayoutDirection.Rtl)
+            separator()
+            add(caption("alignment = CrossAlignment.Baseline"))
+            add(baselineRow())
+        }
+        val page = this.theme.read(scope).tokens.palette.background.background
+        return frame(
+            frame(panel) {
+                width = Some(440.0)
+                padding = Some(Insets.all(20.0))
+                surface = Some(SurfaceKind.Elevated)
+            }
+        ) { style { background(Some(Paint(page))) } }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Flex", { scope -> FlexDemo(scope) })
+    }
+}

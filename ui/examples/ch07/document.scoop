@@ -1,0 +1,65 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+import scoop.graphics.Paint
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+fun highlights(): View = typographyList {
+    item("Components keep their identity and their state between renders.")
+    item("Layout follows constraints: they flow down, sizes flow up.")
+    item("Text is shaped by HarfBuzz and can be selected and copied.")
+}
+
+fun status(): View = typographyTable {
+    header {
+        cell("Area")
+        cell("Status")
+    }
+    row {
+        cell("Layout and text")
+        cell("Ready")
+    }
+    row {
+        cell("Gestures on Windows")
+        cell("Being verified")
+    }
+}
+
+class ReleaseNotes(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val page = column {
+            spacing = 12.0
+            alignment = CrossAlignment.Stretch
+            typography("Release notes", TypographyRole.H2)
+            typography("What changed in this build, in one page.", TypographyRole.Lead)
+            typography("Highlights", TypographyRole.H4)
+            add(highlights())
+            typography(
+                "Describe what the screen should look like; the framework works out what changed.",
+                TypographyRole.Blockquote
+            )
+            add(status())
+            typography("Typography text can be selected and copied.", TypographyRole.Muted)
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(
+            frame(page) {
+                width = Some(560.0)
+                alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            }
+        ) { style { background(Some(Paint(background))) } }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Release notes", { scope -> ReleaseNotes(scope) })
+    }
+}

@@ -1,4 +1,7 @@
-/book/
+# 构建产物
+/programming/book/
+/ui/book/
+/_site/
 target/
 .DS_Store
 # 示例运行时生成，内容与本机 target 有关

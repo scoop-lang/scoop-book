@@ -1,8 +1,11 @@
-name: Deploy book
+name: Deploy books
 
+# 构建《Scoop 程序设计》（programming/）和《Scoop UI 编程指南》（ui/），
+# 与首页（site/）一起组装成站点，部署到 GitHub Pages（book.scoop-lang.org）。
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -12,8 +15,8 @@ permissions:
 
 # 同一时间只部署一次；新的推送不打断正在进行的部署
 concurrency:
-  group: pages
-  cancel-in-progress: false
+  group: pages-${{ github.event_name == 'pull_request' && github.ref || 'deploy' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
   MDBOOK_VERSION: 0.5.4
@@ -31,16 +34,19 @@ jobs:
           curl -sSL "$url" | tar -xz -C "$HOME/.local/bin"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Build
-        run: mdbook build
+      - name: Build both books and the home page
+        run: scripts/build-site.sh _site
 
       - uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
 
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
-          path: book
+          path: _site
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

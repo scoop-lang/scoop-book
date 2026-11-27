@@ -1,0 +1,92 @@
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+import scoop.graphics.Paint
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** Wrong: copies the first input into its own State and never reads Props again. */
+class CopyingView(private val props: Props<Int>, scope: ComponentScope) : Component(scope) {
+    private val shown = state(props.value)
+
+    public override fun render(): View = label(f"Copied into State: ${shown.value}")
+}
+
+/** Right: reads the latest input on every render. */
+class ReadingView(private val props: Props<Int>, scope: ComponentScope) : Component(scope) {
+    public override fun render(): View = label(f"Read from Props: ${props.value}")
+}
+
+/** Input of the step buttons: the current step and how to apply it. */
+struct StepInput(val step: Int, val add: (Int) -> Unit)
+
+class StepButtons(private val props: Props<StepInput>, scope: ComponentScope) : Component(scope) {
+    // Wrong: the step is read once, when the instance is created.
+    private val firstStep = props.value.step
+    private val stale: () -> Unit = { props.value.add(firstStep) }
+
+    // Right: the callback reads the current Props each time it runs.
+    private val current: () -> Unit = { props.value.add(props.value.step) }
+
+    public override fun render(): View {
+        val stale = this.stale
+        val current = this.current
+        return row {
+            spacing = 8.0
+            button("Add the captured step", stale) { variant = ButtonVariant.Outline }
+            button("Add the current step", current)
+        }
+    }
+}
+
+class PropsDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val count = state(0)
+    private val step = state(1)
+
+    public override fun render(): View {
+        val count = this.count
+        val step = this.step
+        val page = column {
+            spacing = 12.0
+            add(component(count.value, { p, s -> ReadingView(p, s) }))
+            add(component(count.value, { p, s -> CopyingView(p, s) }))
+            row {
+                spacing = 8.0
+                button("+1", { count.value += 1 })
+                button("Reset", { count.value = 0 }) { variant = ButtonVariant.Ghost }
+            }
+            separator()
+            row {
+                spacing = 8.0
+                alignment = CrossAlignment.Center
+                label(f"Step: ${step.value}")
+                button("Switch step", { step.value = if (step.value == 1) 10 else 1 }) {
+                    variant = ButtonVariant.Outline
+                }
+            }
+            add(
+                component(
+                    StepInput(step.value, { amount -> count.value += amount }),
+                    { p, s -> StepButtons(p, s) }
+                )
+            )
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Props", { scope -> PropsDemo(scope) })
+    }
+}

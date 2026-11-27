@@ -1,0 +1,13 @@
+[book]
+title = "Scoop UI 编程指南"
+authors = ["Chen Xu"]
+language = "zh-CN"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[output.html]
+# 发布在 https://book.scoop-lang.org/ui/；域名由站点根目录的 site/CNAME 提供
+site-url = "/ui/"
+additional-js = ["theme/scoop-highlight.js"]
