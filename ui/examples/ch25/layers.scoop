@@ -1,0 +1,141 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.math:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.math.PI
+import scoop.math.cos
+import scoop.math.sin
+import scoop.text.substring
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** An 8×8 heart, one character per pixel. */
+val heartRows = [
+    "........",
+    ".XX.XX..",
+    "XXXXXXX.",
+    "XXXXXXX.",
+    ".XXXXX..",
+    "..XXX...",
+    "...X....",
+    "........"
+]
+
+/** Builds straight-alpha RGBA8 bytes, four per pixel, row by row. */
+fun heartPixels(): Array<Byte> {
+    val bytes = ArrayList<Byte>()
+    for (row in heartRows) {
+        for (index in 0L..<8L) {
+            val red = row.substring(index, index + 1L) == "X"
+            bytes.add(if (red) 220.toByte() else 255.toByte())
+            bytes.add(if (red) 40.toByte() else 232.toByte())
+            bytes.add(if (red) 60.toByte() else 236.toByte())
+            bytes.add(255.toByte())
+        }
+    }
+    return bytes.toArray()
+}
+
+/** A five-pointed star around the origin. */
+fun star(outer: Double, inner: Double): Path = path {
+    for (index in 0..9) {
+        val r = if (index % 2 == 0) outer else inner
+        val angle = -PI / 2.0 + PI * index.toDouble() / 5.0
+        val point = Point(r * cos(angle), r * sin(angle))
+        if (index == 0) moveTo(point) else lineTo(point)
+    }
+    closeContour()
+}
+
+/** Captions under the five panels, by horizontal center. */
+val captionCenters = [72.0, 192.0, 304.0, 444.0, 580.0]
+
+class Layers(scope: ComponentScope) : Element<Unit>(scope) {
+    private var heart: Image? = None
+    private var shape: Path? = None
+    private var shadow: ImageFilter? = None
+
+    public override fun onMount() {
+        heart = Some(scope.resource { Image.fromRgba(8, 8, heartPixels()) })
+        shape = Some(scope.resource { star(40.0, 17.0) })
+        shadow = Some(
+            scope
+                .resource {
+                    ImageFilter.dropShadow(Point(4.0, 6.0), 4.0, 4.0, Color.Black.withAlpha(0.45))
+                }
+        )
+    }
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        for (index in 0L..<5L) {
+            val caption = context.measureChild(index, Constraints())
+            context
+                .placeChild(index, Point(captionCenters[index] - caption.size.width / 2.0, 132.0))
+        }
+        return LayoutResult(LayoutMetrics(constraints.constrain(Size(660.0, 160.0))), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        val blue = Color(0.18, 0.42, 0.85)
+        val orange = Color(0.95, 0.55, 0.15)
+        context
+            .draw { paint ->
+                val canvas = paint.canvas
+                // The same 8×8 image scaled 12 times, with two sampling modes.
+                canvas.drawImage(heart!!, Rect(24.0, 24.0, 96.0, 96.0), ImageSampling.Nearest)
+                canvas.drawImage(heart!!, Rect(144.0, 24.0, 96.0, 96.0), ImageSampling.Linear)
+
+                // Each circle is 50% transparent: the overlap is darker.
+                canvas.drawCircle(Point(284.0, 72.0), 32.0, Paint(blue.withAlpha(0.5)))
+                canvas.drawCircle(Point(324.0, 72.0), 32.0, Paint(orange.withAlpha(0.5)))
+
+                // Opaque circles in a layer that is composited at 50% as a whole.
+                canvas.saveLayer(opacity = 0.5)
+                canvas.drawCircle(Point(424.0, 72.0), 32.0, Paint(blue))
+                canvas.drawCircle(Point(464.0, 72.0), 32.0, Paint(orange))
+                canvas.restore()
+
+                // A filter on the layer: the shadow follows whatever was drawn inside.
+                canvas.saveLayer(filter = Some(shadow!!))
+                canvas.translate(580.0, 72.0)
+                canvas.drawPath(shape!!, Paint(Color(0.98, 0.76, 0.18)))
+                canvas.drawCircle(Point(0.0, 0.0), 8.0, Paint(Color.White))
+                canvas.restore()
+            }
+        context.children()
+    }
+}
+
+class LayersDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val captions = [
+            label("Nearest"),
+            label("Linear"),
+            label("Each 50%"),
+            label("Group 50%"),
+            label("Drop shadow")
+        ]
+        val content = element({ mount -> Layers(mount) }, captions)
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(content) {
+            padding = Some(Insets.all(16.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Layers", { scope -> LayersDemo(scope) })
+    }
+}

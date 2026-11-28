@@ -1,0 +1,122 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.macos:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.macos.macosTheme
+import scoop.ui.text.TextEditorState
+
+val danger = Color(0.86, 0.18, 0.16)
+
+/** A reusable destructive button: red fill, no border, darker when pressed. */
+val dangerButton = buttonStyle {
+    surface {
+        style {
+            background(Some(Paint(danger)))
+            border(None)
+            corners(Corners.all(14.0))
+        }
+    }
+    text { color = Some(Color.White) }
+    states {
+        hovered { background(Some(Paint(mixThemeColor(danger, Color.White, 0.15)))) }
+        pressed { background(Some(Paint(mixThemeColor(danger, Color.Black, 0.25)))) }
+    }
+}
+
+/** A larger, round checkbox next to its caption. */
+fun option(value: Binding<Boolean>, text: String): View = row {
+    checkbox(value) {
+        style {
+            marker {
+                size = Some(18.0)
+                style { corners(Corners.all(9.0)) }
+            }
+        }
+    }
+    label(text)
+    spacing = 6.0
+    alignment = CrossAlignment.Center
+}
+
+class Styles(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val shadow = state(false)
+    private val glow = state(false)
+    private val blur = state(false)
+    private val removed = state(0)
+    private val note = TextEditorState()
+
+    public override fun render(): View {
+        val removed = this.removed
+        val palette = this.theme.read(scope).tokens.palette
+
+        // Content effects run in array order on the card's actual pixels.
+        val effects = ArrayList<ContentEffect>()
+        if (this.shadow.value)
+            effects
+                .add(
+                    ContentEffect.DropShadow(Point(3.0, 3.0), 2.0, 2.0, Color.Black.withAlpha(0.5))
+                )
+        if (this.glow.value)
+            effects.add(ContentEffect.Glow(4.0, 4.0, palette.primary.background.withAlpha(0.8)))
+        if (this.blur.value) effects.add(ContentEffect.Blur(1.5, 1.5))
+        val effectArray = effects.toArray()
+
+        // styled adds no padding of its own: the frame provides the room inside the card.
+        val card = styled(frame(label("Styled card")) { padding = Some(Insets.all(24.0)) }) {
+            style {
+                background = Some(Paint(palette.card.background))
+                border = Some(Border.all(1.0, palette.border))
+                corners = Corners.all(12.0)
+                boxShadows = [BoxShadow(Point(0.0, 4.0), 6.0, 6.0, Color.Black.withAlpha(0.2))]
+                contentEffects = effectArray
+            }
+        }
+        val noteField = input(this.note) {
+            placeholder = "Rounded input"
+            style {
+                caretColor = Some(danger)
+                surface { style { corners(Corners.all(14.0)) } }
+            }
+        }
+        val options = [
+            option(this.shadow.binding(), "Drop shadow"),
+            option(this.glow.binding(), "Glow"),
+            option(this.blur.binding(), "Blur")
+        ]
+        val page = column {
+            frame(card) { width = Some(360.0) }
+            row {
+                addAll(options)
+                spacing = 16.0
+                alignment = CrossAlignment.Center
+            }
+            row {
+                button(f"Delete (${removed.value})", { removed.value += 1 }) {
+                    style = dangerButton
+                }
+                button("Cancel", {})
+                spacing = 12.0
+                alignment = CrossAlignment.Center
+            }
+            frame(noteField) { width = Some(260.0) }
+            spacing = 16.0
+        }
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(palette.background.background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(macosTheme(ThemeMode.Light))) {
+        runUiApplication("Styles", { scope -> Styles(scope) })
+    }
+}

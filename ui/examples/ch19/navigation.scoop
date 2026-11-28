@@ -1,0 +1,87 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+import scoop.ui.text.TextEditorState
+
+/** Where the user is. The controls below only show it and ask to change it. */
+class NavModel {
+    val page = state("Overview")
+    val menuOpen = state<ViewKey?>(None)
+    val tab = state<Int?>(Some(0))
+    val resultPage = state(1L)
+    val notes = TextEditorState("Drafts survive switching tabs.")
+
+    fun navigate(target: String) {
+        page.value = target
+        // Close the open panel after a navigation.
+        menuOpen.value = None
+    }
+}
+
+fun guidesPanel(model: NavModel): View = column {
+    navigationMenuLink("Getting started", { model.navigate("Getting started") })
+    navigationMenuLink("Language guide", { model.navigate("Language guide") })
+    navigationMenuLink("UI tutorial", { model.navigate("UI tutorial") })
+    spacing = 4.0
+    alignment = CrossAlignment.Stretch
+}
+
+fun resultsPanel(model: NavModel): View = column {
+    typography(f"Showing results page ${model.resultPage.value} of 12", TypographyRole.P)
+    pagination(model.resultPage.binding(), 12L)
+    spacing = 12.0
+    alignment = CrossAlignment.Start
+}
+
+class Navigation(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val model = NavModel()
+
+    public override fun render(): View {
+        val model = this.model
+        val guides = guidesPanel(model)
+        val overview = typography(f"You are reading: ${model.page.value}", TypographyRole.P)
+        val notes = input(model.notes)
+        val results = resultsPanel(model)
+        val page = column {
+            navigationMenu(Some(model.menuOpen.binding())) {
+                link(ViewKey.Text("home"), "Home", { model.navigate("Overview") })
+                item(ViewKey.Text("guides"), "Guides", guides)
+            }
+            breadcrumb {
+                item("Home", { model.navigate("Overview") })
+                item("Guides", { model.navigate("Guides") })
+                current(model.page.value)
+            }
+            tabs(model.tab.binding()) {
+                variant = TabsVariant.Line
+                // Keep the Notes editor alive while another tab is shown.
+                retention = ContentRetention.KeepMounted
+                item(Choice(ViewKey.Text("overview"), 0, "Overview"), overview)
+                item(Choice(ViewKey.Text("notes"), 1, "Notes"), notes)
+                item(Choice(ViewKey.Text("results"), 2, "Results"), results)
+            }
+            spacing = 20.0
+            alignment = CrossAlignment.Stretch
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Navigation", { scope -> Navigation(scope) })
+    }
+}

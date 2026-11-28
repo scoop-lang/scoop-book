@@ -1,0 +1,123 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.graphics.svg:0.1.0
+//! dep: scoop:scoop.icons.lucide:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.graphics.svg.SvgDocument
+import scoop.icons.lucide.download
+import scoop.icons.lucide.save
+import scoop.icons.lucide.search
+import scoop.icons.lucide.settings
+import scoop.icons.lucide.trash2
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** Draws a 320×180 picture: a sky, a sun and a hill. */
+fun landscape(): Image {
+    val surface = RasterSurface(320, 180)
+    surface
+        .draw { canvas ->
+            canvas.drawRect(Rect(0.0, 0.0, 320.0, 180.0), Paint(Color(0.55, 0.75, 0.95)))
+            canvas.drawCircle(Point(250.0, 50.0), 28.0, Paint(Color(1.0, 0.82, 0.30)))
+            canvas.drawCircle(Point(90.0, 230.0), 140.0, Paint(Color(0.35, 0.62, 0.38)))
+        }
+    val image = surface.snapshot()
+    surface.close()
+    return image
+}
+
+val badgeSvg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <circle cx="32" cy="32" r="30" fill="#4f46e5"/>
+  <path d="M20 33 l8 8 l16 -18" stroke="white" stroke-width="6" fill="none"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>"""
+
+fun fitName(fit: ContentFit): String = when (fit) {
+    case Contain -> "Contain"
+    case Cover -> "Cover"
+    case Fill -> "Fill"
+    case None -> "None"
+}
+
+class Media(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    // The component owns these resources; the views below only borrow them.
+    private val picture = scope.resource { landscape() }
+    private val checkBadge = scope.resource { SvgDocument.parse(badgeSvg) }
+    private val saved = state("Nothing saved yet")
+
+    public override fun render(): View {
+        val picture = this.picture
+        val saved = this.saved
+        val frames = ArrayList<View>()
+        for (fit in [ContentFit.Contain, ContentFit.Cover, ContentFit.Fill, ContentFit.None]) {
+            val image = imageView(picture, Size(320.0, 180.0)) { this.fit = fit }
+            // aspectRatio hands the image view an exact 4:3 box; the 16:9 picture must fit into it.
+            // A grey backdrop makes the empty or cropped parts visible.
+            val boxed = frame(aspectRatio(image, 4.0 / 3.0)) {
+                width = Some(160.0)
+                style { background(Some(Paint(Color(0.90, 0.90, 0.92)))) }
+            }
+            frames
+                .add(
+                    column {
+                        add(boxed)
+                        typography(fitName(fit), TypographyRole.Small)
+                        spacing = 6.0
+                    }
+                )
+        }
+        val icons = row {
+            for (asset in [search, settings, download, trash2])
+                icon(asset) { size = 24.0 }
+            icon(settings) {
+                size = 32.0
+                color = Some(Color(0.31, 0.27, 0.90))
+                absoluteStrokeWidth = true
+            }
+            spacing = 16.0
+            alignment = CrossAlignment.Center
+        }
+        val saveButton = button({ style -> style.icon(save) }, { saved.value = "Saved" }) {
+            variant = ButtonVariant.Outline
+            semantics = ComponentSemantics(name = Some("Save"))
+        }
+        val badge = svgView(this.checkBadge) { naturalSize = Some(Size(48.0, 48.0)) }
+        val page = column {
+            typography("Image fit", TypographyRole.H4)
+            row {
+                addAll(frames.toArray())
+                spacing = 16.0
+            }
+            typography("Lucide icons", TypographyRole.H4)
+            add(icons)
+            row {
+                add(saveButton)
+                typography(saved.value, TypographyRole.Muted)
+                spacing = 12.0
+                alignment = CrossAlignment.Center
+            }
+            typography("SVG", TypographyRole.H4)
+            add(badge)
+            spacing = 16.0
+            alignment = CrossAlignment.Start
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Media", { scope -> Media(scope) })
+    }
+}

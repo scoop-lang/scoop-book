@@ -1,0 +1,102 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+import scoop.ui.text.TextEditorState
+
+fun modeName(mode: OverlayMode): String = when (mode) {
+    case NonModal -> "NonModal"
+    case FocusContained -> "FocusContained"
+    case Modal -> "Modal"
+}
+
+class Popovers(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    // The application owns "is it open"; the popover only reads and requests changes.
+    private val open = state(false)
+    private val overlayMode = state(OverlayMode.NonModal)
+    private val locked = state(false)
+    private val saved = state("No name saved yet")
+    private val name = TextEditorState("Ada")
+    private val nameFocus = FocusHandle()
+    private val closer = OverlayHandle()
+
+    public override fun render(): View {
+        val open = this.open
+        val overlayMode = this.overlayMode
+        val locked = this.locked
+        val saved = this.saved
+        val name = this.name
+        val nameFocus = this.nameFocus
+        val closer = this.closer
+        val save = button("Save", { saved.value = f"Saved: ${name.text}" })
+        val profile = column {
+            typography("Ada Lovelace", TypographyRole.Large)
+            typography("Wrote the first published program.", TypographyRole.Muted)
+            spacing = 4.0
+        }
+        // Built outside the row: inside a builder, typography(...) adds a child instead.
+        val handleName = typography("@ada", TypographyRole.P)
+        val form = column {
+            input(name) { focus = FocusOptions(Some(nameFocus)) }
+            button("Done", { closer.requestClose() })
+            button(
+                if (locked.value) "Unlock closing" else "Lock closing",
+                { locked.value = !locked.value }
+            ) { variant = ButtonVariant.Ghost }
+            spacing = 8.0
+            alignment = CrossAlignment.Stretch
+        }
+        val page = column {
+            row {
+                tooltip(save, "Save the current name")
+                hoverCard(handleName, profile)
+                spacing = 16.0
+                alignment = CrossAlignment.Center
+            }
+            row {
+                for (each in [OverlayMode.NonModal, OverlayMode.FocusContained, OverlayMode.Modal])
+                    button(modeName(each), { overlayMode.value = each }) {
+                        variant = if (overlayMode.value == each)
+                            ButtonVariant.Default
+                        else
+                            ButtonVariant.Outline
+                    }
+                spacing = 8.0
+            }
+            // A row keeps the trigger at its own width instead of the column's.
+            row {
+                popover(open.binding(), form) {
+                    trigger("Edit name")
+                    title("Display name")
+                    description("Changes apply when you press Save.")
+                    mode = overlayMode.value
+                    focus = OverlayFocusOptions(Some(nameFocus))
+                    handle = Some(closer)
+                    onCloseRequest = { _ -> !locked.value }
+                }
+            }
+            typography(f"${saved.value} · open = ${open.value}", TypographyRole.Muted)
+            spacing = 16.0
+            alignment = CrossAlignment.Start
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Popovers", { scope -> Popovers(scope) })
+    }
+}

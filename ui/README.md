@@ -24,7 +24,7 @@ scripts/check-examples.sh                 # 校验全部示例（默认使用 ~/
 scripts/check-examples.sh examples/ch04   # 只校验某一章
 ```
 
-示例按 `0.0.0-dev.local.20261127064200998720`（`afced70c`）版工具链校验，需要安装 GUI 组件（`scoop-install component add gui --target <目标>`）。可用 `SCOOP=/path/to/toolchain/bin/scoop scripts/check-examples.sh` 显式选择工具链。每个 GUI 程序的构建要二十秒左右，全部示例校验一遍需要几分钟。
+示例按 `0.0.0-dev.20261128`（`ec7df9db`）版工具链校验，需要安装 GUI 组件（`scoop-install component add gui --target <目标>`）。可用 `SCOOP=/path/to/toolchain/bin/scoop scripts/check-examples.sh` 显式选择工具链。每个 GUI 程序的构建要二十秒左右，全部示例校验一遍需要几分钟。
 
 ## 示例约定
 

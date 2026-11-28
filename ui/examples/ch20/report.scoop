@@ -1,0 +1,113 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+fun visitorData(): ChartData {
+    val months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+    return ChartData(
+        Array<ChartDatum>(months.size) { at -> ChartDatum(ChartDatumKey(months[at]), months[at]) },
+        [
+            ChartSeries(
+                ChartSeriesKey("desktop"),
+                "Desktop",
+                [Some(186.0), Some(305.0), Some(237.0), Some(73.0), Some(209.0), Some(214.0)]
+            ),
+            ChartSeries(
+                ChartSeriesKey("mobile"),
+                "Mobile",
+                [Some(80.0), Some(200.0), Some(120.0), Some(190.0), Some(130.0), Some(140.0)]
+            )
+        ]
+    )
+}
+
+fun kindName(kind: ChartKind): String = when (kind) {
+    case Bar -> "Bar"
+    case Line -> "Line"
+    case Area -> "Area"
+    else -> "Other"
+}
+
+fun conversation(): View {
+    val question = bubble("Can you summarize last month's traffic?") {
+        align = MessageAlignment.End
+    }
+    val details = typography("Loaded 6 months of data.", TypographyRole.Muted)
+    val answer = bubble("Desktop visits peaked in February.") { variant = BubbleVariant.Secondary }
+    val assistant = avatar("AI")
+    return column {
+        marker("Today at 10:24") { variant = MarkerVariant.Separator }
+        message(question) { align = MessageAlignment.End }
+        trace("Read the analytics report", details) { status = TraceStatus.Complete }
+        traceLine("Drafting the summary") { status = TraceStatus.Running }
+        message(answer) {
+            avatar = Some(assistant)
+            header("Assistant")
+            footer("Just now")
+        }
+        spacing = 12.0
+        alignment = CrossAlignment.Stretch
+    }
+}
+
+class Report(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val kind = state(ChartKind.Bar)
+    // The chart borrows its data from a model the app owns, like an editor state.
+    private val visitors = ChartModel(visitorData())
+
+    public override fun render(): View {
+        val kind = this.kind
+        val left = column {
+            row {
+                for (each in [ChartKind.Bar, ChartKind.Line, ChartKind.Area])
+                    button(kindName(each), { kind.value = each }) {
+                        variant = if (kind.value == each)
+                            ButtonVariant.Default
+                        else
+                            ButtonVariant.Outline
+                    }
+                spacing = 8.0
+            }
+            chart(this @Report.visitors) {
+                this.kind = kind.value
+                curve = ChartCurve.Monotone
+                height = Some(260.0)
+            }
+            spacing = 16.0
+            alignment = CrossAlignment.Stretch
+        }
+        val talk = conversation()
+        val page = row {
+            item(left) {
+                grow = 1.0
+                basis = FlexBasis.Fixed(0.0)
+            }
+            item(talk) {
+                grow = 1.0
+                basis = FlexBasis.Fixed(0.0)
+            }
+            spacing = 32.0
+            alignment = CrossAlignment.Start
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Report", { scope -> Report(scope) })
+    }
+}

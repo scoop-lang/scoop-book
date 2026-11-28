@@ -96,19 +96,21 @@ this.onSubmit = { editor -> greeting.value = f"Hello, ${editor.text}!" }
 this.policy = textEditPolicy {
     this.maxLength = Some(11L)
     this.paste { candidate -> stripSeparators(candidate) }
-    this.accepts { text -> digitsOnly(text) }
+    this.acceptsInsertedText { text -> digitsOnly(text) }
 }
 ```
 
 策略中的各项按固定的顺序执行：
 
-1. **单行时替换换行。** `input` 总是单行的，粘贴进来的换行会被替换成空格。
+1. **单行时替换换行。** `input` 总是单行的，粘贴进来的每个换行都被替换成一个空格，`\r\n` 算作一个换行。在策略中把 `singleLine` 设为 true 也是这样。
 2. **`paste`**：只处理粘贴、拖放和辅助功能写入的文字。
 3. **`transform`**：处理所有来源的编辑，包括键盘输入。
-4. **`accepts`**：逐段检查这次编辑新插入的文字，有一段返回 false，**整次编辑都被丢弃**。
+4. **`acceptsInsertedText`**：逐段检查这次编辑新插入的文字，有一段返回 false，**整次编辑都被丢弃**。它检查的是经过 `paste` 和 `transform` 改写之后的文字。
 5. **`maxLength`**：限制总长度，超出的部分被截掉。
 
-`paste` 和 `transform` 的回调接收一个 `TextEditCandidate`，其中 `before` 是编辑前的内容，`after` 是编辑后的内容，`source` 说明这次编辑来自哪里：键盘输入、粘贴、编辑命令、程序、辅助功能还是拖放。回调返回一个 `TextEditDecision`：
+第 1 步不只在开头做一次。单行时，`paste` 和 `transform` 替换进来的文字如果含有换行，也会先被换成空格，再交给下一步。所以无论回调怎样改写，单行输入框里都不会出现换行，后面的回调看到的也已经是单行的文字。
+
+`paste` 和 `transform` 的回调接收一个 `TextEditCandidate`，其中 `before` 是编辑前的内容，`after` 是编辑后的内容（已经包含前面各步的改写），`insertedRanges` 是这次新插入的文字在 `after.text` 中的范围，`source` 说明这次编辑来自哪里：键盘输入、粘贴、编辑命令、程序、辅助功能还是拖放。回调返回一个 `TextEditDecision`：
 
 - `Accept`：原样接受；
 - `Reject`：拒绝整次编辑；
@@ -120,13 +122,13 @@ this.policy = textEditPolicy {
 
 - **长度。** 姓名框的 `maxLength` 是 20。写入 `Augusta Ada King-Noel, Countess of Lovelace`，框中只留下前 20 个字符 `Augusta Ada King-Noe`，多出的部分被截掉，而不是整段被拒绝。长度按用户看到的字符计算，一个由多个码点组成的表情也只算一个。
 - **内容。** 手机号框一次写入 `138abc`，整次编辑被拒绝，输入框仍然是空的；写入 `13800138000` 则一切正常。
-- **粘贴。** 在别处复制 `138-0013 8000`，在手机号框中按 ⌘V，框中得到 `13800138000`：`paste` 先去掉了空格和短横线，剩下的数字再通过 `accepts` 的检查。
+- **粘贴。** 在别处复制 `138-0013 8000`，在手机号框中按 ⌘V，框中得到 `13800138000`：`paste` 先去掉了空格和短横线，剩下的数字再通过 `acceptsInsertedText` 的检查。
 
 几点建议：
 
 - **策略只保证“输入框里不会出现什么”，不是表单校验。** 一个只有 3 位的手机号完全能通过上面的策略。内容是否完整、是否合法，交给业务模型判断，第 13 章会讲。
 - **能改写就不要拒绝。** 用户粘贴了一段带空格的号码，直接去掉空格比让粘贴“没反应”友好得多。
-- **`accepts` 要写成对片段的判断。** 它看到的是新插入的那一段，不是整个文本。
+- **`acceptsInsertedText` 要写成对片段的判断。** 正如名字所说，它看到的是新插入的那一段，不是整个文本。需要检查编辑后的完整内容时，在 `transform` 中读 `candidate.after.text`，不合要求就返回 `TextEditDecision.Reject`。
 
 ## 12.5　密码框：显示投影与受保护文本
 
@@ -194,7 +196,7 @@ this.input(phone) {
 
 - **在 `render()` 中创建 `TextEditorState`。** 每次 `render()` 都得到一个空的新模型，用户输入的内容一闪而过。把它放在字段或 Store 中。
 - **把编辑策略当作表单校验。** 策略只能挡住不该出现的字符，不能判断内容是否完整。完整性交给业务模型。
-- **用 `accepts` 检查整段文字。** 它收到的是新插入的片段。
+- **用 `acceptsInsertedText` 检查整段文字。** 它收到的是新插入的片段。完整内容在 `transform` 的 `candidate.after.text` 中。
 - **在 `Transform` 中按字符个数计算范围。** 替换范围是 UTF-8 字节偏移。
 - **显示密码明文时去掉 `protectedText`。** 显示方式用 `projection` 切换，保护标记一直保留。
 - **把 `inputPurpose` 当成限制。** 它只是给平台的提示，用户仍然可以输入任何字符。
@@ -203,7 +205,7 @@ this.input(phone) {
 
 - 文本的编辑模型 `TextEditorState` 由调用方持有，控件只是借用；内容、选区和撤销历史都在模型里，读 `text` 会成为依赖。
 - `input` 是单行输入框，`textarea` 是多行输入框；`onSubmit` 在回车（`textarea` 默认是 Primary+回车）时调用。
-- 编辑策略按“替换换行、`paste`、`transform`、`accepts`、`maxLength`”的顺序执行；`accepts` 有一段不通过就丢弃整次编辑，`maxLength` 截掉超出的部分。
+- 编辑策略按“替换换行、`paste`、`transform`、`acceptsInsertedText`、`maxLength`”的顺序执行；单行时，回调替换进来的换行同样变成空格；`acceptsInsertedText` 有一段不通过就丢弃整次编辑，`maxLength` 截掉超出的部分。
 - 密码框用 `projection` 切换显示，用 `protectedText` 声明敏感内容，两者相互独立。
 - `inputGroup` 组合前后附加内容，`inputOtp` 用一个模型实现多格验证码。
 - `inputPurpose` 和 `softwareKeyboard` 是给平台的提示；上下文菜单和系统文本服务用 `contextMenu { ... }` 配置。

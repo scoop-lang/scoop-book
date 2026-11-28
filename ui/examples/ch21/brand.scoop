@@ -1,0 +1,97 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.macos:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.macos.macosTheme
+
+/** A macOS preset with a brand color, larger text and flat action buttons. */
+fun brandTheme(mode: ThemeMode): ShapeTheme {
+    val brand = Color(0.45, 0.22, 0.85)
+    // Normal, hovered, pressed and disabled colors of the brand fill.
+    val brandFill = StateColors(
+        brand,
+        mixThemeColor(brand, Color.White, 0.12),
+        mixThemeColor(brand, Color.Black, 0.18),
+        brand.withAlpha(0.4)
+    )
+    return macosTheme(mode) {
+        tokens {
+            palette {
+                primary = ColorPair(brand, Color.White)
+                ring = brand
+            }
+            typography { body { fontSize = 15.0 } }
+        }
+        // Palette tokens do not rewrite parts: update the parts that use the brand.
+        surfaces {
+            action {
+                fill = brandFill
+                border = brandFill
+                shadows = []
+            }
+        }
+        checkbox {
+            appearance {
+                selected = brandFill
+                selectedBorder = brandFill
+            }
+        }
+    }
+}
+
+class Brand(private val brand: ShapeTheme, scope: ComponentScope) : Component(scope) {
+    // Captured while the component is constructed inside context(source).
+    private val theme = currentThemeSource()
+    private val count = state(0)
+    private val large = state(false)
+
+    public override fun render(): View {
+        val count = this.count
+        val large = this.large
+        val source = this.theme
+        val brand = this.brand
+        val palette = source.read(scope).tokens.palette
+        val page = column {
+            label("Brand theme")
+            row {
+                button(f"Clicked ${count.value} times", { count.value += 1 })
+                checkbox(initialChecked = true)
+                label("Uses the brand color")
+                spacing = 12.0
+                alignment = CrossAlignment.Center
+            }
+            // In a row the button keeps its natural width; directly in a column it would fill it.
+            row {
+                button(
+                    if (large.value) "Normal text" else "Larger text",
+                    {
+                        large.value = !large.value
+                        // copy derives a new value; the original brand theme is unchanged.
+                        source.current.value = if (large.value)
+                            brand.copy { tokens { typography { body { fontSize = 19.0 } } } }
+                        else
+                            brand
+                    }
+                ) { variant = ButtonVariant.Outline }
+            }
+            spacing = 12.0
+        }
+        return frame(page) {
+            padding = Some(Insets.all(20.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(palette.background.background))) }
+        }
+    }
+}
+
+fun main() {
+    val brand = brandTheme(ThemeMode.Light)
+    context(ThemeSource(brand)) {
+        runUiApplication("Brand theme", { scope -> Brand(brand, scope) })
+    }
+}

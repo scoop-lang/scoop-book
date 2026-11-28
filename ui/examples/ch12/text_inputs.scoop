@@ -76,7 +76,7 @@ class TextInputs(scope: ComponentScope) : Component(scope) {
                     this.policy = textEditPolicy {
                         this.maxLength = Some(11L)
                         this.paste { candidate -> stripSeparators(candidate) }
-                        this.accepts { text -> digitsOnly(text) }
+                        this.acceptsInsertedText { text -> digitsOnly(text) }
                     }
                 }
             this

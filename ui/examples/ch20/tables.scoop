@@ -1,0 +1,139 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.text.contains
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+import scoop.ui.text.TextEditorState
+
+class Payment(val id: Long, val email: String, val amount: Int, val status: String)
+
+fun samplePayments(): TableRows<Payment> {
+    val emails = ["ada@example.com", "lin@example.com", "mika@example.com", "grace@example.org"]
+    val statuses = ["Success", "Processing", "Pending"]
+    return TableRows(
+        Array<TableRecord<Payment>>(40L) { index ->
+            // The key is the payment's own id, not its position on screen.
+            TableRecord(
+                ViewKey.Number(index),
+                Payment(
+                    index,
+                    emails[index % 4L],
+                    (100L + index * 35L % 400L).toInt(),
+                    statuses[index % 3L]
+                )
+            )
+        }
+    )
+}
+
+fun paymentColumns(): Array<TableColumn<Payment>> = [
+    TableColumn(
+        "status",
+        "Status",
+        { row -> badge(row.status) { variant = ButtonVariant.Secondary } },
+        TableColumnSize(GridTrack.Auto, minimum = 112.0, samples = ["Processing"]),
+        compare = Some { a, b -> a.status.compareTo(b.status).toInt() }
+    ),
+    TableColumn(
+        "email",
+        "Email",
+        { row -> label(row.email) },
+        TableColumnSize(GridTrack.Fraction(1.0), minimum = 200.0),
+        compare = Some { a, b -> a.email.compareTo(b.email).toInt() },
+        filter = Some { row, text -> row.email.contains(text) }
+    ),
+    TableColumn(
+        "amount",
+        "Amount",
+        { row -> label(f"USD ${row.amount}") },
+        TableColumnSize(GridTrack.Fixed(120.0), minimum = 100.0),
+        alignment = AxisAlignment.End,
+        compare = Some { a, b -> a.amount - b.amount }
+    )
+]
+
+fun invoiceTable(): View = table {
+    header {
+        row {
+            head("Invoice")
+            head("Method")
+            head("Amount") { alignment = AxisAlignment.End }
+        }
+    }
+    body {
+        for (index in 0L..<3L)
+            row(ViewKey.Number(index)) {
+                cell(f"INV00${index + 1L}")
+                cell(["Credit Card", "PayPal", "Bank Transfer"][index])
+                cell(f"USD ${150L + index * 50L}") { alignment = AxisAlignment.End }
+            }
+    }
+    footer {
+        row {
+            cell("Total") { span = 2L }
+            cell("USD 600") { alignment = AxisAlignment.End }
+        }
+    }
+    caption("Recent invoices.")
+}
+
+class Tables(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val query = TextEditorState()
+    // Rows, columns, sorting, filters, paging and selection all live here.
+    private val payments = DataTableState(TableData.Local(samplePayments()), paymentColumns())
+
+    public override fun render(): View {
+        val payments = this.payments
+        val query = this.query
+        val filter = input(query) {
+            placeholder = "Filter emails…"
+            onEdited = { _ -> payments.setFilter("email", query.text) }
+        }
+        val invoices = invoiceTable()
+        val page = column {
+            add(invoices)
+            dataTable(payments) {
+                bodyHeight = 200.0
+                pageSizes = [5L, 10L, 20L]
+                toolbar(filter)
+            }
+            row {
+                button(
+                    "Sort by amount",
+                    {
+                        // The same call a click on the Amount header makes.
+                        payments.toggleSort("amount")
+                        payments.setPage(0L)
+                    }
+                ) { variant = ButtonVariant.Outline }
+                button("Select this page", { payments.selectPage(true) }) {
+                    variant = ButtonVariant.Outline
+                }
+                typography(f"Selected rows: ${payments.selectedKeys.size}", TypographyRole.Muted)
+                spacing = 8.0
+                alignment = CrossAlignment.Center
+            }
+            spacing = 24.0
+            alignment = CrossAlignment.Stretch
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Tables", { scope -> Tables(scope) })
+    }
+}

@@ -2,7 +2,7 @@
 
 更新日期：2026-11-27。本文件是写作计划，不进入 mdbook 构建（不在 `src/` 下）。
 
-**进度**：前言和第一至四部分（第 1～16 章）已完成，其余章节为空文件。
+**进度**：前言和第一至七部分（第 1～26 章）已完成，其余章节为空文件。
 
 ## 0. 定位与写作原则
 
@@ -176,7 +176,7 @@
 - 12.1 一个文本输入的示例（姓名、手机号、密码、输入组、备注、验证码）
 - 12.2 编辑模型由你持有：TextEditorState（读 text 即依赖；replaceAll、undo）
 - 12.3 input 与 textarea（onSubmit；textarea 默认 Primary+Enter 提交；编辑器自己处理 ⌘V）
-- 12.4 编辑策略：替换换行 → paste → transform → accepts（逐段，任一段失败丢弃整次编辑）→ maxLength（按字素截断）
+- 12.4 编辑策略：替换换行 → paste → transform → acceptsInsertedText（逐段检查改写后的新增文字，任一段失败丢弃整次编辑）→ maxLength（按字素截断）；单行时回调输出的换行同样转为空格
 - 12.5 密码框：projection 与 protectedText 相互独立；TextCopyPolicy
 - 12.6 输入组与验证码（InputOtpPattern）
 - 12.7 输入用途与软键盘（macOS 未验证）
@@ -231,107 +231,121 @@
 
 ## 第五部分　组织界面
 
-### 第 17 章　滚动与长列表
-- 17.1 ScrollArea
-- 17.2 ScrollState：读取与控制位置、动画定位
-- 17.3 滚动条行为与弹性边界（scrollbarBehavior、ScrollPhysicsOptions）【新增】
-- 17.4 virtualList：只构建看得见的行
-- 17.5 VirtualListHandle：定位、聚焦与阅读位置（KeepVisible／FollowEnd）
-- 17.6 保留行状态与绘制缓存
-- 17.7 演示：一亿行的列表
+### 第 17 章　滚动与长列表 【已完成】
+- 17.1 一个滚动区域（scrollArea 常用配置；构建并保持全部内容）
+- 17.2 ScrollState：读取（来自 Accepted，读取即依赖）与控制（scrollTo／scrollBy／animateTo／reveal；聚焦即滚动到控件；observeIntent）
+- 17.3 滚动条与边界：scrollbarBehavior 的 FollowSystem／Static／Custom、Overlay／Gutter；ScrollPhysicsOptions 的 Platform／Hard／Elastic 与惯性；chain 与 touchScroll 【新增】
+- 17.4 虚拟列表：ItemSource（稳定 key、indexOfKey 一致）；数据变化换新的数据源对象；ItemExtent.Fixed／Variable；overscan
+- 17.5 按行定位与阅读位置：scrollToItem、reading、restore（书签）；anchor 的 KeepVisible／FollowEnd／None（三个实验）
+- 17.6 保留行状态与绘制缓存：Dispose 与交互中的行、KeepAlive(n)、不能丢的数据放模型；PaintCachePolicy.Tiles
+- 17.7 一亿行的列表（Fixed、overscan、ItemNavigation.Roving、focusItem；读屏器分页：超过 4096 行按页提供，Go to row，需 d31c5543 之后的工具链）
+- 写作注意：后台窗口中滚动条不淡入淡出（allowed() 要求窗口聚焦且未遮挡），FollowSystem 的自动隐藏按源码描述；弹性回弹需要连续相位滚动，未核对；onMount 中 scrollToItem 返回 false
 
-素材：官网 UI-FOCUS-SCROLL §10；示例 ui-focus-scroll-area、ui-focus-scroll-virtual；skill libraries.md（滚动条、弹性边界、动态内容）
+示例：`examples/ch17/`（scroll_area、chat_log、huge_list）
 
-### 第 18 章　弹层
-- 18.1 统一模型：open 绑定是唯一的状态来源
-- 18.2 tooltip、hover card 与 popover
-- 18.3 dialog、confirm、sheet 与 drawer
-- 18.4 菜单：下拉菜单、contextMenu 与 nativeContextMenu
-- 18.5 Toast
-- 18.6 焦点：打开时去哪里，关闭后回到哪里
+### 第 18 章　弹层 【已完成】
+- 18.1 一个示例（popovers）
+- 18.2 open 绑定是唯一的状态来源；触发器可选；onCloseRequest 与 OverlayCloseReason；直接写状态不经过拦截
+- 18.3 提示、悬浮卡片与 Popover；三种 OverlayMode；builder 同名成员的陷阱
+- 18.4 dialog、alertDialog、sheet、drawer；操作按钮不替你关闭；打开前准备草稿
+- 18.5 菜单：menu 内容在 dropdownMenu／contextMenu／menubar 间复用；shortcut 只是标签；原生菜单见第 28 章
+- 18.6 Toast：ToastState、toaster、ToastId 的 update／dismiss、暂停计时
+- 18.7 焦点：OverlayFocusOptions；关闭后恢复到原焦点
+- 写作注意：自动化工具的左键点击和按键不能送达后台窗口，点击外部与 Escape 未在窗口中核对
 
-素材：官网 UI-OVERLAYS §11；示例 ui-overlays-popover、ui-overlays-modal、ui-overlays-menus
+示例：`examples/ch18/`（popovers、dialogs、menus）
 
-### 第 19 章　导航与工作区
-- 19.1 Tabs、面包屑与导航菜单
-- 19.2 侧栏、可调面板与命令面板
-- 19.3 实战：一个精简的工作区
+### 第 19 章　导航与工作区 【已完成】
+- 19.1 一个导航的示例（没有路由器，页面就是 State）
+- 19.2 导航菜单（link／item，open 绑定）与面包屑
+- 19.3 页签（Choice、variant、activation、retention：KeepMounted 保留的是组件自己的状态）与分页
+- 19.4 一个精简的工作区（workspace）
+- 19.5 侧栏（collapsible、variant、rail、Auto 布局与 breakpoint、⌘B；sidebarMenu）
+- 19.6 可调面板（ResizableSize 放在自己的状态中；minimum／collapsible；键盘调整）
+- 19.7 命令面板（commandItems、keywords、CommandFilter；放进 dialog）
+- 19.8 一份状态，多个入口
 
-素材：官网 UI-OVERLAYS §12；示例 ui-overlays-nav、ui-overlays-workspace；shadcn Gallery app_workspace
+示例：`examples/ch19/`（navigation、workspace）
 
-### 第 20 章　数据展示
-- 20.1 内容块：卡片、提示、条目与加载占位
-- 20.2 表格：排序、选择与列宽调整（tableColumnResize）
-- 20.3 树：TreeState、多列、虚拟化与吸顶
-- 20.4 日历与日期选择器
-- 20.5 图表
-- 20.6 会话组件
-- 20.7 图片与图标：图片适配方式、SVG 与 Lucide 图标 【新增】
+### 第 20 章　数据展示 【已完成】
+- 20.1 内容块：卡片、提示、空状态、条目、头像、标签、骨架、进度、Spinner
+- 20.2 表格：table 与 dataTable（DataTableState、TableRecord 的 key、列定义与列宽、TableData.Provided；tableColumnResize）
+- 20.3 树：TreeNode／TreeData／TreeColumns、选择与级联勾选、TreeHandle 定位、sticky、筛选与高亮
+- 20.4 日历与日期选择器（calendar／calendarMultiple／calendarRange、today、rules、datePicker 与 draft）
+- 20.5 图表（ChartModel、ChartKind、图例隐藏系列）与会话组件（bubble、message、marker、trace；messageScroller 简介）
+- 20.6 图片与图标：imageView 的四种 ContentFit（需要确定的区域，aspectRatio）、Lucide 图标与只有图标的按钮、SvgDocument 与 svgView 【新增】
 
-素材：官网 UI-DATA；示例 ui-data-*；skill libraries.md（树与多列、表头调宽）；shadcn Gallery；README scoop.icons.lucide、scoop.graphics.svg
+示例：`examples/ch20/`（content、tables、files、dates、report、media）
 
 ## 第六部分　外观
 
-### 第 21 章　主题
-- 21.1 四套预设：macOS、Material、Fluent、shadcn 的取向与差异
-- 21.2 tokens 与 palette
-- 21.3 在预设上修改；用 copy 派生新主题
-- 21.4 运行时切换主题
-- 21.5 跟随系统明暗与系统配色 【部分新增】
-- 21.6 无障碍显示偏好：减少动画、高对比、减少透明、文字缩放；`uiPreferences` 覆盖 【部分新增】
+### 第 21 章　主题 【已完成】
+- 21.1 四套预设：Cone、工厂函数 `xxxTheme(mode, palette) { }`、取向与选择
+- 21.2 主题由什么组成：tokens 与部件两层；改 tokens 不重算部件；按钮文字用 typography.action；read(scope) 取页面颜色
+- 21.3 在预设上修改（brand）；copy 派生（Larger text：body 变大、按钮文字不变）
+- 21.4 运行时切换主题（themes）：不重建界面，状态全部保留；选择与最终主题分开保存
+- 21.5 跟随系统明暗（observedTheme、ThemeChanged）与系统配色 `macosSystemPalette(mode)`（快照、主线程、仅 macOS）【新增】
+- 21.6 显示偏好：read(scope) 与 current 的区别；theme.preferences；`runUiApplication(preferences = uiPreferences { })` 覆盖；运行中改用 UiWindow.preferences；contrastThemeColors 【新增】
+- 写作注意：切换系统外观未实际操作；按钮直接放在 column 中会占满宽度（居中的标签按可用宽度排版），示例把按钮放进 row
 
-素材：官网 UI-THEMES §14；示例 ui-themes-switcher、ui-themes-brand；skill libraries.md（风格与配色、主题与系统偏好、系统交互偏好）
+示例：`examples/ch21/`（brand、themes、preferences）
 
-### 第 22 章　局部样式与效果
-- 22.1 styled：给一块内容加装饰
-- 22.2 绘制顺序与内容效果
-- 22.3 控件的样式
-- 22.4 styleOverride：Inherit 与 Set
-- 写作注意：`frame { style { border = Some(...) } }` 能通过编译却没有边框（选中了顶层 `scoop.ui.style.style(...)`，结果被丢弃），应写 `border(Some(...))`；第 15 章已简述，本章详细讨论
+### 第 22 章　局部样式与效果 【已完成】
+- 22.1 一个示例（styles）
+- 22.2 styled：Style 的字段；对布局透明、不加内边距、增减效果不重建内容
+- 22.3 绘制顺序与内容效果（BoxShadow 与 DropShadow 的区别、Glow、Blur 不是毛玻璃；StylePainter 与滤镜）
+- 22.4 控件的样式：ButtonStyle、CheckboxStyle、TextFieldStyle、states；局部样式要克制
+- 22.5 StyleOverride：Inherit 与 Set、resolve、then、copy（overrides 控制台程序）
+- 22.6 样式块中的陷阱：`frame { style { border = Some(...) } }` 选中顶层 `style {}` 被丢弃（style_trap 截图对照）
 
-素材：官网 UI-THEMES §15；示例 ui-themes-styles
+示例：`examples/ch22/`（styles、overrides、style_trap）
 
 ## 第七部分　自定义控件
 
-### 第 23 章　自绘 Element
+### 第 23 章　自绘 Element 【已完成】
 - 23.1 Component 与 Element
 - 23.2 一个完整的自绘控件：级别条
 - 23.3 生命周期：onMount、update、onUnmount
-- 23.4 measure：约束、尺寸与子项
-- 23.5 scene：输入区域、子项与绘制顺序
+- 23.4 measure：约束、尺寸与子项（含 skipChild）
+- 23.5 scene：输入区域、子项与绘制顺序；SceneContext 变换与 Canvas 变换（Peek 示例，读屏器位置随变换移动）
 - 23.6 draw：PaintContext 与 Canvas
-- 23.7 输入与动画（弹簧）
-- 23.8 停帧
+- 23.7 输入与动画（弹簧）；自绘控件对读屏器不可见
+- 23.8 停帧；createDeadline（code-editor 光标闪烁）；外部事件驱动的帧（scoop-video）
+- 23.9 onFrameComplete（solar-system 命中与模拟时间、grid 只在 Accepted 后提交）
+- 23.10 真实项目中的自绘控件：六个 scoop-lang 开源项目总览
 
-素材：官网 UI-CUSTOM §16；示例 ui-custom-meter
+示例：`examples/ch23/`（meter、peek）
 
-### 第 24 章　让自绘控件接入框架
-- 24.1 可聚焦：focusTarget
-- 24.2 交互助手
-- 24.3 用 ThemePainterCache 画主题部件
-- 24.4 用 StylePainter 套用公共 Style
-- 24.5 文本：ParagraphHost 与行内子项
-- 24.6 绘制缓存：drawLayer
+### 第 24 章　让自绘控件接入框架 【已完成】
+- 24.1 给级别条补上键盘和读屏器：focusTarget、焦点通知、按键、语义节点（Slider、range、increment/decrement/setNumber），AX 实测
+- 24.2 交互助手：scope.press 与 interaction；mergeLabels 与 routeSemanticsChildren；控件作者用的其他助手
+- 24.3 ThemePainterCache 与主题几何
+- 24.4 StylePainter
+- 24.5 ParagraphHost 与行内子项；文字要自己发布语义（官网示例缺失，书中补上）；drawTextLayout；TextEditHost
+- 24.6 drawLayer（故意写错版本号的对照）；cachedScene
+- 24.7 真实项目：markdown MdSourceAction、terminal 屏幕缓存、markdown MdCodeField、code-editor 原始文本输入
 
-素材：官网 UI-CUSTOM §17.1–17.6；示例 ui-custom-task、ui-custom-paragraph
+示例：`examples/ch24/`（meter、tasks、note、badges）
 
-### 第 25 章　2D 图形与着色器
-- 25.1 scoop.graphics：路径、渐变、裁剪与变换
-- 25.2 图像与图层滤镜 【新增】
-- 25.3 SkSL 着色器
-- 25.4 背景采样：毛玻璃与折射（glass 示例）
-- 25.5 CPU 离屏绘制：不开窗口生成图片，并用于测试 【新增】
+### 第 25 章　2D 图形与着色器 【已完成】
+- 25.1 路径、渐变、裁剪与变换；资源归属（仪表盘）
+- 25.2 图像与图层：采样方式、整体透明度、图层滤镜
+- 25.3 SkSL 着色器：程序结构、编译与绑定
+- 25.4 背景效果：毛玻璃、drawBackdrop、saveBackdropLayer、runtimeShader 折射（glass 示例）
+- 25.5 CPU 离屏绘制：RasterSurface、readPixels（有 .expected）、OffscreenSurface、recordDrawing
+- 25.6 真实项目：video 的 NV12 着色器、solar-system 原生 GPU 渲染、terminal 两遍绘制与硬裁剪
 
-素材：官网 UI-CUSTOM §17.7；示例 ui-custom-shader；工具链示例 glass；README scoop.graphics；skill libraries.md SkSL 段
+示例：`examples/ch25/`（gauge、layers、shader、raster）
 
-### 第 26 章　自定义弹层、容器与按需列表
-- 26.1 portal 与锚点
-- 26.2 模态弹层
-- 26.3 自定义滚动容器：ScrollViewport 与 ViewportScrollbars
-- 26.4 按需子项：LazyElement、吸顶与项内定位 【部分新增】
-- 26.5 共享测量输入：LayoutInput 【新增】
+### 第 26 章　自定义弹层、容器与按需列表 【已完成】
+- 26.1 portal 与锚点：AnchorBox、PanelArea、定位与关闭（官网示例改用 read(scope)）
+- 26.2 模态弹层：自己画遮罩（frame 只会收缩），AX 中背景被移走
+- 26.3 自定义滚动容器：ScrollViewport 四件事、ViewportScrollbars、ScrollAdjustment
+- 26.4 LazyElement：ItemSource、pinnedItems、retention、lazyFocus、item(key) 与 withScrollReveal（未写示例）
+- 26.5 LayoutInput：共用标签列宽的表单，试测与正式测量
+- 26.6 真实项目：grid 两个方向的虚拟化与“测到稳定”、markdown 不挂载子项的按需布局、code-editor
 
-素材：官网 UI-CUSTOM §18；示例 ui-custom-popover、ui-custom-list；README scoop.ui "按需子项"；skill libraries.md
+示例：`examples/ch26/`（popover、confirm、rows、fields）
 
 ## 第八部分　桌面应用
 

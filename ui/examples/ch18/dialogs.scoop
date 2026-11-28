@@ -1,0 +1,133 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+import scoop.ui.text.TextEditorState
+
+/** Plain business state: names, open flags and the notification queue. */
+class ProjectModel {
+    val name = state("Atlas")
+    val editOpen = state(false)
+    val deleteOpen = state(false)
+    val settingsOpen = state(false)
+    val activityOpen = state(false)
+    val draft = TextEditorState("Atlas")
+    val draftFocus = FocusHandle()
+    val toasts = ToastState()
+
+    fun startEdit() {
+        // Reset the draft every time, so a cancelled edit leaves nothing behind.
+        draft.replaceAll(name.value)
+        editOpen.value = true
+    }
+
+    fun save() {
+        if (draft.text.charLength == 0L) {
+            toasts.show("The name cannot be empty") { kind = ToastKind.Error }
+            return
+        }
+        val next = draft.text
+        name.value = next
+        editOpen.value = false
+        toasts
+            .show("Project renamed") {
+                kind = ToastKind.Success
+                description(f"The project is now called ${next}.")
+            }
+    }
+
+    fun delete() {
+        val toasts = this.toasts
+        deleteOpen.value = false
+        toasts
+            .show("Project deleted") {
+                kind = ToastKind.Warning
+                action("Undo", { toasts.show("Deletion undone") { kind = ToastKind.Info } })
+            }
+    }
+}
+
+class Dialogs(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val model = ProjectModel()
+
+    public override fun render(): View {
+        val model = this.model
+        val form = column {
+            typography("Project name", TypographyRole.Small)
+            input(model.draft) { focus = FocusOptions(Some(model.draftFocus)) }
+            spacing = 6.0
+            alignment = CrossAlignment.Stretch
+        }
+        val footer = column {
+            button("Save", { model.save() })
+            alignment = CrossAlignment.Stretch
+        }
+        val warning = typography("Deleting cannot be undone.", TypographyRole.Muted)
+        val settings = typography("Settings live in a side panel.", TypographyRole.P)
+        val activity = typography("Renamed project · just now", TypographyRole.P)
+        val page = column {
+            typography(f"Project: ${model.name.value}", TypographyRole.H3)
+            row {
+                button("Rename…", { model.startEdit() })
+                button("Delete", { model.deleteOpen.value = true }) {
+                    variant = ButtonVariant.Destructive
+                }
+                button("Settings", { model.settingsOpen.value = true }) {
+                    variant = ButtonVariant.Outline
+                }
+                button("Activity", { model.activityOpen.value = true }) {
+                    variant = ButtonVariant.Outline
+                }
+                spacing = 8.0
+            }
+            dialog(model.editOpen.binding(), form) {
+                title("Rename project")
+                description("The new name is applied when you press Save.")
+                focus = OverlayFocusOptions(Some(model.draftFocus))
+                footer(footer)
+            }
+            alertDialog(
+                model.deleteOpen.binding(),
+                warning
+            ) {
+                title(f"Delete ${model.name.value}?")
+                // The action runs your callback; closing is your decision.
+                action("Delete", { model.delete() }) { variant = ButtonVariant.Destructive }
+                cancel("Keep project")
+            }
+            sheet(
+                model.settingsOpen.binding(),
+                settings
+            ) {
+                title("Project settings")
+                side = SheetSide.End
+            }
+            drawer(
+                model.activityOpen.binding(),
+                activity
+            ) { title("Recent activity") }
+            toaster(model.toasts) { position = ToastPosition.BottomEnd }
+            spacing = 16.0
+            alignment = CrossAlignment.Start
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Dialogs", { scope -> Dialogs(scope) })
+    }
+}

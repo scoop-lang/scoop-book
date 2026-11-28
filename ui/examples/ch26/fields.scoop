@@ -1,0 +1,153 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.macos:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.macos.macosTheme
+import scoop.ui.text.TextEditorState
+
+/**
+ * What every row reads while it is measured. labelWidth None means a trial pass:
+ * the row only reports how wide its label wants to be.
+ */
+struct FormPlan(val labelWidth: Double?, val stacked: Boolean)
+
+val gap = 12.0
+
+val fieldMinimum = 180.0
+
+/** Lays out its rows one below another; the rows share one label column. */
+class Form(scope: ComponentScope) : Element<Unit>(scope) {
+    private val probe = LayoutInput(FormPlan(None, false))
+    private var shared: LayoutInput<FormPlan>? = None
+    private var sharedPlan: FormPlan? = None
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        val width = constraints.maxWidth ?: 480.0
+        val loose = Constraints(maxWidth = Some(width))
+        // Trial pass: every row reports the natural width of its label.
+        var widest = 0.0
+        for (index in 0L..<context.childCount) {
+            val trial = context.measureChild(index, loose, probe)
+            if (trial.size.width > widest) widest = trial.size.width
+        }
+        // Too narrow for a label column next to the fields: stack them instead.
+        val plan = FormPlan(Some(widest), widest + gap + fieldMinimum > width)
+        // Keep the same input object while the plan is the same, so rows can reuse their layout.
+        if (sharedPlan != Some(plan)) {
+            shared = Some(LayoutInput(plan))
+            sharedPlan = Some(plan)
+        }
+        var y = 0.0
+        for (index in 0L..<context.childCount) {
+            val row = context.measureChild(index, loose, shared!!)
+            context.placeChild(index, Point(0.0, y))
+            y += row.size.height + gap
+        }
+        return LayoutResult(LayoutMetrics(constraints.constrain(Size(width, y - gap))), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        context.children()
+    }
+}
+
+/** One label and one field, placed according to the plan from the Form. */
+class FieldLayout(scope: ComponentScope) : Element<Unit>(scope) {
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        val plan = context.input<FormPlan>()
+        val width = constraints.maxWidth ?: 480.0
+        val label = context.measureChild(0L, Constraints())
+        when (plan.labelWidth) {
+            case None -> {
+                // Trial pass: report the label's width and place nothing.
+                context.skipChild(1L)
+                return LayoutResult(LayoutMetrics(Size(label.size.width, label.size.height)), Unit)
+            }
+
+            case Some(val column) -> {
+                if (plan.stacked) {
+                    val field = context
+                        .measureChild(1L, Constraints(minWidth = width, maxWidth = Some(width)))
+                    context.placeChild(0L, Point(0.0, 0.0))
+                    context.placeChild(1L, Point(0.0, label.size.height + 4.0))
+                    return LayoutResult(
+                        LayoutMetrics(Size(width, label.size.height + 4.0 + field.size.height)),
+                        Unit
+                    )
+                }
+                val field = context
+                    .measureChild(
+                        1L,
+                        Constraints(
+                            minWidth = width - column - gap,
+                            maxWidth = Some(width - column - gap)
+                        )
+                    )
+                // Right-align the label in the shared column, centered on the field.
+                context
+                    .placeChild(
+                        0L,
+                        Point(
+                            column - label.size.width,
+                            (field.size.height - label.size.height) / 2.0
+                        )
+                    )
+                context.placeChild(1L, Point(column + gap, 0.0))
+                return LayoutResult(LayoutMetrics(Size(width, field.size.height)), Unit)
+            }
+        }
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        context.children()
+    }
+}
+
+/** An ordinary component in between: the layout input passes through it. */
+class FieldRow(private val text: Props<String>, scope: ComponentScope) : Component(scope) {
+    private val value = TextEditorState()
+    private val target = FieldTarget()
+
+    public override fun render(): View {
+        val caption = this.text.value
+        val target = this.target
+        // fieldLabel and labelTarget connect the two (chapter 13): the label names the field.
+        val box = input(this.value) {
+            labelTarget = Some(target)
+            placeholder = caption
+        }
+        return element({ mount -> FieldLayout(mount) }, [fieldLabel(caption, target), box])
+    }
+}
+
+fun field(text: String): View = component(text, { props, mount -> FieldRow(props, mount) })
+
+class FormDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val rows = [field("Name"), field("Email address"), field("Phone")]
+        val form = element({ mount -> Form(mount) }, rows)
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(form) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(macosTheme(ThemeMode.Light))) {
+        runUiApplication("Fields", { scope -> FormDemo(scope) })
+    }
+}

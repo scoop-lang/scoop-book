@@ -1,0 +1,125 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+class UploadModel {
+    val loading = state(true)
+    val uploaded = state(35.0)
+    val files = state(0)
+
+    fun advance() {
+        val next = uploaded.value + 15.0
+        uploaded.value = if (next > 100.0) 100.0 else next
+    }
+}
+
+class Content(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val model = UploadModel()
+
+    public override fun render(): View {
+        val model = this.model
+        // Views passed as arguments are built first: inside a builder block,
+        // avatar(...), badge(...) and friends add a child instead of returning a View.
+        val ada = avatar("AL") { badge() }
+        val admin = badge("Admin") { variant = ButtonVariant.Secondary }
+        val profile = column {
+            contentItem {
+                title("Ada Lovelace")
+                description("Owner · updated just now")
+                media(ada)
+                actions(admin)
+                variant = ItemVariant.Outline
+            }
+            avatarGroup {
+                avatar("AL")
+                avatar("LT")
+                avatar("GH")
+                count(4L)
+            }
+            spacing = 12.0
+        }
+        val warning = typography("Storage is 90% full.", TypographyRole.Muted)
+        val left = column {
+            row {
+                button(
+                    if (model.loading.value) "Reveal content" else "Show skeleton",
+                    { model.loading.value = !model.loading.value }
+                ) { variant = ButtonVariant.Outline }
+                badge(f"${model.files.value} files")
+                spacing = 12.0
+                alignment = CrossAlignment.Center
+            }
+            // The profile stays mounted while loading; it is only hidden.
+            skeleton(profile) { loading = model.loading.value }
+            alert(warning) {
+                title("Almost out of space")
+                variant = AlertVariant.Destructive
+            }
+            spacing = 16.0
+            alignment = CrossAlignment.Stretch
+        }
+        val upload = column {
+            progress(Some(model.uploaded.value)) {
+                label("Upload")
+                showValue = true
+            }
+            row {
+                button("+15%", { model.advance() })
+                spinner { running = model.uploaded.value < 100.0 }
+                spacing = 12.0
+                alignment = CrossAlignment.Center
+            }
+            spacing = 12.0
+            alignment = CrossAlignment.Stretch
+        }
+        val addFile = button("Add file", { model.files.value += 1 })
+        val addFirstFile = button("Add file", { model.files.value += 1 })
+        val right = column {
+            card(upload) {
+                title("Project files")
+                description("Uploads continue in the background.")
+                footer(addFile)
+            }
+            if (model.files.value == 0)
+                emptyState(addFirstFile) {
+                    title("No files yet")
+                    description("Files you add appear here.")
+                    outlined = true
+                }
+            spacing = 16.0
+            alignment = CrossAlignment.Stretch
+        }
+        val page = row {
+            item(left) {
+                grow = 1.0
+                basis = FlexBasis.Fixed(0.0)
+            }
+            item(right) {
+                grow = 1.0
+                basis = FlexBasis.Fixed(0.0)
+            }
+            spacing = 24.0
+            alignment = CrossAlignment.Start
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Content", { scope -> Content(scope) })
+    }
+}
