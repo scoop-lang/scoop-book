@@ -4,6 +4,7 @@
 
 - `styled` 怎样给任意内容加装饰，它为什么不影响布局；
 - 一块样式按什么顺序绘制，外框阴影和内容阴影有什么区别；
+- `glass` 怎样处理控件背后的画面，`glassEffectContainer` 怎样把几块玻璃融合在一起；
 - 按钮、复选框和输入框各自的样式对象怎样配置，怎样复用；
 - `StyleOverride` 中 `Inherit` 和 `Set` 的区别，覆盖怎样一层层叠加；
 - 样式块中一个能通过编译、却什么也不做的写法。
@@ -50,6 +51,7 @@ val card = styled(frame(label("Styled card")) { padding = Some(Insets.all(24.0))
 | `boxShadows: Array<BoxShadow>` | 外框阴影：`BoxShadow(offset, sigmaX, sigmaY, color)` |
 | `contentEffects: Array<ContentEffect>` | 依次作用在内容像素上的效果，见下一节 |
 | `clipContent: Boolean` | 为 true 时，用同一个圆角轮廓裁剪内容和子项的点击范围 |
+| `glass: GlassMaterial?` | 玻璃材质：模糊、折射圆角外框内背后的画面，`None` 表示不用玻璃，见下一节 |
 
 `styled` **对布局是透明的**：它把收到的约束原样交给内容，自己的尺寸和基线就是内容的尺寸和基线。它不增加内边距，也不创建点击区域，点击的范围仍然来自内容本身。所以示例先用 `frame { padding = ... }` 在文字周围留出空间，再交给 `styled`；直接 `styled(label(...))` 的话，背景会紧贴着文字。
 
@@ -62,15 +64,16 @@ val card = styled(frame(label("Styled card")) { padding = Some(Insets.all(24.0))
 一个 styled 区域按固定的顺序绘制：
 
 1. **外框阴影** `boxShadows`：以填满的圆角外框为形状投下阴影，和背景是否透明无关；
-2. **背景** `background`；
-3. **内容**：先绘制内容本身，再按数组的顺序应用 `contentEffects`；
-4. **边框** `border`：向内绘制，压在内容的上面。
+2. **玻璃** `glass`：在圆角外框内处理已经画在下面的画面，见本节最后；
+3. **背景** `background`；
+4. **内容**：先绘制内容本身，再按数组的顺序应用 `contentEffects`；
+5. **边框** `border`：向内绘制，压在内容的上面。
 
 `ContentEffect` 有三种，作用对象都是内容实际画出来的像素。文字、图片、子控件都一样，不需要把文字转换成路径：
 
 - **`ContentEffect.DropShadow(offset, sigmaX, sigmaY, color)`**：按内容的透明度投下阴影；
 - **`Glow(sigmaX, sigmaY, color)`**：零偏移的着色模糊光晕，垫在原内容的下面；
-- **`Blur(sigmaX, sigmaY)`**：模糊内容本身。它不采样背后的画面，所以不是“毛玻璃”效果。
+- **`Blur(sigmaX, sigmaY)`**：模糊内容本身。它不采样背后的画面，所以不是“毛玻璃”效果，毛玻璃用 `glass`。
 
 `sigma` 是高斯模糊的标准差，和 `offset` 一样使用逻辑单位。效果按顺序串联：`[Blur(...), DropShadow(...)]` 先模糊再投影，反过来的顺序结果不同。示例按勾选的顺序把效果放进数组：
 
@@ -86,9 +89,46 @@ if (this.shadow.value)
 
 `BoxShadow` 和 `ContentEffect.DropShadow` 的区别在示例中很容易看出：卡片的 `boxShadows` 让整张卡片浮了起来；勾选 Drop shadow 后，阴影只出现在**文字**下面。原因是卡片的内容是那行文字，白色的背景属于 `Style` 本身，不是内容。
 
-> **深入一点：毛玻璃**
->
-> 要模糊的是控件**背后**的画面时（比如浮在列表上的半透明工具栏），需要在自绘控件中使用 `StylePainter.scene(context, style, Some(filter)) { ... }`：它先处理已经绘制在样式圆角内的背景，再填充、绘制前景和描边。`filter` 可以是高斯模糊，也可以是自定义的着色器。工具链附带的 glass 示例（`scoop.ui.component/examples/glass`）演示了这种做法，第 23 章和第 25 章会讲到自绘控件和着色器。
+### 玻璃：处理背后的画面
+
+内容效果处理的都是内容自己的像素。要模糊的是控件**背后**的画面时，比如浮在列表上的半透明工具栏，给 `Style` 设置 `glass`：
+
+```scoop
+styled(content) {
+    style {
+        glass = Some(glassMaterial {
+            blurSigma = 12.0
+            refraction = 0.0
+        })
+        corners = Corners.all(16.0)
+    }
+}
+```
+
+画完外框阴影之后，先按同一个圆角外框处理已经画在下面的画面，再画背景、内容和边框，内容本身保持清晰。背后的画面要先于这块样式画出来，比如在 `stack` 中声明在它的前面。`GlassMaterial` 的参数见第 21.7 节。
+
+这样直接设置的材质不经过主题：第 21.7 节中主题为玻璃上的文字计算的可读底色、高对比度和减少透明度时的自动关闭，在这里都不适用。上面的例子没有设置 `background`，背后的画面上只叠了材质自带的一层淡淡的白色，文字放在上面是否看得清，要自己检查。设置了不透明的 `background` 又会把玻璃完全盖住，因为背景画在玻璃之后。
+
+`frame` 和控件的 `style { ... }` 是覆盖（22.5 节），在那里用 `glass(Some(material))` 设置材质，`glass(None)` 清除主题给的材质，清除时恢复主题原来的底色。
+
+几块玻璃靠得很近时，可以用控件库的 `glassEffectContainer` 把它们融合成一个连续的形状：
+
+```scoop
+glassEffectContainer(material) {
+    layout = GlassEffectLayout.Flex(FlexLayout(spacing = 8.0))
+    item(ViewKey.Text("back"), back) { corners = CornerRadii.all(22.0) }
+    item(ViewKey.Text("search"), search) { corners = CornerRadii.all(22.0) }
+}
+```
+
+容器只处理一次背后的画面，相邻的轮廓之间连出平滑的“水桥”；每个 `item` 的内容仍然是独立的控件，按钮各自响应点击、各自出现在读屏器中，连接处本身不能点击。
+
+- **布局。** `GlassEffectLayout.Flex` 和 `Wrap` 让实际的内容决定每块玻璃的大小和位置，间距、对齐和从右到左的排列规则与 `row`、`wrap` 相同；默认的 `Absolute` 则用 `item(key, rect, content)` 直接给出每块的矩形。每块玻璃按自己的圆角裁剪内容，按钮的焦点环之类画在控件外面的东西，要用 `frame` 的 `padding` 留出空间。
+- **形变。** `key` 要稳定。增加、去掉一项或者改变尺寸时，玻璃从当前的形状平滑地过渡到新的形状，默认用时 300 毫秒，`animation = None` 时立即到位；去掉的那一项立即退出输入和读屏器，只留下正在收拢的玻璃。
+- **连接。** `blendRadius` 控制多近的轮廓会连在一起，默认 24，0 表示不融合。
+- **显示偏好。** 高对比度和减少透明度时，容器改用主题 `card` 的不透明底色画出同样的形状；减少动态效果时，形变立即到位。
+
+本书写作时，用三个按钮试验过融合的形状，以及去掉中间一项之后两侧的玻璃重新连在一起的结果，没有截图。第 21.7 节的按钮组用的是同一套机制。
 
 ## 22.4　控件的样式
 
@@ -129,7 +169,7 @@ val dangerButton = buttonStyle {
 
 本书写作时，用自动化工具在后台窗口中无法悬停，所以 Delete 按钮悬停时变亮的效果没有在窗口中核对。
 
-**局部样式要克制。** 主题保证了整个应用的一致性和显示偏好的处理：高对比度下，主题会加深边框；减少透明度时，主题会去掉半透明。你在局部样式中写死的颜色不会参与这些处理。所以，能用主题解决的就改主题（第 21 章），局部样式只用在真正需要与众不同的地方，比如危险操作的按钮；即使在局部样式中，也尽量从 `palette` 中取颜色，示例中卡片的背景和边框就是这样做的。
+**局部样式要克制。** 主题保证了整个应用的一致性和显示偏好的处理：高对比度下，主题会加深边框；减少透明度时，主题会去掉半透明和玻璃。你在局部样式中写死的颜色不会参与这些处理。所以，能用主题解决的就改主题（第 21 章），局部样式只用在真正需要与众不同的地方，比如危险操作的按钮；即使在局部样式中，也尽量从 `palette` 中取颜色，示例中卡片的背景和边框就是这样做的。
 
 ## 22.5　StyleOverride：Inherit 与 Set
 
@@ -195,7 +235,8 @@ scoop run style_trap.scoop --release
 
 - **给 `styled` 加了背景，内容却紧贴着边缘。** `styled` 不加内边距，先用 `frame { padding = ... }` 包住内容。
 - **以为光晕或阴影会扩大点击范围。** 效果不改变布局和命中范围，这是预期的行为。
-- **用 `ContentEffect.Blur` 做毛玻璃。** 它只模糊内容自己。模糊背后的画面要用 `StylePainter` 和滤镜。
+- **用 `ContentEffect.Blur` 做毛玻璃。** 它只模糊内容自己。模糊背后的画面用 `glass`。
+- **给设置了 `glass` 的样式又加上不透明的 `background`。** 背景画在玻璃之后，会把玻璃完全盖住；需要底色时用半透明的颜色，并检查文字的对比度。
 - **在 `frame { style { ... } }` 中写 `border = Some(...)`。** 能通过编译，却什么也不做。用 `border(Some(...))`。
 - **想“去掉”背景时写 `background = StyleValue.Inherit`。** `Inherit` 是沿用原来的，去掉要写 `background(None)`，即 `Set(None)`。
 - **在局部样式中到处写死颜色。** 它们不参与主题切换和显示偏好。尽量改主题，或者从 `palette` 中取色。
@@ -203,7 +244,8 @@ scoop run style_trap.scoop --release
 ## 小结
 
 - `styled(content) { style { ... } }` 给任意内容加背景、边框、圆角、外框阴影和内容效果；它对布局透明，不加内边距，不改变点击范围，增减效果不重建内容。
-- 绘制顺序是外框阴影、背景、内容（再应用 `contentEffects`）、边框；`DropShadow`、`Glow`、`Blur` 作用在内容的像素上，按数组顺序串联。
+- 绘制顺序是外框阴影、玻璃、背景、内容（再应用 `contentEffects`）、边框；`DropShadow`、`Glow`、`Blur` 作用在内容的像素上，按数组顺序串联。
+- `glass` 处理样式背后已经画好的画面，内容保持清晰；直接设置的材质不经过主题，可读性和显示偏好要自己处理。`glassEffectContainer` 把几块玻璃融合成连续的形状，各项内容仍是独立的控件，按稳定的 key 平滑形变。
 - `ButtonStyle`、`CheckboxStyle`、`TextFieldStyle` 调整单个控件；`states` 描述交互状态下的覆盖；`style { }` 在当前样式上修改，`style = ...` 使用构造好的样式。
 - `StyleOverride` 的每个字段是 `StyleValue`：`Inherit` 沿用，`Set(value)` 替换，`Set(None)` 明确清除；同名方法写入 `Set`；`then` 叠加两层覆盖，`resolve` 得到完整的 `Style`。
 - 覆盖块中给字段赋普通值会选中顶层的 `style { }` 函数而被丢弃；在覆盖块中总是用同名方法。
@@ -215,3 +257,4 @@ scoop run style_trap.scoop --release
 3. 给 `dangerButton` 加一个 `disabled { ... }` 覆盖，再把 Delete 按钮设为禁用，比较禁用时的外观。
 4. 用 `then` 把两个 `StyleOverride` 合并：第一个设置红色背景和 8 的圆角，第二个只设置 16 的圆角。预测 `resolve` 的结果，再用 `overrides.scoop` 的写法验证。
 5. 在 `style_trap.scoop` 中，把左边的 `frame` 换成 `styled`，`border = Some(...)` 这时还有问题吗？为什么？
+6. 给 `styles.scoop` 中卡片的 `style` 加上 `glass = Some(glassMaterial())`，卡片看起来有变化吗？为什么？要怎样改，玻璃才看得出来？

@@ -13,7 +13,7 @@ Scoop 工具链自带一套编写桌面图形界面的库。用它写出来的�
 
 ## 1.1　先看一眼
 
-工具链附带了一个完整的示例程序 Gallery。它有 65 个控件页面和 4 个组合起来的小应用，右上角可以在四套视觉风格之间切换，顶部可以切换明暗、从右到左的书写方向和减少动态效果。下图是其中的付款管理应用：柱状图、可筛选的表格、行内备注和每行的操作菜单都是用 Scoop 写的。
+工具链附带了一个完整的示例程序 Gallery。它有 66 个控件和材质页面、4 个组合起来的小应用，右上角可以在五套视觉风格之间切换，顶部可以切换明暗、从右到左的书写方向和减少动态效果。下图是其中的付款管理应用：柱状图、可筛选的表格、行内备注和每行的操作菜单都是用 Scoop 写的。
 
 <img src="../images/ch01/gallery-data.png" width="720" alt="Scoop UI Gallery 的 Data app 页面：左侧是导航列表，右侧是 Payments 标题、柱状图和带筛选框、备注输入框的付款表格">
 
@@ -27,11 +27,11 @@ scoop run --release
 
 `<版本>-<宿主>` 换成你实际安装的工具链目录名，`ls ~/.scoop/toolchains` 可以看到。第一次构建要编译整个示例并链接图形相关的库，在 Apple M 系列芯片上大约一分钟；之后再运行就快了。
 
-打开以后不妨随意点一点：在 Input 页输入几个中文字，在 Settings app 里用 Tab 键在控件之间移动，在 Tree 页把文件拖进另一个目录，切换 Style 看同一个界面换成 macOS、Material、Fluent 风格。这些行为后面的章节都会讲到怎样实现。
+打开以后不妨随意点一点：在 Input 页输入几个中文字，在 Settings app 里用 Tab 键在控件之间移动，在 Tree 页把文件拖进另一个目录，切换 Style 看同一个界面换成 macOS、Material、Fluent、Liquid Glass 风格，在 Liquid Glass 页滚动彩色的底图，看浮在上面的两块玻璃怎样融合在一起、怎样透出背后的颜色。这些行为后面的章节都会讲到怎样实现。
 
 > **注意**
 >
-> 示例目录名叫 `shadcn` 是历史原因，它包含全部四套风格。示例的测试依赖指向工具链源码树里的其他目录，复制出来以后不能运行它的测试，但构建和运行不受影响。
+> 示例目录名叫 `shadcn` 是历史原因，它包含全部五套风格。示例的测试依赖指向工具链源码树里的其他目录，复制出来以后不能运行它的测试，但构建和运行不受影响。
 
 ## 1.2　声明式 UI
 
@@ -74,7 +74,7 @@ Scoop UI 的按钮、输入框、表格并不是 AppKit、Win32 或 GTK 的控�
 
 这样做有几个直接的结果：
 
-- **同一份代码，各平台外观一致。** 控件长什么样由**主题**决定，与运行在哪个系统上无关。工具链提供 macOS、Material、Fluent、shadcn 四套主题，你完全可以在 Windows 上使用 macOS 风格，或者在所有平台上使用自己的品牌主题。
+- **同一份代码，各平台外观一致。** 控件长什么样由**主题**决定，与运行在哪个系统上无关。工具链提供 macOS、Material、Fluent、shadcn、Liquid Glass 五套主题，你完全可以在 Windows 上使用 macOS 风格，或者在所有平台上使用自己的品牌主题。
 - **自定义控件和内置控件地位相同。** 内置控件也是用公开接口画出来的，你自己写的控件可以使用同样的布局、输入、焦点、主题和动画能力（第七部分）。
 - **静止时不做无用功。** 界面没有变化时，框架不重新计算、不重新绘制，也不提交 GPU 命令。这一条是框架的硬性要求，第 4 章会实际验证。
 
@@ -101,7 +101,7 @@ Scoop UI 不是一个大而全的库，而是几个分工明确的 Cone（Scoop 
 | 框架 | `scoop.ui` | 组件、状态、挂载与更新、布局协议、输入与焦点、弹层、滚动 |
 | | `scoop.ui.style` | 样式与主题协议：颜色、边框、圆角、阴影，主题的设计参数和部件绘制 |
 | 控件与主题 | `scoop.ui.component` | Label、Button、Input、Checkbox、布局容器、滚动区域、虚拟列表、弹层、菜单、表格、树、日历、图表…… |
-| | `scoop.ui.style.macos`、`.material`、`.fluent`、`.shadcn` | 四套主题预设 |
+| | `scoop.ui.style.macos`、`.material`、`.fluent`、`.shadcn`、`.liquidglass` | 五套主题预设 |
 | 桌面外围 | `scoop.ui.component.desktop`、`scoop.ui.component.tray` | 把 Dock／任务栏和系统托盘接入组件 |
 | | `scoop.desktop`、`scoop.tray`、`scoop.icons.lucide` | 应用图标、角标、系统通知、托盘；一组 Lucide 图标 |
 
@@ -175,5 +175,5 @@ gui --target x86_64-apple-darwin
 ## 练习
 
 1. 用 `scoop-install component list` 查看本机的 GUI 组件是否已经安装，没有的话装上。
-2. 按 1.1 节的步骤运行 Gallery。在 Style 下拉框里切换四套风格，观察同一个页面上哪些东西变了、哪些没变。
+2. 按 1.1 节的步骤运行 Gallery。在 Style 下拉框里切换五套风格，观察同一个页面上哪些东西变了、哪些没变。
 3. 在 Gallery 里点一下 “Switch to RTL”，看看界面布局怎样变化。再打开系统的读屏器（macOS 上按 ⌘F5 开关 VoiceOver），用它在 Button 页上找到 Continue 按钮。

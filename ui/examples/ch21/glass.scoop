@@ -1,0 +1,143 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.liquidglass:0.1.0
+//! dep: scoop:scoop.ui.style.material:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.liquidglass.liquidGlassTheme
+import scoop.ui.style.material.materialTheme
+import scoop.ui.text.TextEditorState
+
+class Band(val name: String, val color: Color)
+
+val bands = [
+    Band("Coral", Color(0.95, 0.42, 0.36)),
+    Band("Amber", Color(0.96, 0.66, 0.2)),
+    Band("Lime", Color(0.55, 0.76, 0.25)),
+    Band("Teal", Color(0.1, 0.62, 0.62)),
+    Band("Azure", Color(0.18, 0.5, 0.9)),
+    Band("Indigo", Color(0.33, 0.3, 0.78)),
+    Band("Plum", Color(0.6, 0.3, 0.66)),
+    Band("Rose", Color(0.9, 0.36, 0.56))
+]
+
+/** A colored band with large white text: something for the glass to blur. */
+fun band(value: Band): View = frame(
+    label(value.name) {
+        style {
+            color = Some(Color.White)
+            fontSize = Some(34.0)
+            weight = Some(800)
+        }
+    }
+) {
+    height = Some(88.0)
+    padding = Some(Insets(24.0, 0.0, 24.0, 0.0))
+    alignment = Alignment(AxisAlignment.Start, AxisAlignment.Center)
+    style { background(Some(Paint(value.color))) }
+}
+
+/** Material keeps its own surfaces; only toolbars and popovers become glass. */
+fun materialGlass(): ShapeTheme {
+    val frost = glassMaterial {
+        blurSigma = 10.0
+        refraction = 4.0
+        edgeWidth = 12.0
+    }
+    return materialTheme {
+        tokens {
+            glassSurfaces {
+                toolbar = Some(frost)
+                popover = Some(frost)
+            }
+        }
+    }
+}
+
+class GlassModel {
+    val source = ThemeSource(liquidGlassTheme())
+    val material = state(false)
+
+    fun select(value: Boolean) {
+        material.value = value
+        source.current.value = if (value) materialGlass() else liquidGlassTheme()
+    }
+}
+
+class Glass(private val model: GlassModel, scope: ComponentScope) : Component(scope) {
+    private val solid = state(false)
+    private val shared = state(false)
+    private val note = TextEditorState("Cards and inputs stay solid.")
+
+    public override fun render(): View {
+        val model = this.model
+        val solid = this.solid
+        val palette = model.source.read(scope).tokens.palette
+        val details = column {
+            typography("Link copied", TypographyRole.Large)
+            typography("Popovers use the floating material.", TypographyRole.Muted)
+            spacing = 6.0
+        }
+        val actions = row {
+            // Under Liquid Glass the buttons of a group share one piece of glass.
+            buttonGroup {
+                button("Liquid Glass", { model.select(false) }) {
+                    variant = if (model.material.value)
+                        ButtonVariant.Outline
+                    else
+                        ButtonVariant.Default
+                }
+                button("Material", { model.select(true) }) {
+                    variant = if (model.material.value)
+                        ButtonVariant.Default
+                    else
+                        ButtonVariant.Outline
+                }
+            }
+            popover(this @Glass.shared.binding(), details) { trigger("Share") }
+            button(if (solid.value) "Glass bar" else "Solid bar", { solid.value = !solid.value }) {
+                variant = ButtonVariant.Secondary
+            }
+            spacing = 8.0
+            alignment = CrossAlignment.Center
+        }
+        // A themed surface used as a toolbar: the role, not the kind, selects the material.
+        val toolbar = frame(actions) {
+            surface = Some(SurfaceKind.Elevated)
+            surfaceRole = SurfaceRole.Toolbar
+            padding = Some(Insets.all(8.0))
+            // Clearing the material locally brings back the theme's opaque fill.
+            if (solid.value) style { glass(None) }
+        }
+        val noteCard = card(input(this.note)) {
+            title("A solid card")
+            description("Content and input surfaces keep an opaque fill.")
+        }
+        val content = column {
+            add(band(bands[0]))
+            add(band(bands[1]))
+            frame(noteCard) { padding = Some(Insets.all(24.0)) }
+            for (i in 2L until bands.size)
+                add(band(bands[i]))
+            alignment = CrossAlignment.Stretch
+        }
+        // The toolbar floats above the scrolling bands, so the glass always has a backdrop.
+        val page = stack {
+            scrollArea(content)
+            frame(toolbar) { padding = Some(Insets.all(16.0)) }
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+        }
+        return frame(page) { style { background(Some(Paint(palette.background.background))) } }
+    }
+}
+
+fun main() {
+    val model = GlassModel()
+    context(model.source) {
+        runUiApplication("Liquid Glass", { scope -> Glass(model, scope) })
+    }
+}

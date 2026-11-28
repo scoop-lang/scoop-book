@@ -207,7 +207,7 @@ decoration!!.scene(context, rowStyle) { content ->
 
 `StylePainter.scene(context, style) { content -> ... }` 先画外框阴影和背景，再执行回调中的内容并应用 `contentEffects`，最后画边框，顺序和 `styled` 完全相同（第 22.3 节）。回调收到的仍然是一个 `SceneContext`，可以继续 `draw`、放置子项。任务行根据 `state.hovered` 决定有没有背景色，圆角取自主题的 `tokens.corners.medium`。
 
-另外两种形式：`scene(context, bounds, style) { ... }` 指定一个矩形而不是整个元素；`paint(canvas, bounds, style)` 直接画在一个 Canvas 上，适合第 25 章的离屏绘制。第 22.3 节提到的毛玻璃，用的是 `scene(context, bounds, style, Some(filter)) { ... }` 这个带滤镜的版本，第 25 章会讲到。
+另外两种形式：`scene(context, bounds, style) { ... }` 指定一个矩形而不是整个元素；`paint(canvas, bounds, style)` 直接画在一个 Canvas 上，适合第 25 章的离屏绘制。`Style` 设置了 `glass` 时（第 22.3 节），`StylePainter` 自己创建并缓存所需的滤镜，形状或材质变化时替换，随 painter 一起关闭；要使用自己的滤镜，用 `scene(context, bounds, style, Some(filter)) { ... }` 这个带滤镜的版本，第 25 章会讲到。两者不能同时使用，同时提供时绘制前就会报参数错误。
 
 ## 24.5　文字：ParagraphHost 与行内子项
 

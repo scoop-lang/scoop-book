@@ -68,7 +68,7 @@ class ChatStore {
     val conversation = state(Conversation([]))
 
     init {
-        for (step in 0..<30) {
+        for (_ in 0..<30) {
             messages.add(messageFor(next))
             next += 1L
         }
@@ -157,7 +157,7 @@ class ChatLog(scope: ComponentScope) : Component(scope) {
                 button(
                     "Jump to latest",
                     {
-                        when (val key = conversation.lastKey) {
+                        when (conversation.lastKey) {
                             case Some(val last) -> list.scrollToItem(last, ScrollAlignment.End)
                             case None -> {}
                         }
@@ -169,7 +169,7 @@ class ChatLog(scope: ComponentScope) : Component(scope) {
                 button(
                     "Bookmark",
                     {
-                        bookmark.value = when (val snapshot = list.reading) {
+                        bookmark.value = when (list.reading) {
                             case Some(val value) -> value.anchor
                             case None -> None
                         }
@@ -178,7 +178,7 @@ class ChatLog(scope: ComponentScope) : Component(scope) {
                 button(
                     "Back to bookmark",
                     {
-                        when (val anchor = bookmark.value) {
+                        when (bookmark.value) {
                             case Some(val value) -> list.restore(value)
                             case None -> {}
                         }

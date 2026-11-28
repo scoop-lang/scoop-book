@@ -293,7 +293,7 @@ virtualList(conversation, ItemExtent.Variable(56.0)) {
 `scrollToItem(key, alignment)` 滚动到指定的行，`alignment` 和 `reveal` 的相同。Jump to latest 把最后一条消息滚动到视口底部：
 
 ```scoop
-when (val key = conversation.lastKey) {
+when (conversation.lastKey) {
     case Some(val last) -> list.scrollToItem(last, ScrollAlignment.End)
     case None -> {}
 }
@@ -318,14 +318,14 @@ when (val key = conversation.lastKey) {
 阅读锚点用 key 而不是像素描述位置，所以在数据变化之后仍然有意义。Bookmark 把它存起来，Back to bookmark 把它交给 `restore`：
 
 ```scoop
-bookmark.value = when (val snapshot = list.reading) {
+bookmark.value = when (list.reading) {
     case Some(val value) -> value.anchor
     case None -> None
 }
 ```
 
 ```scoop
-when (val anchor = bookmark.value) {
+when (bookmark.value) {
     case Some(val value) -> list.restore(value)
     case None -> {}
 }

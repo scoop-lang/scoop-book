@@ -3,6 +3,7 @@
 //! dep: scoop:scoop.ui.component:0.1.0
 //! dep: scoop:scoop.ui.style:0.1.0
 //! dep: scoop:scoop.ui.style.fluent:0.1.0
+//! dep: scoop:scoop.ui.style.liquidglass:0.1.0
 //! dep: scoop:scoop.ui.style.macos:0.1.0
 //! dep: scoop:scoop.ui.style.material:0.1.0
 //! dep: scoop:scoop.ui.style.shadcn:0.1.0
@@ -12,6 +13,7 @@ import scoop.ui.*
 import scoop.ui.component.*
 import scoop.ui.style.*
 import scoop.ui.style.fluent.fluentTheme
+import scoop.ui.style.liquidglass.liquidGlassTheme
 import scoop.ui.style.macos.macosSystemPalette
 import scoop.ui.style.macos.macosTheme
 import scoop.ui.style.material.materialTheme
@@ -21,7 +23,7 @@ import scoop.window.Theme as WindowTheme
 import scoop.window.WindowEvent
 
 enum Preset {
-    MacOS, Material, Fluent, Shadcn
+    MacOS, Material, Fluent, Shadcn, LiquidGlass
 }
 
 enum ModeChoice {
@@ -74,6 +76,7 @@ class ThemeModel {
             case Material -> materialTheme(resolved, palette)
             case Fluent -> fluentTheme(resolved, palette)
             case Shadcn -> shadcnTheme(resolved, palette)
+            case LiquidGlass -> liquidGlassTheme(resolved, palette)
         }
     }
 }
@@ -124,6 +127,11 @@ class Themes(private val model: ThemeModel, scope: ComponentScope) : Component(s
                 "shadcn",
                 model.preset.value == Preset.Shadcn,
                 { model.selectPreset(Preset.Shadcn) }
+            ),
+            choice(
+                "Liquid Glass",
+                model.preset.value == Preset.LiquidGlass,
+                { model.selectPreset(Preset.LiquidGlass) }
             )
         ]
         val modes = [

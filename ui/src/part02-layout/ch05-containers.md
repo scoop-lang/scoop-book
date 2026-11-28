@@ -133,6 +133,7 @@ scoop run card.scoop --release
 | `padding`、`logicalPadding` | 内边距，物理或逻辑方向 |
 | `alignment` | 子项在 frame 内的位置，默认两个方向都居中 |
 | `surface` | 使用主题的表面：`SurfaceKind.Plain`、`Action` 或 `Elevated` |
+| `surfaceRole` | 表面的用途，默认 `SurfaceRole.Content`；主题据此决定这块表面是否使用玻璃（第 21.7 节） |
 | `style { ... }` | 局部装饰：`background(...)`、`corners(...)`、`border(...)` 等 |
 
 几点需要注意：
