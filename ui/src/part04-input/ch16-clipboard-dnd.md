@@ -30,7 +30,7 @@ scoop run transfer.scoop --release
 
 ```scoop
 private fun paste() {
-    pasted.value = when (val text = scope.nativeWindow.clipboard.readText()) {
+    pasted.value = when (scope.nativeWindow.clipboard.readText()) {
         case Some(val value) -> f"Pasted: ${value}"
         case None -> "The clipboard has no plain text."
     }

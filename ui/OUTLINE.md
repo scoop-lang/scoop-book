@@ -1,6 +1,6 @@
 # 《Scoop UI 编程指南》大纲
 
-更新日期：2026-11-27。本文件是写作计划，不进入 mdbook 构建（不在 `src/` 下）。
+更新日期：2026-11-28。本文件是写作计划，不进入 mdbook 构建（不在 `src/` 下）。
 
 **进度**：前言和第一至七部分（第 1～26 章）已完成，其余章节为空文件。
 
@@ -280,20 +280,21 @@
 ## 第六部分　外观
 
 ### 第 21 章　主题 【已完成】
-- 21.1 四套预设：Cone、工厂函数 `xxxTheme(mode, palette) { }`、取向与选择
-- 21.2 主题由什么组成：tokens 与部件两层；改 tokens 不重算部件；按钮文字用 typography.action；read(scope) 取页面颜色
+- 21.1 五套预设：Cone、工厂函数 `xxxTheme(mode, palette) { }`、取向与选择（macOS 为 Sequoia 外观，没有玻璃；Liquid Glass 为第五套）
+- 21.2 主题由什么组成：tokens 与部件两层（tokens 含 glassSurfaces、controlMetrics、controlThumb）；改 tokens 不重算部件；按钮文字用 typography.action；read(scope) 取页面颜色
 - 21.3 在预设上修改（brand）；copy 派生（Larger text：body 变大、按钮文字不变）
-- 21.4 运行时切换主题（themes）：不重建界面，状态全部保留；选择与最终主题分开保存
+- 21.4 运行时切换主题（themes，五套预设）：不重建界面，状态全部保留；选择与最终主题分开保存
 - 21.5 跟随系统明暗（observedTheme、ThemeChanged）与系统配色 `macosSystemPalette(mode)`（快照、主线程、仅 macOS）【新增】
 - 21.6 显示偏好：read(scope) 与 current 的区别；theme.preferences；`runUiApplication(preferences = uiPreferences { })` 覆盖；运行中改用 UiWindow.preferences；contrastThemeColors 【新增】
-- 写作注意：切换系统外观未实际操作；按钮直接放在 column 中会占满宽度（居中的标签按可用宽度排版），示例把按钮放进 row
+- 21.7 Liquid Glass 与玻璃表面（glass）：stack 中浮在色带上的工具栏；SurfaceRole 与 SurfaceKind、各控件的用途、frame 的 surfaceRole；tokens.glassSurfaces 与 Liquid Glass 的三组默认材质，Material 按用途打开玻璃；GlassMaterial 字段与 copy；局部 glass(None)；可读性底色与 glassSurfaceFill；ButtonGroup 融合；高对比度／减少透明度关闭主题玻璃；静止 0% CPU 【新增】
+- 写作注意：切换系统外观未实际操作；按钮直接放在 column 中会占满宽度（居中的标签按可用宽度排版），示例把按钮放进 row；按钮组按下时的形变未在窗口中核对；2026-11-28 更新本章截图时，本机终端没有屏幕录制权限，改用 computer-use 工具抓取窗口（JPEG），再裁剪、量化为 PNG
 
-示例：`examples/ch21/`（brand、themes、preferences）
+示例：`examples/ch21/`（brand、themes、preferences、glass）
 
 ### 第 22 章　局部样式与效果 【已完成】
 - 22.1 一个示例（styles）
 - 22.2 styled：Style 的字段；对布局透明、不加内边距、增减效果不重建内容
-- 22.3 绘制顺序与内容效果（BoxShadow 与 DropShadow 的区别、Glow、Blur 不是毛玻璃；StylePainter 与滤镜）
+- 22.3 绘制顺序与内容效果（BoxShadow 与 DropShadow 的区别、Glow、Blur 不是毛玻璃）；Style.glass 处理背后的画面，不经过主题；glassEffectContainer 融合与形变（三按钮试验，无截图）
 - 22.4 控件的样式：ButtonStyle、CheckboxStyle、TextFieldStyle、states；局部样式要克制
 - 22.5 StyleOverride：Inherit 与 Set、resolve、then、copy（overrides 控制台程序）
 - 22.6 样式块中的陷阱：`frame { style { border = Some(...) } }` 选中顶层 `style {}` 被丢弃（style_trap 截图对照）
@@ -331,7 +332,7 @@
 - 25.1 路径、渐变、裁剪与变换；资源归属（仪表盘）
 - 25.2 图像与图层：采样方式、整体透明度、图层滤镜
 - 25.3 SkSL 着色器：程序结构、编译与绑定
-- 25.4 背景效果：毛玻璃、drawBackdrop、saveBackdropLayer、runtimeShader 折射（glass 示例）
+- 25.4 背景效果：毛玻璃、drawBackdrop、saveBackdropLayer、runtimeShader（工具链 glass 示例已改用 Style.glass，GlassMaterial 内部用 runtimeShader 实现）
 - 25.5 CPU 离屏绘制：RasterSurface、readPixels（有 .expected）、OffscreenSurface、recordDrawing
 - 25.6 真实项目：video 的 NV12 着色器、solar-system 原生 GPU 渲染、terminal 两遍绘制与硬裁剪
 
@@ -440,7 +441,7 @@
 
 - 附录 A　控件速查：`scoop.ui.component` 按类别列出控件、主要参数和所在章节
 - 附录 B　常见错误与诊断：汇总各章"常见错误"表（E0716、MissingContextException、State 写入阶段错误、builder 返回 Unit 等）
-- 附录 C　四套主题对照与 tokens 速查
+- 附录 C　五套主题对照与 tokens 速查
 - 附录 D　平台差异与验证状态：输入、无障碍、桌面能力、窗口测试在三个平台上的实际支持与验证情况
 - 附录 E　概念对照：React／Jetpack Compose／SwiftUI → Scoop UI
 - 附录 F　术语表（中英对照：紧约束、owner 线程、Accepted 帧……）

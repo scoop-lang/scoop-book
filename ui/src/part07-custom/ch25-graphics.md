@@ -190,7 +190,7 @@ half4 main(float2 p) {
 
 ## 25.4　背景效果：毛玻璃
 
-`Style` 的 `contentEffects` 和图层滤镜处理的都是“自己画的内容”。毛玻璃要处理的是面板**背后**已经画好的画面。示例的 `Poster` 是这样画面板的：
+`Style` 的 `contentEffects` 和图层滤镜处理的都是“自己画的内容”。毛玻璃要处理的是面板**背后**已经画好的画面。常见的毛玻璃给 `Style` 设置 `glass` 就够了（第 22.3 节），`StylePainter` 会按材质自己创建滤镜；这个示例则自己持有一个高斯模糊滤镜，直接交给 `StylePainter`。`Poster` 是这样画面板的：
 
 ```scoop
 // The backdrop filter samples what this layer has drawn so far: the waves.
@@ -215,7 +215,9 @@ painter.scene(context, layout, glass, backdrop) { local -> local.children() }
 
 `ImageFilter.runtimeShader(program, sourceChild, sampleRadius) { ... }` 用一段 SkSL 程序处理图像：`sourceChild` 是程序中代表输入图像的 `uniform shader` 的名字，程序用 `background.eval(p)` 读取输入图像在某处的颜色；`sampleRadius` 声明程序最多会偏离当前像素多远去取样，框架据此准备足够的邻域。
 
-工具链附带的 glass 示例（`scoop.ui.component/examples/glass`）在可滚动的色样列表上方放了两块固定的工具栏，左边用高斯模糊，右边用一段“折射”程序：它在面板的圆角附近按法线方向偏移取样的位置，让背后的线条像透过玻璃边缘一样弯折，最大偏移 13，所以 `sampleRadius` 也是 13。这个滤镜需要知道面板的尺寸，示例在 `measure` 中根据尺寸创建它，作为布局数据返回，并传入关闭函数（第 23.4 节），布局被替换时滤镜随之关闭。把这个目录复制到自己的工作目录，运行 `scoop run --release` 就能看到。
+工具链附带的 glass 示例（`scoop.ui.component/examples/glass`）在可滚动的色样列表上方放了两块固定的工具栏，左边是高斯模糊，右边是折射：背后的线条在面板的圆角附近像透过玻璃边缘一样弯折。两块面板都没有自己写滤镜，而是把 `glassMaterial { ... }` 赋给 `Style.glass`（第 22.3 节）：左边是 `blurSigma = 7`、`refraction = 0`，右边用 `copy` 改成 `blurSigma = 0`、`refraction = 13`、`edgeWidth = 20`，由 `StylePainter` 按面板实际的圆角生成折射程序和滤镜。底部的按钮在 100% 和 50% 之间切换整条工具栏的透明度，用的就是上面的 `saveBackdropLayer`。把这个目录复制到自己的工作目录，运行 `scoop run --release` 就能看到。
+
+`GlassMaterial` 本身就是用 `ImageFilter.runtimeShader` 实现的：它在圆角附近按法线方向偏移取样的位置，最大偏移就是 `refraction`，所以 `sampleRadius` 也取这个值。源码在工具链的 `src/scoop.ui.style/src/glass/` 中。材质的几个参数表达不了的效果，比如色散或者特殊的扭曲，再自己编写这样的程序。
 
 ## 25.5　CPU 离屏绘制
 
@@ -302,7 +304,7 @@ canvas.drawImageRegion(tile.lease.image, tile.source, tile.destination, tile.sam
 - **`saveLayer` 或 `save` 之后忘了 `restore()`。** 后面的绘制都会受影响。用 `withState { }` 让它自动恢复。
 - **给 `setFloat` 传 `Double`。** 参数类型是 `Float`，写成 `0.8f` 或调用 `toFloat()`。
 - **背景滤镜没有效果。** 要模糊的内容必须在同一图层中、先于面板绘制。
-- **把 `ContentEffect.Blur` 当成毛玻璃。** 它模糊的是内容自己，毛玻璃用背景滤镜。
+- **把 `ContentEffect.Blur` 当成毛玻璃。** 它模糊的是内容自己，毛玻璃用 `Style.glass` 或背景滤镜。
 - **用 `readPixels()` 读取 UI 的画面。** 离屏画布才能读回；UI 的画面在 GPU 上，测试窗口的像素见第 30 章。
 
 ## 小结
@@ -312,7 +314,7 @@ canvas.drawImageRegion(tile.lease.image, tile.source, tile.destination, tile.sam
 - Canvas 的变换和裁剪影响之后的绘制，用 `save`／`restore` 或 `withState` 限定范围；它们不移动子项和输入区域。
 - `Image.decode` 和 `Image.fromRgba` 构造图像，`Nearest` 和 `Linear` 是两种采样方式；`saveLayer` 让一组绘制整体透明、整体应用滤镜。
 - `ShaderProgram.compile` 编译 SkSL，`makeShader` 绑定参数得到不可变的快照，`main(p)` 中的 `p` 是元素的局部逻辑坐标。
-- `StylePainter.scene` 的滤镜参数、`drawBackdrop` 和 `saveBackdropLayer` 处理同一图层中先画的背景；`ImageFilter.runtimeShader` 用 SkSL 处理图像。
+- `Style.glass` 的材质、`StylePainter.scene` 的滤镜参数、`drawBackdrop` 和 `saveBackdropLayer` 处理同一图层中先画的背景；`ImageFilter.runtimeShader` 用 SkSL 处理图像，`GlassMaterial` 就是用它实现的。
 - `RasterSurface` 在 CPU 上绘图，不需要窗口，`readPixels()` 读回 RGBA8，`snapshot()` 得到独立的图像。
 
 ## 练习
