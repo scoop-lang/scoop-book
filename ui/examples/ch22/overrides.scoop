@@ -1,0 +1,35 @@
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.graphics:0.1.0
+import scoop.graphics.*
+import scoop.ui.style.*
+
+fun <T> slot(value: T?): String = when (value) {
+    case Some(_) -> "set"
+    case None -> "none"
+}
+
+fun describe(label: String, value: Style) {
+    println(
+        f"${label}: background=${slot(value.background)}, border=${slot(value.border)}, " +
+            f"corners=${value.corners == Corners.all(8.0)}"
+    )
+}
+
+fun main() {
+    // A complete Style: every field has a value.
+    val base = style {
+        background = Some(Paint(Color.White))
+        border = Some(Border.all(1.0, Color.Black))
+        corners = Corners.all(8.0)
+    }
+    describe("base", base)
+    // Only the border slot is Set(None); every other slot stays Inherit.
+    val noBorder = styleOverride { border(None) }
+    describe("override", noBorder.resolve(base))
+    // Assigning Inherit back restores inheritance for that slot.
+    val restored = noBorder.copy { border = StyleValue.Inherit }
+    describe("restored", restored.resolve(base))
+    // then: Set in the second layer wins, Inherit keeps the first layer's value.
+    val square = styleOverride { corners(Corners.all(0.0)) }
+    describe("layered", noBorder.then(square).resolve(base))
+}

@@ -1,0 +1,112 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+import scoop.ui.text.TextEditorState
+
+class Messages(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    // Like TextEditorState, the scroll position is owned here and lent to the area.
+    private val scroll = ScrollState()
+    private val reply = TextEditorState()
+    private val replyFocus = FocusHandle()
+    private val staticBars = state(false)
+    private val hardEdges = state(false)
+    private val barsTarget = FieldTarget()
+    private val edgesTarget = FieldTarget()
+
+    public override fun render(): View {
+        val scroll = this.scroll
+        val replyFocus = this.replyFocus
+        val staticBars = this.staticBars
+        val hardEdges = this.hardEdges
+        val messages = column {
+            for (index in 1..40) {
+                label(f"Message ${index}")
+                separator()
+            }
+            input(this @Messages.reply) {
+                placeholder = "Reply at the very bottom"
+                focus = FocusOptions(Some(replyFocus))
+            }
+            spacing = 8.0
+            padding = Insets.all(12.0)
+            alignment = CrossAlignment.Stretch
+        }
+        val page = column {
+            row {
+                button("Top", { scroll.scrollTo(Point(0.0, 0.0)) })
+                button("Bottom (animated)", { scroll.animateTo(Point(0.0, scroll.maximum.y)) }) {
+                    variant = ButtonVariant.Outline
+                }
+                button(
+                    "Down 100",
+                    {
+                        scroll.scrollBy(Point(0.0, 100.0))
+                        Unit
+                    }
+                ) { variant = ButtonVariant.Outline }
+                button(
+                    "Focus reply",
+                    {
+                        replyFocus.requestFocus()
+                        Unit
+                    }
+                ) { variant = ButtonVariant.Outline }
+                spacing = 8.0
+            }
+            scrollArea(messages) {
+                state = Some(scroll)
+                height = Some(320.0)
+                scrollbarBehavior {
+                    preset = if (staticBars.value)
+                        ScrollbarPreset.Static
+                    else
+                        ScrollbarPreset.FollowSystem
+                }
+                scrollPhysics = if (hardEdges.value)
+                    ScrollPhysicsOptions(boundary = ScrollBoundary.Hard)
+                else
+                    ScrollPhysicsOptions()
+            }
+            // Reading the state in render: the label follows every scroll.
+            label(
+                f"offset ${scroll.offset.y.toInt()} / ${scroll.maximum.y.toInt()}, " +
+                    f"viewport ${scroll.viewport.height.toInt()}, " +
+                    f"content ${scroll.content.height.toInt()}"
+            )
+            row {
+                switchControl(staticBars.binding()) {
+                    labelTarget = Some(this @Messages.barsTarget)
+                }
+                fieldLabel("Always show the scrollbar", this @Messages.barsTarget)
+                switchControl(hardEdges.binding()) {
+                    labelTarget = Some(this @Messages.edgesTarget)
+                }
+                fieldLabel("Hard edges", this @Messages.edgesTarget)
+                spacing = 8.0
+                alignment = CrossAlignment.Center
+            }
+            spacing = 12.0
+            alignment = CrossAlignment.Stretch
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Scrolling", { scope -> Messages(scope) })
+    }
+}

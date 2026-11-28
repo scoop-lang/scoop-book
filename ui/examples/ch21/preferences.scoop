@@ -1,0 +1,66 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+import scoop.ui.text.TextEditorState
+
+fun yesNo(value: Boolean): String = if (value) "on" else "off"
+
+class Preferences(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val note = TextEditorState("Text follows the theme's type scale.")
+
+    public override fun render(): View {
+        // read(scope) merges the base theme with this root's effective preferences.
+        val theme = this.theme.read(scope)
+        val applied = theme.preferences
+        val palette = theme.tokens.palette
+        val summary = typography(
+            f"high contrast ${yesNo(applied.highContrast)} · " +
+                f"reduce transparency ${yesNo(applied.reduceTransparency)} · " +
+                f"reduce motion ${yesNo(applied.reduceMotion)} · " +
+                f"text scale ${applied.textScaleFactor}",
+            TypographyRole.Muted
+        )
+        val page = column {
+            typography("Display preferences", TypographyRole.H3)
+            add(summary)
+            row {
+                button("Save", {})
+                button("Cancel", {}) { variant = ButtonVariant.Outline }
+                checkbox(initialChecked = true)
+                label("Remember me")
+                spacing = 12.0
+                alignment = CrossAlignment.Center
+            }
+            input(this @Preferences.note)
+            spacing = 16.0
+            alignment = CrossAlignment.Stretch
+        }
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(palette.background.background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication(
+            "Preferences",
+            { scope -> Preferences(scope) },
+            // Each field left as None follows the system; these two override it for this window.
+            preferences = uiPreferences {
+                highContrast = Some(true)
+                textScaleFactor = Some(1.25)
+            }
+        )
+    }
+}

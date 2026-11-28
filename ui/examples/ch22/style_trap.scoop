@@ -1,0 +1,48 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+val red = Color(0.86, 0.18, 0.16)
+
+class StyleTrap(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+
+    public override fun render(): View {
+        val palette = this.theme.read(scope).tokens.palette
+        // WRONG: compiles, but draws no border. In this block `border` is a StyleValue, so the
+        // assignment does not fit, and `style { ... }` resolves to the top-level
+        // scoop.ui.style.style(...) instead. That builds a Style value which is thrown away.
+        val wrong = frame(label("border = Some(...)")) {
+            padding = Some(Insets.all(16.0))
+            style { border = Some(Border.all(2.0, red)) }
+        }
+        // RIGHT: the method with the same name writes StyleValue.Set(...).
+        val right = frame(label("border(Some(...))")) {
+            padding = Some(Insets.all(16.0))
+            style { border(Some(Border.all(2.0, red))) }
+        }
+        val page = row {
+            add(wrong)
+            add(right)
+            spacing = 24.0
+        }
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(palette.background.background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Style trap", { scope -> StyleTrap(scope) })
+    }
+}

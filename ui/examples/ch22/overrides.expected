@@ -1,0 +1,4 @@
+base: background=set, border=set, corners=true
+override: background=set, border=none, corners=true
+restored: background=set, border=set, corners=true
+layered: background=set, border=none, corners=false

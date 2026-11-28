@@ -1,0 +1,223 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+class Message(val id: Long, val author: String, val text: String)
+
+private val samples = [
+    "Morning!",
+    "Did the build pass on the new toolchain?",
+    "Yes. The text input chapter needed one rename, everything else compiled as before.",
+    "Nice.",
+    "I am looking at the long list next: one hundred million rows, but only the visible ones are built, so it starts as fast as a short one.",
+    "Ship it."
+]
+
+/** A message whose text depends only on its id, so ids alone describe the history. */
+fun messageFor(id: Long): Message {
+    val author = if (id % 2L == 0L) "Ada" else "Lin"
+    return Message(
+        id,
+        author,
+        f"#${id}  ${samples[(id % samples.size + samples.size) % samples.size]}"
+    )
+}
+
+/**
+ * An immutable snapshot of the conversation. Ids are consecutive, so a key maps back to its index
+ * without searching. Every change creates a new snapshot.
+ */
+class Conversation(private val messages: Array<Message>) : ItemSource {
+    public override val count: Long get() = messages.size
+    public override fun keyAt(index: Long): ViewKey = ViewKey.Number(messages[index].id)
+    public override fun indexOfKey(key: ViewKey): Long? {
+        if (messages.size == 0L) return None
+        return when (key) {
+            case Number(val id) -> {
+                val index = id - messages[0L].id
+                if (index >= 0L && index < messages.size) Some(index) else None
+            }
+
+            else -> None
+        }
+    }
+    public override fun build(index: Long): View = component(
+        messages[index],
+        { p, s -> MessageRow(p, s) }
+    )
+
+    val lastKey: ViewKey?
+        get() = if (messages.size == 0L)
+            None
+        else
+            Some(ViewKey.Number(messages[messages.size - 1L].id))
+}
+
+/** The business side: a plain class with State, no views. */
+class ChatStore {
+    private var first = 1000L
+    private var next = 1000L
+    private val messages = ArrayList<Message>()
+    val conversation = state(Conversation([]))
+
+    init {
+        for (step in 0..<30) {
+            messages.add(messageFor(next))
+            next += 1L
+        }
+        publish()
+    }
+
+    private fun publish() {
+        conversation.value = Conversation(messages.toArray())
+    }
+
+    /** Older history arrives at the front, as in a chat that loads on demand. */
+    fun loadEarlier() {
+        val current = messages.toArray()
+        first -= 20L
+        messages.clear()
+        for (id in first..<first + 20L)
+            messages.add(messageFor(id))
+        for (message in current)
+            messages.add(message)
+        publish()
+    }
+
+    fun receive() {
+        messages.add(messageFor(next))
+        next += 1L
+        publish()
+    }
+}
+
+/** One message. `expanded` is local to the row instance, not part of the store. */
+class MessageRow(private val props: Props<Message>, scope: ComponentScope) : Component(scope) {
+    private val expanded = state(false)
+
+    public override fun render(): View {
+        val message = props.value
+        val expanded = this.expanded
+        return column {
+            row {
+                typography(message.author, TypographyRole.Small)
+                button(
+                    if (expanded.value) "Less" else "More",
+                    { expanded.value = !expanded.value }
+                ) {
+                    variant = ButtonVariant.Ghost
+                    size = ButtonSize.Xs
+                }
+                spacing = 8.0
+                alignment = CrossAlignment.Center
+            }
+            label(message.text)
+            if (expanded.value)
+                typography(
+                    f"Message id ${message.id}, kept in this row only.",
+                    TypographyRole.Muted
+                )
+            spacing = 2.0
+            padding = Insets(6.0, 12.0, 6.0, 12.0)
+            alignment = CrossAlignment.Stretch
+        }
+    }
+}
+
+class ChatLog(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val store = ChatStore()
+    private val list = VirtualListHandle()
+    private val bookmark = state<VirtualReadingAnchor?>(None)
+    private val keepAlive = state(false)
+    private val keepTarget = FieldTarget()
+
+    public override fun render(): View {
+        val store = this.store
+        val list = this.list
+        val bookmark = this.bookmark
+        val conversation = store.conversation.value
+        val reading = when (list.reading) {
+            case Some(val snapshot) ->
+                f"rows ${snapshot.visible.start} ..< ${snapshot.visible.end}" +
+                    (if (snapshot.atEnd) ", at the end" else "")
+            case None -> "not laid out yet"
+        }
+        val page = column {
+            row {
+                button("Load earlier", { store.loadEarlier() }) { variant = ButtonVariant.Outline }
+                button("New message", { store.receive() })
+                button(
+                    "Jump to latest",
+                    {
+                        when (val key = conversation.lastKey) {
+                            case Some(val last) -> list.scrollToItem(last, ScrollAlignment.End)
+                            case None -> {}
+                        }
+                    }
+                ) { variant = ButtonVariant.Outline }
+                spacing = 8.0
+            }
+            row {
+                button(
+                    "Bookmark",
+                    {
+                        bookmark.value = when (val snapshot = list.reading) {
+                            case Some(val value) -> value.anchor
+                            case None -> None
+                        }
+                    }
+                ) { variant = ButtonVariant.Outline }
+                button(
+                    "Back to bookmark",
+                    {
+                        when (val anchor = bookmark.value) {
+                            case Some(val value) -> list.restore(value)
+                            case None -> {}
+                        }
+                    }
+                ) { variant = ButtonVariant.Outline }
+                spacing = 8.0
+            }
+            virtualList(conversation, ItemExtent.Variable(56.0)) {
+                handle = Some(list)
+                height = Some(360.0)
+                anchor = VirtualListAnchor.FollowEnd
+                retention = if (this @ChatLog.keepAlive.value)
+                    ItemRetention.KeepAlive(50L)
+                else
+                    ItemRetention.Dispose
+            }
+            label(f"${conversation.count} messages, ${reading}")
+            row {
+                switchControl(this @ChatLog.keepAlive.binding()) {
+                    labelTarget = Some(this @ChatLog.keepTarget)
+                }
+                fieldLabel("Keep 50 off-screen rows alive", this @ChatLog.keepTarget)
+                spacing = 8.0
+                alignment = CrossAlignment.Center
+            }
+            spacing = 12.0
+            alignment = CrossAlignment.Stretch
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Chat log", { scope -> ChatLog(scope) })
+    }
+}

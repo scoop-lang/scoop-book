@@ -1,0 +1,45 @@
+//! dep: scoop:scoop.graphics:0.1.0
+import scoop.graphics.*
+
+/** Red channel of pixel (x, y) in tightly packed RGBA8 rows, as 0 to 255. */
+fun red(pixels: Array<Byte>, width: Long, x: Long, y: Long): Int = pixels[(y * width + x) * 4L]
+    .toUByte()
+    .toInt()
+
+fun main() {
+    val width = 36L
+    val height = 13L
+    // A CPU surface needs no window, no GPU and no running application.
+    RasterSurface(width.toInt(), height.toInt())
+        .use { surface ->
+            surface
+                .draw { canvas ->
+                    canvas.clear(Color.White)
+                    canvas.drawCircle(Point(7.0, 6.5), 5.0, Paint(Color.Black))
+                    canvas
+                        .drawRoundRect(
+                            Rect(16.0, 2.0, 18.0, 9.0),
+                            3.0,
+                            3.0,
+                            Paint(Color.Black, PaintingStyle.Stroke, 2.0)
+                        )
+                    canvas
+                        .drawLine(
+                            Point(19.0, 6.5),
+                            Point(30.0, 6.5),
+                            Paint(Color.Black, PaintingStyle.Stroke, 3.0)
+                        )
+                }
+            // readPixels copies the pixels back: straight-alpha RGBA8, row by row.
+            val pixels = surface.readPixels()
+            println(f"${pixels.size} bytes")
+            for (y in 0L..<height) {
+                val line = StringBuilder()
+                for (x in 0L..<width)
+                    line.append(if (red(pixels, width, x, y) < 128) "#" else ".")
+                println(line.toString())
+            }
+            // A snapshot is an ordinary Image that later drawing does not change.
+            surface.snapshot().use { image -> println(f"snapshot: ${image.width}×${image.height}") }
+        }
+}

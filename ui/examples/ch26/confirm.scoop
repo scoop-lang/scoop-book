@@ -1,0 +1,130 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.surface:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.macos:0.1.0
+import scoop.graphics.*
+import scoop.surface.InputArea
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.macos.macosTheme
+
+class ConfirmDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val open = state(false)
+    private val deleted = state(0)
+    private val other = state(0)
+    private val cancel = FocusHandle()
+
+    public override fun render(): View {
+        val open = this.open
+        val deleted = this.deleted
+        val other = this.other
+        val cancel = this.cancel
+        val palette = this.theme.read(scope).tokens.palette
+
+        // The dialog: a card centered on a dimmed backdrop that fills the window.
+        val card = styled(
+            frame(
+                column {
+                    label("Delete “notes.txt”?")
+                    label("This cannot be undone.")
+                    row {
+                        button("Cancel", { open.value = false }) { focus { handle = Some(cancel) } }
+                        button(
+                            "Delete",
+                            {
+                                deleted.value += 1
+                                open.value = false
+                            }
+                        )
+                        spacing = 8.0
+                    }
+                    spacing = 10.0
+                }
+            ) {
+                width = Some(280.0)
+                padding = Some(Insets.all(16.0))
+            }
+        ) {
+            style {
+                background = Some(Paint(palette.popover.background))
+                border = Some(Border.all(1.0, palette.border))
+                corners = Corners.all(10.0)
+                boxShadows = [BoxShadow(Point(0.0, 8.0), 16.0, 16.0, palette.shadow)]
+            }
+        }
+        val scrim = element({ mount -> Scrim(mount) }, [card])
+        val layer = portal(open.binding(), scrim) {
+            // Fill the whole window: the scrim draws the dimmed backdrop itself.
+            viewport { viewportPadding = 0.0 }
+            mode = OverlayMode.Modal
+            focus { initialFocus = Some(cancel) }
+            dismiss { escape = true }
+        }
+
+        val content = column {
+            row {
+                button("Delete file…", { open.value = true })
+                label(f"Deleted: ${deleted.value}")
+                spacing = 12.0
+                alignment = CrossAlignment.Center
+            }
+            row { button(f"Another button (${other.value})", { other.value += 1 }) }
+            add(layer)
+            spacing = 12.0
+        }
+        return frame(content) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(palette.background.background))) }
+        }
+    }
+}
+
+/**
+ * Fills the space the layer offers, dims it, and centers its only child.
+ * Only the card has an input area; the dimmed part is "outside" the layer.
+ */
+class Scrim(scope: ComponentScope) : Element<Rect>(scope) {
+    private var area: InputArea? = None
+
+    public override fun onMount() {
+        area = Some(scope.createArea())
+        scope.routeChildren(area!!)
+    }
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Rect
+    > {
+        // A layer offers bounded constraints: take all of it.
+        val size = Size(
+            constraints.maxWidth ?: constraints.minWidth,
+            constraints.maxHeight ?: constraints.minHeight
+        )
+        val card = context
+            .measureChild(
+                0L,
+                Constraints(maxWidth = Some(size.width), maxHeight = Some(size.height))
+            )
+            .size
+        val origin = Point((size.width - card.width) / 2.0, (size.height - card.height) / 2.0)
+        context.placeChild(0L, origin)
+        return LayoutResult(LayoutMetrics(size), Rect(origin.x, origin.y, card.width, card.height))
+    }
+
+    public override fun scene(context: SceneContext, card: Rect) {
+        val whole = Rect(0.0, 0.0, context.size.width, context.size.height)
+        context.draw { paint -> paint.canvas.drawRect(whole, Paint(Color.Black.withAlpha(0.3))) }
+        context.place(area!!, card)
+        context.children()
+    }
+}
+
+fun main() {
+    context(ThemeSource(macosTheme(ThemeMode.Light))) {
+        runUiApplication("Confirm", { scope -> ConfirmDemo(scope) })
+    }
+}

@@ -1,0 +1,89 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** What a badge shows, and the revision it reports for its cached layer. */
+struct BadgeInput(val count: Int, val revision: Long)
+
+/** A round badge: the circle is a cached layer, the number is an ordinary child. */
+class Badge(private val props: Props<BadgeInput>, scope: ComponentScope) : Element<Unit>(scope) {
+    private val circle = PaintKey()
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        val number = context.measureChild(0L, Constraints())
+        context
+            .placeChild(
+                0L,
+                Point((40.0 - number.size.width) / 2.0, (40.0 - number.size.height) / 2.0)
+            )
+        return LayoutResult(LayoutMetrics(constraints.constrain(Size(40.0, 40.0))), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        val count = props.value.count
+        // The block runs again only when the revision changes; otherwise the old pixels are reused.
+        context
+            .drawLayer(circle, Rect(0.0, 0.0, 40.0, 40.0), props.value.revision) { paint ->
+                val color = if (count > 9) Color(0.86, 0.18, 0.16) else Color(0.18, 0.42, 0.85)
+                paint.canvas.drawCircle(Point(20.0, 20.0), 18.0, Paint(color))
+            }
+        // Children are not part of the layer: the number is drawn every frame as usual.
+        context.children()
+    }
+}
+
+fun badge(count: Int, revision: Long): View = element(
+    BadgeInput(count, revision),
+    { props, mount -> Badge(props, mount) },
+    [label(f"${count}") { style { color = Some(Color.White) } }]
+)
+
+class BadgeDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val count = state(8)
+
+    public override fun render(): View {
+        val count = this.count
+        val n = count.value
+        // The circle turns red above 9. The second badge forgets that in its revision.
+        val correct = badge(n, n.toLong())
+        val stale = badge(n, 0L)
+        val page = column {
+            row {
+                add(correct)
+                label("revision = count")
+                spacing = 8.0
+                alignment = CrossAlignment.Center
+            }
+            row {
+                add(stale)
+                label("revision = 0 (wrong)")
+                spacing = 8.0
+                alignment = CrossAlignment.Center
+            }
+            row { button("Add one", { count.value += 1 }) }
+            spacing = 12.0
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Badges", { scope -> BadgeDemo(scope) })
+    }
+}

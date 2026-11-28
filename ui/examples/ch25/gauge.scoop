@@ -1,0 +1,212 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.math:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.math.PI
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** Angles are in radians, clockwise from the positive x axis (y points down). */
+val startAngle = PI * 5.0 / 6.0
+
+val sweepAngle = PI * 4.0 / 3.0
+
+val center = Point(140.0, 120.0)
+
+val radius = 88.0
+
+val dialOval = Rect(center.x - radius, center.y - radius, radius * 2.0, radius * 2.0)
+
+/** A dial for a value from 0 to 100; the number below is an ordinary child. */
+class Gauge(private val props: Props<Double>, scope: ComponentScope) : Element<Unit>(scope) {
+    private var card: Path? = None
+    private var track: Path? = None
+    private var needle: Path? = None
+    private var filled: Path? = None
+    private var shown = -1.0
+
+    public override fun onMount() {
+        // Shapes that never change are built once and owned by the scope.
+        card = Some(
+            scope.resource { path { addRoundRect(Rect(0.0, 0.0, 280.0, 220.0), 20.0, 20.0) } }
+        )
+        track = Some(
+            scope.resource { path { arcTo(dialOval, startAngle, sweepAngle, moveToStart = true) } }
+        )
+        needle = Some(
+            scope
+                .resource {
+                    path {
+                        moveTo(Point(0.0, -5.0))
+                        lineTo(Point(radius - 14.0, 0.0))
+                        lineTo(Point(0.0, 5.0))
+                        closeContour()
+                    }
+                }
+        )
+    }
+
+    public override fun update(): UiInvalidation {
+        // The filled arc follows the value: replace it and close the old one.
+        val value = props.value
+        if (value != shown) {
+            val next = path {
+                arcTo(dialOval, startAngle, sweepAngle * value / 100.0, moveToStart = true)
+            }
+            filled?.close()
+            filled = Some(next)
+            shown = value
+        }
+        return UiInvalidation.Scene
+    }
+
+    public override fun onUnmount() {
+        // Not registered with scope.resource, so this element closes it itself.
+        filled?.close()
+    }
+
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        val number = context.measureChild(0L, Constraints())
+        context.placeChild(0L, Point(center.x - number.size.width / 2.0, 160.0))
+        return LayoutResult(LayoutMetrics(constraints.constrain(Size(280.0, 220.0))), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        val angle = startAngle + sweepAngle * props.value / 100.0
+        context
+            .draw { paint ->
+                paint
+                    .canvas
+                    .withState { canvas ->
+                        // Everything below stays inside the rounded card.
+                        canvas.clipPath(card!!)
+                        val shade = Gradient
+                            .linear(
+                                Point(0.0, 0.0),
+                                Point(0.0, 220.0),
+                                [
+                                    GradientStop(0.0, Color(0.17, 0.19, 0.26)),
+                                    GradientStop(1.0, Color(0.06, 0.07, 0.10))
+                                ]
+                            )
+                        canvas.drawRect(Rect(0.0, 0.0, 280.0, 220.0), Paint(gradient = Some(shade)))
+                        // A glow larger than the card; the clip cuts it at the corners.
+                        val glow = Gradient
+                            .radial(
+                                center,
+                                170.0,
+                                [
+                                    GradientStop(0.0, Color(0.30, 0.55, 1.0, 0.45)),
+                                    GradientStop(1.0, Color(0.30, 0.55, 1.0, 0.0))
+                                ]
+                            )
+                        canvas.drawCircle(center, 170.0, Paint(gradient = Some(glow)))
+
+                        canvas
+                            .drawPath(
+                                track!!,
+                                Paint(
+                                    Color.White.withAlpha(0.12),
+                                    PaintingStyle.Stroke,
+                                    14.0,
+                                    StrokeCap.Round
+                                )
+                            )
+                        // The stroke takes its color from a gradient running left to right.
+                        val heat = Gradient
+                            .linear(
+                                Point(center.x - radius, 0.0),
+                                Point(center.x + radius, 0.0),
+                                [
+                                    GradientStop(0.0, Color(0.20, 0.80, 0.45)),
+                                    GradientStop(0.5, Color(0.98, 0.78, 0.20)),
+                                    GradientStop(1.0, Color(0.95, 0.30, 0.25))
+                                ]
+                            )
+                        canvas
+                            .drawPath(
+                                filled!!,
+                                Paint(
+                                    style = PaintingStyle.Stroke,
+                                    strokeWidth = 14.0,
+                                    cap = StrokeCap.Round,
+                                    gradient = Some(heat)
+                                )
+                            )
+
+                        // Ticks: rotate the coordinates instead of computing each end point.
+                        canvas
+                            .withState { ticks ->
+                                ticks.translate(center.x, center.y)
+                                ticks.rotate(startAngle)
+                                val tick = Paint(
+                                    Color.White.withAlpha(0.55),
+                                    PaintingStyle.Stroke,
+                                    2.0
+                                )
+                                for (index in 0..10) {
+                                    val inner = if (index % 5 == 0) radius - 30.0 else radius - 24.0
+                                    ticks
+                                        .drawLine(
+                                            Point(inner, 0.0),
+                                            Point(radius - 16.0, 0.0),
+                                            tick
+                                        )
+                                    ticks.rotate(sweepAngle / 10.0)
+                                }
+                            }
+                        canvas
+                            .withState { hand ->
+                                hand.translate(center.x, center.y)
+                                hand.rotate(angle)
+                                hand.drawPath(needle!!, Paint(Color(0.96, 0.97, 1.0)))
+                            }
+                        canvas.drawCircle(center, 7.0, Paint(Color(0.96, 0.97, 1.0)))
+                    }
+            }
+        context.children()
+    }
+}
+
+class GaugeDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val level = state([62.0])
+
+    public override fun render(): View {
+        val value = this.level.value[0L]
+        val number = label(f"${value.toInt()}") {
+            style {
+                fontSize = Some(26.0)
+                color = Some(Color.White)
+            }
+        }
+        val dial = element(value, { props, mount -> Gauge(props, mount) }, [number])
+        val control = frame(slider(this.level.binding(), RangeSpec(0.0, 100.0, Some(1.0)))) {
+            width = Some(280.0)
+        }
+        val page = column {
+            add(dial)
+            add(control)
+            spacing = 16.0
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Gauge", { scope -> GaugeDemo(scope) })
+    }
+}

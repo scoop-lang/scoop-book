@@ -1,0 +1,106 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+//! dep: scoop:scoop.window:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+import scoop.window.LogicalKey
+import scoop.window.ShortcutChord
+import scoop.window.ShortcutKey
+import scoop.window.ShortcutModifiers
+
+class MenuModel {
+    val open = state(false)
+    val bar = state<ViewKey?>(None)
+    val statusBar = state(true)
+    val appearance = state("System")
+    val result = state("Choose a command")
+}
+
+/** One menu value, shared by the dropdown, the context menu and the menubar. */
+fun fileMenu(model: MenuModel): MenuContent = menu {
+    label(ViewKey.Text("title"), "Project")
+    item(ViewKey.Text("open"), "Open…", { model.result.value = "Open" }) {
+        // Only a label: the shortcut itself is registered elsewhere (chapter 14).
+        shortcut = Some(
+            ShortcutChord(
+                ShortcutKey.Logical(LogicalKey.Character("o")),
+                ShortcutModifiers(primary = true)
+            )
+        )
+    }
+    submenu(
+        ViewKey.Text("share"),
+        "Share",
+        menu {
+            item(ViewKey.Text("link"), "Copy link", { model.result.value = "Link copied" })
+            item(ViewKey.Text("mail"), "Email…", { model.result.value = "Email" })
+        }
+    )
+    separator(ViewKey.Text("sep-1"))
+    checkboxItem(ViewKey.Text("status"), "Show status bar", model.statusBar.binding())
+    label(ViewKey.Text("appearance"), "Appearance")
+    for (name in ["System", "Light", "Dark"])
+        radioItem(ViewKey.Text(name), name, name, model.appearance.binding())
+    separator(ViewKey.Text("sep-2"))
+    item(ViewKey.Text("delete"), "Delete", { model.result.value = "Deleted" }) {
+        destructive = true
+    }
+}
+
+fun helpMenu(model: MenuModel): MenuContent = menu {
+    item(ViewKey.Text("guide"), "User guide", { model.result.value = "User guide" })
+    item(ViewKey.Text("about"), "About", { model.result.value = "About" })
+}
+
+class Menus(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val model = MenuModel()
+
+    public override fun render(): View {
+        val model = this.model
+        val canvas = button("Right-click here", { model.result.value = "Normal click" }) {
+            variant = ButtonVariant.Outline
+            style { surface { padding = Some(Insets.all(32.0)) } }
+        }
+        val page = column {
+            menubar(model.bar.binding()) {
+                menu(ViewKey.Text("file"), "File", fileMenu(model))
+                menu(ViewKey.Text("help"), "Help", helpMenu(model))
+            }
+            row {
+                dropdownMenu(model.open.binding(), fileMenu(model)) {
+                    trigger("Actions")
+                    width = 220.0
+                }
+                contextMenu(canvas, fileMenu(model))
+                spacing = 16.0
+                alignment = CrossAlignment.Center
+            }
+            typography(model.result.value, TypographyRole.P)
+            typography(
+                f"Status bar: ${model.statusBar.value} · Appearance: ${model.appearance.value}",
+                TypographyRole.Muted
+            )
+            spacing = 16.0
+            alignment = CrossAlignment.Start
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Menus", { scope -> Menus(scope) })
+    }
+}

@@ -1,0 +1,71 @@
+//! dep: scoop:scoop.graphics:0.1.0
+//! dep: scoop:scoop.ui:0.1.0
+//! dep: scoop:scoop.ui.component:0.1.0
+//! dep: scoop:scoop.ui.style:0.1.0
+//! dep: scoop:scoop.ui.style.shadcn:0.1.0
+import scoop.graphics.*
+import scoop.ui.*
+import scoop.ui.component.*
+import scoop.ui.style.*
+import scoop.ui.style.shadcn.shadcnTheme
+
+/** Shows only a 120×40 window of its child, with the child shifted left by 10. */
+class Peek(scope: ComponentScope) : Element<Unit>(scope) {
+    public override fun measure(context: MeasureContext, constraints: Constraints): LayoutResult<
+        Unit
+    > {
+        // Unbounded constraints: the child takes its natural size, which may be larger than 120.
+        context.measureChild(0L, Constraints())
+        context.placeChild(0L, Point(0.0, 0.0))
+        return LayoutResult(LayoutMetrics(constraints.constrain(Size(120.0, 40.0))), Unit)
+    }
+
+    public override fun scene(context: SceneContext, layout: Unit) {
+        // A thin outline shows the window itself; it is drawn outside the clipped block.
+        context
+            .draw { paint ->
+                paint
+                    .canvas
+                    .drawRect(
+                        Rect(0.5, 0.5, 119.0, 39.0),
+                        Paint(Color(0.55, 0.55, 0.60), PaintingStyle.Stroke, 1.0)
+                    )
+            }
+        // Clip and translate apply to everything that follows inside the block,
+        // including where the child's input areas end up.
+        context
+            .withState { local ->
+                local.clipRect(Rect(0.0, 0.0, 120.0, 40.0))
+                local.translate(-10.0, 0.0)
+                local.children()
+            }
+    }
+}
+
+class PeekDemo(scope: ComponentScope) : Component(scope) {
+    private val theme = currentThemeSource()
+    private val count = state(0)
+
+    public override fun render(): View {
+        val count = this.count
+        val wide = button(f"Pressed ${count.value} times, a wide button", { count.value += 1 })
+        val page = column {
+            label("The element below shows a 120×40 part of a wider button:")
+            add(element({ mount -> Peek(mount) }, [wide]))
+            label(f"Count: ${count.value}")
+            spacing = 12.0
+        }
+        val background = this.theme.read(scope).tokens.palette.background.background
+        return frame(page) {
+            padding = Some(Insets.all(24.0))
+            alignment = Alignment(AxisAlignment.Start, AxisAlignment.Start)
+            style { background(Some(Paint(background))) }
+        }
+    }
+}
+
+fun main() {
+    context(ThemeSource(shadcnTheme(ThemeMode.Light))) {
+        runUiApplication("Peek", { scope -> PeekDemo(scope) })
+    }
+}
